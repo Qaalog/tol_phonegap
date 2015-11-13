@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <!-- Main menu strings -->
+    <string name="main_menu_option_list">%NULL%</string>
+    <string name="main_menu_option_product_tree">Navegar</string>
+    <string name="main_menu_option_barcode">Código Barras</string>
+    <string name="main_menu_option_near">Perto de Mim</string>
+    <string name="main_menu_option_result_for">%NULL%</string>
+    <string name="main_menu_option_no_result_found_for">%NULL%</string>
+    <string name="main_menu_option_no_data_in_catalog">%NULL%</string>
+
+    <!-- Catalog selection strings -->
+    <string name="catalog_selection_subtitle">Seleccione o catálogo a usar</string>
+    <string name="catalog_selection_favorite_tag">Favoritos</string>
+    <string name="catalog_selection_default_tag">Genéricos</string>
+    <string name="catalog_selection_catalog_info_title">%NULL%</string>
+
+    <!-- Barcode strings -->
+    <string name="barcode_input_info_button">Active a câmara</string>
+    <string name="barcode_input_info_number">ou digite o número</string>
+    <string name="barcode_button_scan_label">%NULL%</string>
+    <string name="barcode_input_no_results">Nenhum resultado encontrado</string>
+
+    <!-- Near products string  -->
+    <string name="product_near_location_off_title">Sem serviço</string>
+    <string name="product_near_location_off_message">Esta funcionalidade requer os serviços de localização activos. Deseja abrir as configurações de localização?</string>
+    <string name="product_near_no_location_message">Não foi possível obter a sua localização :(</string>
+    <string name="product_near_no_results_message">Não existem resultados numa proximidade de %s metros de si :(</string>
+
+    <!-- Product detail strings -->
+    <string name="product_detail_tab_detail_title">Detalhe</string>
+    <string name="product_detail_tab_related_title">Relacionados</string>
+
+    <!-- Groups -->
+    <string name="groups_group_by_title">%NULL%</string>
+
+    <!-- Favorite products string  -->
+    <string name="product_fav_empty_message">A lista dos favoritos está vazia.</string>
+
+    <!-- Menu -->
+    <string name="menu_sort_asc_title">Ordenar A-Z</string>
+    <string name="menu_sort_desc_title">Ordenar Z-A</string>
+    <string name="menu_favorites">Favoritos</string>
+    <string name="menu_list_view">%NULL%</string>
+    <string name="menu_gallery_view">%NULL%</string>
+    <string name="menu_catalog_info">%NULL%</string>
+    <string name="menu_change_catalog">%NULL%</string>
+    <string name="menu_share">Partilhar</string>
+
+    <!-- Messages -->
+    <string name="messages_nothing_found">Não existem resultados</string>
+
+    <!-- Network strings -->
+    <string name="network_generic_no_network_title">Rede indisponível</string>
+    <string name="network_generic_no_network_message">Por favor verifique a sua ligação à rede.</string>
+    <string name="network_generic_loading_message">A carregar dados ...</string>
+    <string name="network_generic_error_title">Erro de rede</string>
+    <string name="network_generic_timeout_title">Timeout de rede</string>
+    <string name="network_generic_app_error_message">Lamentamos mas ocorreu um fenómeno do Entroncamento :(</string>
+    <string name="network_generic_timeout_message">Por favor verifique a sua ligação à internet e tente novamente.</string>
+    <string name="network_generic_error_message">Verifique a sua ligação à internet.</string>
+    <string name="network_generic_error_button_ok">OK</string>
+
+</resources>

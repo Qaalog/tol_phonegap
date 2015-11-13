@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>	
+	<!-- iOS specific location strings -->
+	<string name="NSLocationWhenInUseUsageDescription">Qaalog needs your location in order to provide NEAR ME functionality</string>
+	<string name="NSLocationAlwaysUsageDescription">Qaalog needs your location in order to provide NEAR ME functionality</string>
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <!-- Main menu strings -->
+    <string name="main_menu_option_list">List</string>
+    <string name="main_menu_option_product_tree">Browse</string>
+    <string name="main_menu_option_barcode">Barcode</string>
+    <string name="main_menu_option_near">Near me</string>
+    <string name="main_menu_option_result_for">Result for</string>
+    <string name="main_menu_option_no_result_found_for">No results found for</string>
+    <string name="main_menu_option_no_data_in_catalog">Sorry, there are no data in the catalog</string>
+
+    <!-- Catalog selection strings -->
+    <string name="catalog_selection_subtitle">Select catalog to use</string>
+    <string name="catalog_selection_favorite_tag">Favorites</string>
+    <string name="catalog_selection_default_tag">Generic</string>
+    <string name="catalog_selection_catalog_info_title">Catalog Information</string>
+
+    <!-- Barcode strings -->
+    <string name="barcode_input_info_button">Press scan button</string>
+    <string name="barcode_input_info_number">or type barcode number</string>
+    <string name="barcode_button_scan_label">scan</string>
+    <string name="barcode_input_no_results">No results found</string>
+
+    <!-- Near products string  -->
+    <string name="product_near_location_off_title">No service</string>
+    <string name="product_near_location_off_message">This functionality requires location services on. Would you like to open location settings?</string>
+    <string name="product_near_no_location_message">Couldn't get your location :(</string>
+    <string name="product_near_no_results_message">Nothing found in a vicinity of %s meters from you :(</string>
+
+    <!-- Product detail strings -->
+    <string name="product_detail_tab_detail_title">Detail</string>
+    <string name="product_detail_tab_related_title">Related</string>
+
+    <!-- Groups -->
+    <string name="groups_group_by_title">Group by</string>
+
+    <!-- Favorite products string  -->
+    <string name="product_fav_empty_message">Your favorites list is empty.</string>
+
+    <!-- Menu -->
+    <string name="menu_sort_asc_title">Sort A-Z</string>
+    <string name="menu_sort_desc_title">Sort Z-A</string>
+    <string name="menu_favorites">Favorites</string>
+    <string name="menu_list_view">List view</string>
+    <string name="menu_gallery_view">Gallery view</string>
+    <string name="menu_catalog_info">Catalog information</string>
+    <string name="menu_change_catalog">Change catalog</string>
+    <string name="menu_share">Share</string>
+
+    <!-- Messages -->
+    <string name="messages_nothing_found">Nothing found</string>
+
+    <!-- Network strings -->
+    <string name="network_generic_no_network_title">Network unavailable</string>
+    <string name="network_generic_no_network_message">Please check your network settings.</string>
+    <string name="network_generic_loading_message">Loading data ...</string>
+    <string name="network_generic_error_title">Network error</string>
+    <string name="network_generic_timeout_title">Network timeout</string>
+    <string name="network_generic_app_error_message">Something went wrong while fetching data.</string>
+    <string name="network_generic_timeout_message">Check you internet connection and try again.</string>
+    <string name="network_generic_error_message">Check you internet connection and try again</string>
+    <string name="network_generic_error_button_ok">OK</string>
+
+</resources>

@@ -1,0 +1,111 @@
+<div class="container" id="givePoints_container">
+	<div class="give-points-box">
+		<div class="user-posted">
+	    <div class="image-wrap" ng-fast-touch="showPictureInLightBox(params.from_product_image || params.image_url)">
+	      <div class="img-middle-wrap">
+	        <div class="img-inner-wrap">
+	          <img class="img" 
+                   ng-src="{{ (params.from_product_image || params.image_url) ? imgPrefix + (params.from_product_image || params.image_url) + imgSuffix : 'img/default-staff.png'}}">
+	        </div>
+	      </div>
+	    </div>
+	    <div class="user-title">
+	      <div class="feed-title"><span class="user-name">{{params.from_product_name || params.name || 'Anonymous user'}}</span> is just</div>
+	    </div>
+<!--	    <div class="user-menu t-icon_menu" ng-show="product.id*1 === feedItem.from_product_id*1" ng-fast-touch="userMenuShow(feedItem)"></div>-->
+	  </div>
+	  <div class="points-block blocks-{{markCount}}">
+        <div class="points-col col-1" ng-fast-touch="setMark(0)" ng-class="{active: (mark === 0)}">
+	  		<span class="t-icon_point"></span>
+	  		<div class="points-name">{{categoryConfig[0]['point_values'][0].name}}</div>
+	  	</div>
+	  	<div class="points-col col-2" ng-fast-touch="setMark(1)" ng-class="{active: (mark === 1)}">
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<div class="points-name">{{categoryConfig[0]['point_values'][1].name}}</div>
+	  	</div>
+	  	<div class="points-col col-3" ng-fast-touch="setMark(2)" ng-class="{active: (mark === 2)}">
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<div class="points-name">{{categoryConfig[0]['point_values'][2].name}}</div>
+	  	</div>
+	  	<div class="points-col col-4" ng-fast-touch="setMark(3)" ng-class="{active: (mark === 3)}">
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<div class="points-name">{{categoryConfig[0]['point_values'][3].name}}</div>
+	  	</div>
+	  	<div class="points-col col-5" ng-fast-touch="setMark(4)" ng-class="{active: (mark === 4)}">
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<span class="t-icon_point"></span>
+	  		<div class="points-name">{{categoryConfig[0]['point_values'][4].name}}</div>
+	  	</div>
+	  	<div class="text-center on">on</div>
+	  </div>
+	  <div class="point-cat-block" ng-class="{'five': (categoryCount === 5), 'three': (categoryCount === 3), 'one': (categoryCount === 1)}">
+	  	<div class="cat-box" 
+             ng-fast-touch="setCategory(0)" 
+             ng-hide="categoryCount < 1"
+             ng-class="{active: (category === 0)}">
+          <span class="cat-name"><span class="q-icon_category_1 cat-icon"></span>{{categoryConfig[0].long_name}}</span>
+        </div>
+	  	<div class="cat-box" 
+             ng-fast-touch="setCategory(1)" 
+             ng-hide="categoryCount < 2"
+             ng-class="{active: (category === 1)}">
+          <span class="cat-name"><span class="q-icon_category_2 cat-icon"></span>{{categoryConfig[1].long_name}}</span>
+        </div>
+	  	<div class="cat-box" 
+             ng-fast-touch="setCategory(2)" 
+             ng-hide="categoryCount < 3"
+             ng-class="{active: (category === 2)}">
+          <span class="cat-name"><span class="q-icon_category_3 cat-icon"></span>{{categoryConfig[2].long_name}}</span>
+        </div>
+	  	<div class="cat-box" 
+             ng-fast-touch="setCategory(3)" 
+             ng-hide="categoryCount < 4"
+             ng-class="{active: (category === 3)}">
+          <span class="cat-name"><span class="q-icon_category_4 cat-icon"></span>{{categoryConfig[3].long_name}}</span>
+        </div>	
+	  	<div class="cat-box" 
+             ng-fast-touch="setCategory(4)" 
+             ng-hide="categoryCount < 5"
+             ng-class="{active: (category === 4)}">
+          <span class="cat-name"><span class="t-icon_category_4 cat-icon"></span>{{categoryConfig[4].long_name}}</span>
+        </div>	  	
+	  </div>
+	  <div class="to-remember share create">
+      
+      <div class="custom-checkbox" id="pointPost" ng-fast-touch="toggleCheckBox($event)" ng-show="params.pointsForPost">
+			<div class="switcher"></div>
+			</div>
+        <div class="to-remember-label">Create a new post</div>
+    </div>
+    <div class="write-post">
+      <textarea class="write-post-text" 
+                id="givePoints_textarea"
+                placeholder="Anything to say about this?" 
+                ng-disabled="!isCreatePost" 
+                ng-change="validate()"
+                ng-focus="preScroll()"
+                ng-blur="abortPreScroll()"
+                ng-model="postBody.message"></textarea>
+    </div>
+    <div class="add-photo-wrap text-center" id="givePoits_add_photo" ng-fast-touch="addPhoto()">
+    	<div class="add-photo-btn" id="add-photo-btn" ng-class="{'active': isCreatePost}"><span class="t-icon_photo"></span>Add photo</div>
+    	<div class="added-wrap added" id="givePoits_photo_wrap" style="display:none;">
+    		<img id="givePoits_photo" class="img" src="http://www.apicius.es/wp-content/uploads/2012/07/IMG-20120714-009211.jpg">
+    	</div>
+    </div>
+    <div class="text-center needs-to">
+      <strong>{{params.from_product_name || params.name || 'Anonymous user'}}</strong> needs <strong>
+        {{ mostDesired.left + ((mostDesired.left != 1) ? ' points' : ' point') }}</strong> 
+      for Level {{mostDesired.level}} on {{mostDesired.name}}
+    </div>
+	</div>	
+</div>

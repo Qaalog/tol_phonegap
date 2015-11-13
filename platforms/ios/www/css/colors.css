@@ -1,0 +1,94 @@
+body {
+	background: #ededed;
+	color: #000;
+}
+.search-wrap,
+.barcode-wrap button,
+.header,
+.statusbar {background: #4bbee1;}
+.top-wrap span {color: #0498ba;}
+.title, 
+.in-group span, 
+.prod-titles h2,
+.barcode-wrap button,
+.statusbar,
+.control-nav li,
+.control-nav-screen li,
+.gallery-wrap .close {color: #fff;}
+.category-title {
+	background: #33a9cd;
+	color: #fff;
+}
+.to-favorite {color: #1ea0c8;}
+.cat-organisation {color: #33a9cd;}
+.cat-description,
+.prod-desc li,
+.prod-desc li:first-child span,
+.prod-desc li a {color: #868686;}
+.opened .category-title,
+.group-box .category-title {
+	background: #fff;
+	color: #1ea0c8;
+}
+.tag-box li {color: #9ce2f2;}
+.tag-box li.active {
+	color: #fff;
+	border-color: #e1265d;
+}
+.products, 
+.search-tips, 
+.prod-details, 
+.item-related,
+.menu-wrap,
+.item-browse,
+.subitem-browse,
+.grouped-prod-wrap,
+.title.expanded .image-wrap,
+.image-wrapper,
+.category .image-wrapper,
+.list-view .products .middle-wrap,
+.barcode-wrap .input-wrap .search-close {background: #fff;}
+.in-group .corner {border-right-color: #26bc30;}
+.list-view .in-group {background: #26bc30;}
+.tag-box {
+	background: #4abde0;
+    color: #fff;
+}
+input.search {background: #c2e2ef;}
+.search-wrap:before, 
+.search-close {color: #38a2c6;}
+.search-item:before, 
+.menu-wrap li:before,
+.control-nav-screen li.active,
+.control-nav li.active,
+.barcode-wrap .search-item span {color: #4bbee1;}
+.search-result-title {color: #9a9a9a;}
+.prod-titles h3 {color: #b4b4b4;}
+.prod-desc i.q-icons-non-favorite:before {color: #f00;}
+.prod-desc i.q-icons-price:before {color: #00aa08;}
+.prod-desc .nearme:before {color: #3c61d6;}
+.prod-name .group-name, 
+.prod-desc li span, 
+.prod-desc li i:before,
+.item-browse.opened span,
+.item-browse.opened,
+.subitem-browse.opened span,
+.subitem-browse.opened,
+.catalog-name {color: #0a9bc8;}
+.prod-desc li {border-color: #ddd;}
+.menu-wrap ul {border-color: #e0e0e0;}
+.item-browse span,
+.subitem-browse span {color: #000;}
+.subitem-browse {color: #787878;}
+.group-title {
+	color: #9ce2f2;
+	background: #4bbee1;
+}
+.list-view .in-group .corner {border-left-color: #26bc30;}
+.about-content p {color: #7c7c7c;}
+.barcode-wrap .scan {background: #aaa;}
+.barcode-wrap .scan h2,
+.catalog-title {background: #ededed;}
+.barcode-wrap h2,
+.barcode-wrap .scan .result,
+.catalog-title {color: #505050;}

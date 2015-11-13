@@ -1,0 +1,43 @@
+<div class="login-page fixed-screen">
+	<div class="color-scheme">
+		<div class="login-container">
+			<div class="logo text-center">Team<span class="logo-second-part"><span class="t-icon_point"></span>utLoud</span></div>
+			<input type="email" 
+                   class="login-input" 
+                   placeholder="Username" 
+                   ng-model="auth.login" 
+                   ng-keypress="onEnter($event,auth)">
+			<input type="password" 
+                   class="login-input password" 
+                   placeholder="Password" 
+                   ng-model="auth.password" 
+                   ng-keypress="onEnter($event,auth)">
+			<div class="to-remember">
+				
+				<div class="custom-checkbox" id="remember_me" ng-fast-touch="toggleCheckBox($event)">
+					<div class="switcher"></div>
+				</div>
+              <div class="to-remember-label">Remember Me</div>
+			</div>
+			<button class="login-submit text-center" ng-fast-touch="login(auth)">login</button>
+			<div class="forgot-pass-btn text-center" ng-fast-touch="openForgotPass()">Forgot Password</div>
+		</div>
+		<div class="popup-block fixed-screen" 
+         ng-class="{show: isForgotPassShow}"
+         ng-fast-touch="closeForgotPass($event)">
+			<div class="white-box forgot-test">
+				<div class="login-container text-center">
+					<h1 class="white-box-title">Forgot your password?</h1>
+					<div class="white-box-desc">Enter your company email and we will send you a new password.</div>
+					<input class="white-box-input"
+                       ng-focus="changeForgotPassPosition(true)"
+                       ng-blur="changeForgotPassPosition(false)"
+                       ng-model="forgotEmail"
+                       type="email" 
+                       placeholder="Username">
+				</div>
+				<button class="light-btn text-center" ng-fast-touch="resetPassword(forgotEmail)">request now</button>
+			</div>
+		</div>
+	</div>
+</div>

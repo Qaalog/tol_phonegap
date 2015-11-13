@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="post-box">
+    <div class="write-post-header">
+      <div class="image-wrap" ng-fast-touch="showPictureInLightBox(userAvatar)">
+        <div class="img-middle-wrap">
+          <div class="img-inner-wrap">
+            <img class="img" 
+                 ng-src="{{(userAvatar) ? imgPrefix + userAvatar + imgSuffix : 'img/default-staff.png'}}">
+          </div>
+        </div>
+      </div>
+      <div class="write-post">
+        <textarea class="write-post-text" placeholder="Say something about this" ng-change="validatePost()" ng-model="postBody.message"></textarea>
+      </div>      
+    </div>
+    <div id="post_preview_wrap" class="add-photo" ng-class="{added: postBody['media_data']['content'] || isEdit}" ng-fast-touch="addPhoto()">
+      <div class="add-photo-label text-center">
+        <span class="t-icon_photo"></span>
+        <div>Add photo</div>
+      </div>
+      <img class="img" id="post_preview_img" style="display:none;">    
+    </div>
+    <div class="to-remember share" ng-hide="isEdit">
+      
+      <div class="custom-checkbox" id="post_switcher" ng-fast-touch="toggleCheckBox($event)">
+        <div class="switcher"></div>
+      </div>
+      <div class="to-remember-label">Share on Facebook</div>
+    </div>
+  </div>
+</div>
+
+<!-- 
+<div style="margin-top: 6em">
+  
+  <div>
+    <img style="height: 50px; width: 50px; border-radius: 50%" ng-src="{{userAvatar}}">
+    <input style="font-size: 2em;" type="text" ng-model="postBody.message"/>
+  </div>
+  
+  <div style="margin-top: 2em; text-align: center" id="post_preview_wrap" >
+    <img id="post_preview" 
+         ng-fast-touch="getPictureFromGallery()"
+         style="width: 37em; border: 1px solid black;height: 23em;">
+  </div>
+  
+  <div style="margin-top: 2em; text-align: center">
+    <span style="font-size: 2em;">Share to facebook</span>
+    <input style="height: 2em;width: 2em;font-size: 0.5em;" ng-model="postToFB" type="checkbox" />
+  </div>
+  
+  <div style="margin-top: 2em; text-align: center">
+    <button style="font-size: 3em;" ng-fast-touch="postNow(postToFB)">Post now</button>
+  </div>
+  
+</div> -->

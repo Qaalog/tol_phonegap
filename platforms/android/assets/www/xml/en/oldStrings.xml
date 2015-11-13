@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>	
+	<string name="NSLocationWhenInUseUsageDescription">Qaalog needs your location in order to provide NEAR ME functionality</string>
+	<!-- Main menu strings -->
+	<string name="main_menu_option_product_tree">Browse</string>
+	<string name="main_menu_option_product_search">Search</string>
+	<string name="main_menu_option_favorites">Favorites</string>
+	<string name="main_menu_option_barcode">Barcode</string>
+	<string name="main_menu_option_catalogs">Catalogs</string>
+	<string name="main_menu_option_near">Near me</string>
+	<string name="main_menu_slide_title">MENU</string>	
+	<string name="main_menu_options_title">OPTIONS</string>
+	<!-- Catalog selection strings -->
+	<string name="catalog_selection_title">Catalog selection</string>
+	<string name="catalog_selection_subtitle">Select catalog to use</string>
+	<string name="catalog_selection_selected">Catalog '%s' selected</string>
+	<string name="catalog_selection_add_favorites">Add as favorite</string>
+	<string name="catalog_selection_remove_favorites">Remove from favorites</string>
+	<string name="catalog_selection_more_info">Additional information</string>
+	<string name="catalog_selection_favorite_tag">Favorites</string>
+	<string name="catalog_selection_default_tag">Generic</string>
+	<!-- Product search strings -->
+	<string name="product_search_menu_search_title">SEARCH</string>
+	<string name="product_search_slide_menu_search_options_search_type">Change search type</string>
+	<string name="product_search_menu_sort_asc_title">Sort a>z</string> 
+	<string name="product_search_menu_sort_desc_title">Sort z>a</string> 
+	<string name="product_search_menu_search_options_title">Search type</string> 
+	<string name="product_search_input_hint">Search</string> 
+	<string name="product_search_option_refresh_as_type">Refresh as you type (slow)</string> 
+	<string name="product_search_option_show_product_words">Show product words</string> 
+	<string name="product_search_option_show_product_name">Show product name</string> 
+	<string name="product_search_option_history_only">History only</string> 	
+	<string name="product_search_option_cancel">Cancel</string> 
+	<string name="product_search_no_results">No results</string>	
+	<!-- Favorite products string  -->
+	<string name="product_fav_empty_message">Your favorites list is empty.</string>	
+	<!-- Near products string  -->
+	<string name="product_near_location_off_title">No service</string>
+	<string name="product_near_location_off_message">This functionality requires location services on. Would you like to open location settings?</string>
+	<string name="product_near_no_location_message">Couldn't get your location :(</string>
+	<string name="product_near_no_results_message">Nothing found in a vicinity of %s meters from you :(</string>
+	<!-- Product list strings -->
+    <string name="product_list_no_results_title">No results</string>
+	<string name="product_list_no_results">Your search returned no results :|</string>
+	<string name="product_list_no_results_button_ok">Ok</string>
+	<string name="product_list_load_more">More results</string>
+	<string name="product_list_loading_more">Loading results ...</string>
+	<!-- Product selection strings -->
+	<string name="product_selection_tab_characteristics_title">Characteristics</string>
+	<string name="product_selection_tab_products_title">Products</string>
+	<string name="product_selection_tab_products_select_characteristic">Select a characteristic</string>
+	<!-- Product detail strings -->
+	<string name="product_detail_menu_share_title">Share</string>
+	<string name="product_detail_menu_favorites_title">Favorites</string>
+	<string name="product_detail_menu_like_title">I Love It</string>
+	<string name="product_detail_tab_detail_title">Detail</string>
+	<string name="product_detail_tab_related_title">Related</string>
+	<string name="product_detail_related_see_also">See Also</string>
+	<string name="product_detail_related_similar">Similar</string>
+	<string name="product_detail_title_characteristics">Detail</string>
+	<string name="product_detail_title_media">Pictures</string>
+	<string name="product_detail_related_empty">No related products</string>
+	<string name="product_detail_favorites_title">Favorites</string>
+	<string name="product_detail_favorites_hint">New group name</string>
+	<string name="product_detail_share">Take a look at this: %s\n\r%s</string>
+	<string name="product_detail_favorites_required_message">Specify a group name</string>
+	<string name="product_detail_favorites_group_unable_message">Unable to create group :(</string>
+	<string name="product_detail_favorites_group_created_message">Group created</string>
+	<string name="product_detail_favorites_group_existed_message">Group existed, product associated</string>
+	<string name="product_detail_favorites_group_already_associated_message">Producted already associated</string>
+	<string name="product_detail_share_text">{name} | {supplier} - Via Qaalog\r\nApp iOS: https://itunes.apple.com/app/id928036482\r\nApp Android: https://play.google.com/store/apps/details?id=com.leverage.qaalog</string>
+	<!-- Barcode strings -->
+	<string name="barcode_input_title">Barcode search</string>
+	<string name="barcode_input_hint">Barcode number</string>
+    <string name="barcode_input_info">Type barcode number or press scan button</string>
+    <string name="barcode_input_no_results">No results found</string>
+    <string name="barcode_scan_tips">Scanning tips</string>
+    <string name="barcode_scan_hint">Center barcode and keep camera still. Try several focal distances with good lighting.</string>
+    <string name="barcode_scan_button_cancel">Cancel scan</string>
+    <string name="barcode_scan_button_options">Show options</string>
+    <string name="barcode_scan_results_title">Select barcode</string>
+    <string name="barcode_scan_options_title">Scan configuration</string>   
+    <string name="barcode_scan_options_auto_focus">Autofocus type</string>
+    <string name="barcode_scan_options_image_size">Image size</string>
+    <string name="barcode_scan_options_title">Scan configuration</string>    
+    <string name="barcode_scan_options_button_cancel">Cancel</string>
+	<string name="barcode_scan_options_button_reset">Reset</string>
+	<string name="barcode_scan_options_button_apply">Apply</string>
+	<string name="barcode_scan_options_reseted">Configuration reseted</string>
+	<string name="barcode_scan_options_applied">Configuration changed</string>
+	<string name="barcode_scan_not_found_title">Qaalog barcode scanner</string>
+	<string name="barcode_scan_not_found_message">Scanned code %s (%s) with no matching product</string>
+	<string name="barcode_scan_not_found_button">Ok</string>
+	<string name="barcode_scan_config_error">Unable to change scanner settings :(</string>
+	<!-- Product tree strings -->
+	<string name="product_tree_no_products">-- No products --</string>
+	<!-- Favorites manager strings -->
+	<string name="favorites_manager_tab_favorites_title">Favorites</string>
+	<string name="favorites_manager_tab_products_title">Products</string>
+	<string name="favorites_manager_tab_products_select_group">Select a group</string>
+	<string name="favorites_manager_group_empty">Group empty, add products from the product detail screen</string>
+	<string name="favorites_manager_remove_product_title">Remove favorite</string>
+	<string name="favorites_manager_remove_product_message">Remove selected product from this group?</string>
+	<string name="favorites_manager_remove_product_button_yes">Yes</string>
+	<string name="favorites_manager_remove_product_button_no">No</string>
+	<string name="favorites_manager_remove_product_ok_message">Product removed</string>
+	<string name="favorites_manager_remove_product_error_message">Could not remove product, try again.</string>
+	<string name="favorites_manager_manage_group_title">Manage group %s</string>
+	<string name="favorites_manager_manage_group_button_rename">&#160;Rename</string>
+	<string name="favorites_manager_manage_group_button_remove">&#160;Delete</string>	
+	<string name="favorites_manager_rename_group_title">Rename group</string>
+	<string name="favorites_manager_rename_group_hint">Group name</string>
+	<string name="favorites_manager_rename_group_button_rename">Rename</string>	
+	<string name="favorites_manager_rename_group_button_cancel">Cancel</string>	
+	<string name="favorites_manager_rename_group_ok_message">Group renamed sucessfully</string>	
+	<string name="favorites_manager_rename_group_in_use_message">Group name in use, specify a new one.</string>		
+	<string name="favorites_manager_remove_group_title">Delete group</string>
+	<string name="favorites_manager_remove_group_message">Confirm group delete?</string>
+	<string name="favorites_manager_remove_group_button_remove">Yes</string>	
+	<string name="favorites_manager_remove_group_button_cancel">Cancel</string>	
+	<string name="favorites_manager_remove_group_ok_message">Group deleted sucessfully</string>
+	<!-- Network strings -->
+	<string name="network_generic_no_network_title">Network unavailable</string>
+	<string name="network_generic_no_network_message">Please check your network settings.</string>
+	<string name="network_generic_loading_message">Loading data ...</string>
+	<string name="network_generic_error_title">Network error</string>
+	<string name="network_generic_timeout_title">Network timeout</string>
+	<string name="network_generic_app_error_message">Something went wrong while fetching data.</string>
+	<string name="network_generic_timeout_message">Check you internet connection and try again.</string>
+	<string name="network_generic_error_message">Check you internet connection and try again</string>
+	<string name="network_generic_error_button_ok">OK</string>
+	<!-- Button strings  -->
+	<string name="button_yes_title">Ok</string>
+	<string name="button_no_title">No</string>
+	<!-- Message strings  -->
+	<string name="message_title_ios">Message (%d/%d)</string>
+	<string name="message_title_android">Message (%s/%s)</string>
+</resources>

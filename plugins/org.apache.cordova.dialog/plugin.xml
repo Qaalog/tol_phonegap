@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+           id="org.apache.cordova.dialog"
+      version="1.0.0">
+    <name>AndroidDialog</name>
+    <description>Android dialogs for Cordova</description>
+    <license>MIT</license>
+    <keywords>cordova,dialog</keywords>
+
+    <js-module src="www/dialog.js" name="WebIntent">
+        <clobbers target="AndroidDialog" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="AndroidDialog" >
+                <param name="android-package" value="org.apache.cordova.dialog.AndroidDialog"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/Dialog.java" target-dir="src/org/apache/cordova/dialog" />
+    </platform>
+</plugin>

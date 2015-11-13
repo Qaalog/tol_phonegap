@@ -1,0 +1,55 @@
+<div class="container" id="feed_container">
+  <div class="feed-wrap" id="common_feed">
+    <div class="feed-box post-root"
+         ng-repeat="feedItem in feedItems" 
+         ng-fast-touch="selectFeedItem(feedItem)"
+         ng-class="{'ios':isIOS()}">
+      <div class="user-posted this-user" ng-fast-touch="showUserPosts(feedItem)">
+        <div class="image-wrap" ng-fast-touch="showPictureInLightBox(feedItem.from_product_image)">
+          <div class="img-middle-wrap">
+            <div class="img-inner-wrap">
+              <img class="img" 
+                   ng-src="{{::(feedItem.from_product_image) ?  imgPrefix + feedItem.from_product_image + imgSuffix : 'img/default-staff.png'}}">
+            </div>
+          </div>
+        </div>
+        <div class="user-title">
+          <div class="feed-title"><span class="user-name">{{::feedItem.from_product_name || 'Anonymous user'}}</span> published a new post</div>
+          <div class="time-published">{{::getPostAge(feedItem)}} - {{hotelName}}</div>
+        </div>
+        <div class="user-menu t-icon_menu" ng-show="::product.id*1 === feedItem.from_product_id*1" ng-fast-touch="userMenuShow(feedItem,$index)"></div>
+      </div>
+      <div class="post-box">
+        <h2 class="post-title" ng-bind-html="::getHtml(feedItem.message)"></h2>
+        <div class="points-wrap">
+          <div class="you-gave" 
+               ng-hide="::product.id*1 === feedItem.from_product_id*1 || !feedItem['my_points'] || feedItem['my_points'] == 0">
+               {{::'You gave ' + (feedItem['my_points'] || 0) + ((feedItem['my_points'] == 1) ? ' point' : ' points')}}
+          </div>
+          <div class="give" 
+               ng-fast-touch="givePoints(feedItem)"
+               ng-hide="::product.id*1 === feedItem.from_product_id*1 || feedItem['my_points']">
+            <span class="t-icon_point"></span>Give
+          </div>
+          <div class="post-img-wrap" ng-image-loader="img/tol_loader_gr_wh.gif">
+            <img class="img"
+                 onerror="app.onImgError(this)"
+                 ng-fast-touch="showPictureInLightBox(feedItem.media_url)"
+                 ng-src="{{::feedItem.media_url}}">
+          </div>
+        </div>
+        <div class="post-info" ng-fast-touch="showWhoGivePoints(feedItem)">
+          <div class="points left"><span class="t-icon_point"></span>This post has 
+            <strong>{{:: (feedItem.points || 0) + ((feedItem.points == 1) ? ' point' : ' points')}}</strong> 
+            so far
+          </div>
+          <div class="fb-share right" 
+               ng-show="::product.id*1 === feedItem.from_product_id*1"
+               ng-fast-touch="showShareMenu(feedItem)">
+            <span class="t-icon_link_fb"></span>Share
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

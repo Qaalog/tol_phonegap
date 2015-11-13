@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html ng-strict-di>
+    <head>
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+        <link rel="stylesheet" type="text/css" href="css/styles.css">
+        <link rel="stylesheet" type="text/css" href="css/colors.css">
+        
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/lib/angular.min.js"></script>
+        
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/lib/BrowsTree.js"></script>
+        
+        <!-- Config -->
+        <script type="text/javascript" src="js/config/config.js"></script>
+        
+        <!-- Controllers -->
+        <script type="text/javascript" src="js/controller/main.js"></script>
+        <script type="text/javascript" src="js/controller/menu.js"></script>
+        <script type="text/javascript" src="js/controller/catalog.js"></script>
+        <script type="text/javascript" src="js/controller/products.js"></script>
+        <script type="text/javascript" src="js/controller/productDetail.js"></script>
+        <script type="text/javascript" src="js/controller/productCharacteristics.js"></script>
+        <script type="text/javascript" src="js/controller/groups.js"></script>
+        <script type="text/javascript" src="js/controller/groupDetail.js"></script>
+        <script type="text/javascript" src="js/controller/browseProduct.js"></script>
+        <script type="text/javascript" src="js/controller/catalogInfo.js"></script>
+        <script type="text/javascript" src="js/controller/barcodeScan.js"></script>
+
+        <!-- Directives -->
+        <script type="text/javascript" src="js/directive/ngSection.js"></script>
+        <script type="text/javascript" src="js/directive/touchMethods.js"></script>
+        <script type="text/javascript" src="js/directive/ngToggleList.js"></script>
+        <script type="text/javascript" src="js/directive/ngRender.js"></script>
+        <script type="text/javascript" src="js/directive/ngSwipeHeader.js"></script>
+        <script type="text/javascript" src="js/directive/ngCntHeight.js"></script>
+
+        <!-- Services -->
+        <script type="text/javascript" src="js/service/page.js"></script>
+        <script type="text/javascript" src="js/service/network.js"></script>
+        <script type="text/javascript" src="js/service/device.js"></script>
+        <script type="text/javascript" src="js/service/httpAdapter.js"></script>
+        <script type="text/javascript" src="js/service/search.js"></script>
+        <script type="text/javascript" src="js/service/menu.js"></script>
+        <script type="text/javascript" src="js/service/pager.js"></script>
+        <script type="text/javascript" src="js/service/share.js"></script>
+                
+        <title>Qaalog</title>
+    </head>
+    <body ng-controller="main">
+      <div class="search-background"
+           style="position: absolute; top:0;left:0;bottom:0;right:0;background: rgba(0,0,0,0.5);z-index:1;"
+           ng-fast-touch="stopBlurSearching();searchModel.value = '';"
+           ng-show="isSearchPanelVisiable"></div>
+      <header class="header" ng-swipe-header ng-class="{'ios':isIOS()}" ng-hide="headerIsHidden">
+        <div class="top-wrap" id="top-wrap">
+          <div class="back-btn-trigger" ng-fast-touch="onBack()" ng-show="canBack"></div>
+          <span class="back-btn q-icons-back" ng-fast-touch="onBack()" ng-show="canBack"></span>
+          <span class="search-btn q-icons-search" ng-show="canSearch"></span>
+          <span class="share-btn q-icons-share" ng-fast-touch="share()" ng-show="canShare"></span>
+          <span class="menu-btn q-icons-menu" ng-fast-touch="showMenu()" ng-show="menuAvailable"></span>
+          <h1 class="title" ng-class="{'expanded':isHeaderExtended && !resultVisiable,'ios':isIOS()}" ng-fast-touch="goToCatalogInfo()">
+            <div class="image-wrap">
+                <img onerror="app.onImgError(this)" ng-src="{{imgPrefix + extendedImage + imgSufix}}" alt="">
+            </div>
+            {{title}}
+          </h1>
+          <ul class="tag-box" ng-show="tabsAvailable && !resultVisiable && !isSearchPanelVisiable">
+            <li ng-class="{'active':activeView[tab.name]}" 
+                ng-style="{'width': 100/tabs.length+'%'}"
+                ng-repeat="tab in tabs"
+                ng-fast-touch="changeView(tab.name)">{{tab.value.toUpperCase()}}</li> 
+          </ul>
+          <h3 class="group-title" ng-show="isGroupTitleVisiable">{{groupTitle}}</h3>
+        </div>
+        
+      </header>
+
+      <div ng-hide="isLoaded" style="position: fixed; top: 0; left: 0; bottom:0;right:0;background: #ededed; z-index: 9999"></div>
+
+      <div ng-hide="isStatusbarHidden" ng-class="{'statusbar':isIOS()}"></div>
+      <div class="search-wrap" ng-class="{'ios':isIOS(), 'hidden': !isSearchPanelVisiable}" ng-show="canSearch">
+            <input type="text" 
+                   class="search"
+                   id="search-input"
+                   ng-model="searchModel.value" 
+                   ng-change="onSearchChange()"
+                   ng-focus="onSearchInputFocus()"
+                   ng-keypress="onSearch($event)"
+                   />
+            <span class="search-close q-icons-close-search"
+                  ng-class="{'hidden': !isSearchPanelVisiable}"
+                  ng-fast-touch="stopBlurSearching(searchModel.value);searchModel.value = '';onSearchChange();"></span>
+            <div ng-show="tips[0]" class="search-tips">
+              <div ng-repeat="tip in tips" 
+                   class="search-item"
+                   ng-fast-touch="completeSearchValue(tip.t)">
+                {{tip.t}}
+              </div>
+            </div>
+          </div>
+      <h2 class="catalog-title" ng-class="{'ios':isIOS()}"
+          ng-show="!noResultVisiable && currentPage === 'catalog' && catalogTitleVisiable">{{selectionTitle}}</h2>
+      <div class="loader" ng-show="isLoaderVisiable"></div> 
+      <div class="content-wrapper" ng-style="scrollType">
+        <div class="container" ng-class="{'expanded':isHeaderExtended && !resultVisiable,'ios':isIOS()}">
+          <div class="barcode-wrap" ng-show="noResultVisiable && !isLoaderVisiable" ng-fast-touch="onNoResultClick()">
+            <div class="result">
+              <h2>{{noResultText}}</h2>
+            </div> 
+          </div>
+          
+          <div class="search-result-title" ng-show="resultVisiable && !noResultVisiable">{{resultsTitle}} '{{searchModel.value}}': {{searchModel.count}}</div>
+          <div ng-section="partial/menu.html" ctrl-name="menu" ng-show="activePage['menu']"></div>
+          <div ng-section="partial/catalog.html" ctrl-name="catalog" ng-show="activePage['catalog']"></div>
+          <div ng-section="partial/products.html" ctrl-name="products" ng-show="activePage['products']"></div>
+          <div ng-section="partial/productDetail.html" ctrl-name="productDetail" ng-show="activePage['productDetail']"></div>
+          <div ng-section="partial/groups.html" ctrl-name="groups" ng-show="activePage['groups']"></div>
+          <div ng-section="partial/groupDetail.html" ctrl-name="groupDetail" ng-show="activePage['groupDetail']"></div>
+          <div ng-section="partial/browseProduct.html" ctrl-name="browseProduct" ng-show="activePage['browseProduct']"></div>
+          <div ng-section="partial/catalogInfo.html" ctrl-name="catalogInfo" ng-show="activePage['catalogInfo']"></div>
+          <div ng-section="partial/barcodeScan.html" ctrl-name="barcodeScan" ng-show="activePage['barcodeScan']"></div>
+        </div>
+      </div>
+      
+
+    </body>
+</html>

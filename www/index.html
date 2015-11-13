@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html ng-strict-di>
+    <head>
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+        <link rel="stylesheet" type="text/css" href="css/styles.css">
+        <link rel="stylesheet" type="text/css" href="css/colors.css">
+        
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/lib/angular.min.js"></script>
+        
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/lib/BrowsTree.js"></script>
+        <script type="text/javascript" src="js/lib/openfb.js"></script>
+        
+        <!-- Config -->
+        <script type="text/javascript" src="js/config/config.js"></script>
+        
+        <!-- Controllers -->
+        <script type="text/javascript" src="js/controller/main.js"></script>
+        <script type="text/javascript" src="js/controller/login.js"></script>
+        <script type="text/javascript" src="js/controller/facebookLink.js"></script>
+        <script type="text/javascript" src="js/controller/menu.js"></script>
+        <script type="text/javascript" src="js/controller/catalog.js"></script>
+        <script type="text/javascript" src="js/controller/feed.js"></script>
+        <script type="text/javascript" src="js/controller/post.js"></script>
+        <script type="text/javascript" src="js/controller/profile.js"></script>
+        <script type="text/javascript" src="js/controller/changePassword.js"></script>
+        <script type="text/javascript" src="js/controller/searchPage.js"></script>
+        <script type="text/javascript" src="js/controller/ranking.js"></script>
+        <script type="text/javascript" src="js/controller/fullList.js"></script>
+        <script type="text/javascript" src="js/controller/givePoints.js"></script>
+        <script type="text/javascript" src="js/controller/chart.js"></script>
+        <script type="text/javascript" src="js/controller/sql.js"></script>
+       
+
+        <!-- Directives -->
+        <script type="text/javascript" src="js/directive/ngSection.js"></script>
+        <script type="text/javascript" src="js/directive/touchMethods.js"></script>
+        <script type="text/javascript" src="js/directive/ngRender.js"></script>
+        <script type="text/javascript" src="js/directive/ngCntHeight.js"></script>
+        <script type="text/javascript" src="js/directive/ngImageLoader.js"></script>
+
+        <!-- Services -->  
+        <script type="text/javascript" src="js/service/page.js"></script>
+        <script type="text/javascript" src="js/service/network.js"></script>
+        <script type="text/javascript" src="js/service/device.js"></script>
+        <script type="text/javascript" src="js/service/httpAdapter.js"></script>
+        <script type="text/javascript" src="js/service/search.js"></script>
+        <script type="text/javascript" src="js/service/menu.js"></script>
+        <script type="text/javascript" src="js/service/pager.js"></script>
+        <script type="text/javascript" src="js/service/facebook.js"></script>
+        <script type="text/javascript" src="js/service/dialog.js"></script>
+        <script type="text/javascript" src="js/service/header.js"></script>
+        <script type="text/javascript" src="js/service/feed.js"></script>
+        <script type="text/javascript" src="js/service/userService.js"></script>
+        <script type="text/javascript" src="js/service/imageUpload.js"></script>
+        <script type="text/javascript" src="js/service/pager.js"></script>
+        <script type="text/javascript" src="js/service/lightbox.js"></script>
+                
+        <title>Team Out Loud</title>
+    </head>
+    <body ng-class="{'ios':isIOS()}" ng-controller="main">
+
+      <header class="header" ng-hide="headerIsHidden">
+        <h1 class="title text-center" ng-class="{'ios':isIOS()}">{{title}}</h1>
+        <div class="search-wrap " ng-class="{'ios':isIOS(), 'small': smallSearch}" ng-show="canSearch">
+          <span class="search-icon t-icon_search"></span>
+          <input type="text" 
+                 class="search"
+                 id="search-input"
+                 placeholder="Search"
+                 ng-model="searchModel.value" 
+                 ng-change="onSearchChange(searchModel.value)"
+                 ng-focus="onSearchInputFocus()"
+                 ng-blur="onSearchInputBlur()"
+                 ng-keypress="onSearch($event)"
+                 />
+        </div>
+
+        <div class="option org-icon" 
+             ng-show="canChart" 
+             ng-fast-touch="goToChart()"
+             ng-class="{active: chartActive}"><span class="t-icon_org_chart"></span></div>
+        <div class="option cancel" ng-show="canCancel" ng-fast-touch="onBack()">Cancel</div>
+        <div class="option post-now" ng-class="{disabled: !isPostEnabled}" ng-show="canPost" ng-fast-touch="postNow()">Post now</div>
+        <div class="option save" ng-class="{disabled: !isSaveEnabled}" ng-show="canSave" ng-fast-touch="save()">Save</div>
+        <div class="option back" ng-fast-touch="onBack()" ng-show="canBack"><span class="t-icon_arrow_left"></span>Back</div>
+        <div class="option small-back" ng-fast-touch="onBack()" ng-show="canSmallBack"><span class="t-icon_arrow_left"></span></div>
+        <div class="option doit" ng-show="canDoIt" ng-fast-touch="onDoIt()" ng-class="{disabled: !isDoItEnabled}">Do it!</div>
+
+        <!-- User Profile Header -->
+        <div class="profile-head-wrap" ng-show="profileHeaderShow">
+          <div class="profile-header">
+            <div class="profile-user">
+              <div class="image-wrap" id="avatar_wrap" ng-fast-touch="changeAvatar(product)">
+                <div class="img-middle-wrap">
+                  <div class="img-inner-wrap">
+                    <img class="img"
+                         id="avatar_img"
+                         ng-src="{{(product.image_url) ? imgPrefix + product.image_url + imgSuffix : 'img/default-staff.png'}}">
+                  </div>
+                </div>
+              </div>
+              <div class="profile-title">
+                <div class="user-name">{{product.name}}</div>
+                <div class="user-position">{{product.header_name}}</div>
+              </div>
+            </div>
+            <div class="tab-header">
+              <div class="tab-title" 
+                   ng-fast-touch="onProfileTabTouch(tab)"
+                   ng-class="{active: tab.isActive}" 
+                   style="{{'width: '+ (100 / profileTabs.length) + '%;'}}" 
+                   ng-repeat="tab in profileTabs">
+                {{tab.title}}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Ranking Tab Header -->
+        <div class="ranking-head-wrap" ng-show="rankingHeaderShow">
+          <div class="ranking-header">
+            <div class="tab-header">
+              <div class="tab-title active">This month</div>
+              <div class="tab-title">Year to date</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Statusbar -->
+      <div ng-hide="isStatusbarHidden" ng-class="{'statusbar':isIOS()}"></div>
+      
+      <!-- Loader -->
+      <div class="loader full-cover" id="loader" ng-show="isLoaderVisiable" ng-hold-touch="hideLoader()"></div>
+      
+      <div ng-section="partial/login.html" ctrl-name="login" ng-show="activePage['login']" class="page_section"></div>
+      <div ng-section="partial/facebookLink.html" ctrl-name="facebookLink" ng-show="activePage['facebookLink']" class="page_section"></div>
+      <div class="content-wrapper" ng-style="scrollType">
+          
+          <div ng-section="partial/menu.html" ctrl-name="menu" ng-show="activePage['menu']" class="page_section"></div>
+          <div ng-section="partial/catalog.html" ctrl-name="catalog" ng-show="activePage['catalog']" class="page_section"></div>
+          <div ng-section="partial/feed.html" ctrl-name="feed" ng-show="activePage['feed']" class="page_section"></div>
+          <div ng-section="partial/post.html" ctrl-name="post" ng-show="activePage['post']" class="page_section"></div>
+          <div ng-section="partial/profile.html" ctrl-name="profile" ng-show="activePage['profile']" class="page_section"></div>
+          <div ng-section="partial/changePassword.html" ctrl-name="changePassword" ng-show="activePage['changePassword']" class="page_section"></div>
+          <div ng-section="partial/searchPage.html" ctrl-name="searchPage" ng-show="activePage['searchPage']" class="page_section"></div>
+          <div ng-section="partial/ranking.html" ctrl-name="ranking" ng-show="activePage['ranking']" class="page_section"></div>
+          <div ng-section="partial/fullList.html" ctrl-name="fullList" ng-show="activePage['fullList']" class="page_section"></div>
+          <div ng-section="partial/givePoints.html" ctrl-name="givePoints" ng-show="activePage['givePoints']" class="page_section"></div>
+          <div ng-section="partial/chart.html" ctrl-name="chart" ng-show="activePage['chart']" class="page_section"></div>
+          <div ng-section="partial/sql.html" ctrl-name="sql" ng-show="activePage['sql']" class="page_section"></div>
+
+      </div>
+
+
+      <!-- Facebook Share Post -->
+      <div class="fb-share-popup popup-block fixed-screen" ng-class="{'show': isShareShow}" ng-fast-touch="closeShareMenu($event)">
+        <div class="white-box animate-fb-share">
+          <h1 class="white-box-title text-center">Share to Facebook</h1>
+          <div class="user-posted this-user">
+            <div class="image-wrap" ng-fast-touch="showPictureInLightBox(shareItem.from_product_image)">
+              <div class="img-middle-wrap">
+                <div class="img-inner-wrap">
+                  <img class="img" 
+                       ng-src="{{(shareItem.from_product_image) ? imgPrefix + shareItem.from_product_image + imgSuffix : 'img/default-staff.png'}}">
+                </div>
+              </div>
+            </div>
+            <div class="user-title">
+              <div class="feed-title"><span class="user-name">{{shareItem.from_product_name}}</span> published a new post</div>
+              <div class="time-published">{{getPostAge(shareItem)}} - {{shareItem.hotel}}</div>
+            </div>
+          </div>
+          <div class="post-box">
+            <h2 class="post-title" ng-bind-html="getHtml(shareItem.message)"></h2>
+            <div class="post-img-wrap">
+              <img class="img" 
+                   ng-hide="shareItem.hideImage"
+                   onerror="app.onImgError(this)"
+                   ng-fast-touch="showPictureInLightBox(shareItem.media_url)"
+                   ng-src="{{shareItem.media_url}}">
+            </div>
+          </div>
+          <button class="light-btn text-center" ng-fast-touch="shareNow(shareItem)">share now</button>
+        </div>
+      </div>
+      
+      <!-- Image Lightbox -->
+      <div class="lightbox-wrap fixed-screen" 
+           ng-swipe="true"
+           ng-on-left="swipe('prev')"
+           ng-on-right="swipe('next')"
+           ng-on-up="closeLightBox()"
+           ng-fast-touch="showCloseBtn()"
+           ng-show="isLightBoxShow">
+        <span class="close t-icons_close" ng-fast-touch="closeLightBox()" ng-show="isCloseBtnShow"></span>
+      </div>
+
+      <!-- Popup Messages -->
+      <!-- Posted -->
+      <div class="popup-message fixed-screen" ng-class="{show: isInfoShow}">
+        <div class="white-box text-center">
+          <h1 class="white-box-title">{{dialog.title}}</h1>
+          <div class="white-box-desc" ng-bind-html="dialog.message"></div>
+          <button ng-fast-touch="positiveBtnTouch()" class="light-btn text-center">{{dialog.positiveBtn}}</button>
+        </div>
+      </div>
+
+      <!-- Manage Post -->
+      <div class="popup-message fixed-screen" 
+           ng-fast-touch="closeUserMenu($event)"
+           ng-class="{show: isUserMenuShow}">
+        <div class="white-box">
+          <button class="light-btn edit-btn text-center" ng-fast-touch="dialogAction('edit_post')">
+            <span class="t-icon_edit inner-btn">Edit your post</span>
+          </button>
+          <button class="light-btn delete-btn text-center" ng-fast-touch="dialogAction('delete_post')">
+            <span class="t-icon_delete inner-btn">Delete your post</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Photo from -->
+      <div class="popup-message fixed-screen"
+           ng-fast-touch="closePhotoMenu($event)"
+           ng-class="{show: isPhotoMenuShow}">
+        <div class="white-box">
+          <button class="light-btn camera-btn text-center" ng-fast-touch="dialogAction('take_photo')">
+            <span class="t-icon_photo inner-btn">Take photo</span>
+          </button>
+          <button class="light-btn gallery-btn text-center" ng-fast-touch="dialogAction('select_from_gallery')">
+            <span class="t-icon_gallery inner-btn">Select from Gallery</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Delete Post -->
+      <div class="popup-message fixed-screen" ng-class="{show: isQuestionShow}">
+        <div class="white-box text-center">
+          <h1 class="white-box-title">{{dialog.title}}</h1>
+          <div class="white-box-desc" ng-bind-html="dialog.message"></div>
+          <div class="two-light-btns">
+            <button ng-fast-touch="negativeBtnTouch()" class="light-btn left-btn text-center">{{dialog.negativeBtn}}</button>
+            <button ng-fast-touch="positiveBtnTouch()" class="light-btn right-btn text-center">{{dialog.positiveBtn}}</button>
+          </div>          
+        </div>
+      </div>
+
+      <!-- Unlink FB -->
+      <div class="popup-message fixed-screen">
+        <div class="white-box text-center">
+          <h1 class="white-box-title">Unlink FB account?</h1>
+          <div class="white-box-desc">Your Facebook account will be<br>unlinked. Are you sure?</div>
+          <div class="two-light-btns">
+            <button class="light-btn left-btn text-center">no</button>
+            <button class="light-btn right-btn text-center">yes</button>
+          </div>          
+        </div>
+      </div>
+
+      <!-- Bottom Menu -->
+      <footer class="footer-menu" ng-show='tabsAvailable'>
+        <div class="menu-item" 
+             ng-class="{'active':activeView['profile']}"
+             ng-fast-touch="changeView('profile')">
+          <span class="menu-icon t-icon_profile"></span>
+          <div class="item-text">Profile</div> 
+        </div>
+        <div class="menu-item" 
+             ng-class="{'active':activeView['ranking']}"
+             ng-fast-touch="changeView('ranking')">
+          <span class="menu-icon t-icon_point"></span>
+          <div class="item-text">Ranking</div>
+        </div>
+        <div class="menu-item" 
+             ng-class="{'active':activeView['feed']}"
+             ng-fast-touch="changeView('feed')">
+          <span class="menu-icon t-icon_news"></span>
+          <div class="item-text">Feed</div>
+        </div>
+        <div class="menu-item" 
+             ng-class="{'active':activeView['post']}"
+             ng-fast-touch="changeView('post')">
+          <span class="menu-icon t-icon_post"></span>
+          <div class="item-text">Post</div>
+        </div>
+      </footer>
+      
+    </body>
+</html>

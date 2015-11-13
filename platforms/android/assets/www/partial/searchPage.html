@@ -1,0 +1,23 @@
+<div class="container">
+	<div class="search-box">
+		<h1 class="search-title" ng-hide="searchStarted">Recent searches</h1>
+        
+		<div class="person-found" ng-repeat="product in products" ng-fast-touch="showProfile(product)">
+			<div class="image-wrap" ng-fast-touch="showPictureInLightBox(product.image_url || product.from_product_image)">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" 
+                             onerror="app.onAvatarError(this)"
+                             ng-src="{{(product.image_url || product.from_product_image) ? imgPrefix + (product.image_url || product.from_product_image) + imgSuffix : 'img/default-staff.png'}}">
+					</div>
+				</div>
+			</div>
+			<div class="person-title">
+              <div class="user-name">{{product.name || product.from_product_name}}</div>
+              <div class="user-position">{{product.header_name || product.from_product_header_name}}</div>
+            </div>
+            <div ng-if="product.productId != currentProductId" class="give" ng-fast-touch="goToGivePoints(product)"><span class="t-icon_point"></span>Give</div>
+        </div>
+
+	</div>
+</div>

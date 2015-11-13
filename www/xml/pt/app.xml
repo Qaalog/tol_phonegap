@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>	
+	<!-- iOS specific geolocation strings -->
+	<string name="NSLocationWhenInUseUsageDescription">O Qaalog precisa da sua localização para a funcionalidade PERTO DE MIM</string>
+	<string name="NSLocationAlwaysUsageDescription">O Qaalog precisa da sua localização para a funcionalidade PERTO DE MIM</string>
+</resources>

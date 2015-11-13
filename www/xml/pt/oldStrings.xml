@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>	
+	<string name="NSLocationWhenInUseUsageDescription">O Qaalog precisa da sua localização para a funcionalidade PERTO DE MIM</string>
+	<!-- Main menu strings -->
+	<string name="main_menu_option_product_tree">Navegar</string>
+	<string name="main_menu_option_product_search">Pesquisar</string>
+	<string name="main_menu_option_favorites">Favoritos</string>
+	<string name="main_menu_option_barcode">Código Barras</string>
+	<string name="main_menu_option_catalogs">Catálogos</string>
+	<string name="main_menu_option_near">Perto de Mim</string>
+	<string name="main_menu_slide_title">MENU</string>
+	<string name="main_menu_options_title">OPÇÕES</string>
+	<!-- Catalog selection strings -->
+	<string name="catalog_selection_title">Seleção de Catálogo</string>
+	<string name="catalog_selection_subtitle">Seleccione o catálogo a usar</string>
+	<string name="catalog_selection_selected">Catálogo '%s' seleccionado</string>
+	<string name="catalog_selection_add_favorites">Adicionar como favorito</string>
+	<string name="catalog_selection_remove_favorites">Remover como favorito</string>
+	<string name="catalog_selection_more_info">Mais informação</string>
+	<string name="catalog_selection_favorite_tag">Favoritos</string>
+	<string name="catalog_selection_default_tag">Genéricos</string>
+	<!-- Product search strings -->
+	<string name="product_search_menu_search_title">Pesquisar artigos</string>
+	<string name="product_search_slide_menu_search_options_search_type">Alterar tipo de pesquisa</string>
+	<string name="product_search_menu_sort_asc_title">Ordenar a>z</string> 
+	<string name="product_search_menu_sort_desc_title">Ordenar z>a</string> 
+	<string name="product_search_menu_search_options_title">Opções de pesquisa</string> 
+	<string name="product_search_input_hint">Pesquisar</string> 
+	<string name="product_search_option_refresh_as_type">Refrescar enquanto escreve (lento)</string> 
+	<string name="product_search_option_show_product_words">Pesquisar quaisquer palavras</string> 
+	<string name="product_search_option_show_product_name">Pesquisar nome de produto</string> 
+	<string name="product_search_option_history_only">Mostrar histórico apenas</string> 	
+	<string name="product_search_option_cancel">Cancelar</string> 
+	<string name="product_search_no_results">Sem resultados</string>
+	<!-- Favorite products string  -->
+	<string name="product_fav_empty_message">A lista dos favoritos está vazia.</string>	
+	<!-- Near products string  -->
+	<string name="product_near_location_off_title">Sem serviço</string>
+	<string name="product_near_location_off_message">Esta funcionalidade requer os serviços de localização activos. Deseja abrir as configurações de localização?</string>
+	<string name="product_near_no_location_message">Não foi possível obter a sua localização :(</string>
+	<string name="product_near_no_results_message">Não existem resultados numa proximidade de %s metros de si :(</string>
+	<!-- Product list strings -->
+	<string name="product_list_no_results_title">Resultados</string>
+    <string name="product_list_no_results">Pesquisa sem resultados :|</string>
+	<string name="product_list_no_results_button_ok">Ok</string>
+	<string name="product_list_load_more">Mostrar mais</string>
+	<string name="product_list_loading_more">A carregar...</string>
+	<!-- Product selection strings -->
+	<string name="product_selection_tab_characteristics_title">Características</string>
+	<string name="product_selection_tab_products_title">Produtos</string>
+	<string name="product_selection_tab_products_select_characteristic">Selecione uma característica</string>
+	<!-- Product detail strings -->
+	<string name="product_detail_menu_share_title">Partilhar</string>
+	<string name="product_detail_menu_favorites_title">Favoritos</string>
+	<string name="product_detail_menu_like_title">Gosto</string>
+	<string name="product_detail_tab_detail_title">Detalhe</string>
+	<string name="product_detail_tab_related_title">Relacionados</string>
+	<string name="product_detail_related_see_also">Veja Também</string>
+	<string name="product_detail_related_similar">Semelhantes</string>
+	<string name="product_detail_title_characteristics">Detalhes</string>
+	<string name="product_detail_title_media">Imagens</string>
+	<string name="product_detail_related_empty">Não existem itens relacionados</string>
+	<string name="product_detail_favorites_title">Favoritos</string>
+	<string name="product_detail_favorites_hint">Nome do grupo</string>
+	<string name="product_detail_share">Ve isto: %s\n\r%s</string>
+	<string name="product_detail_favorites_required_message">Indique o nome do grupo</string>
+	<string name="product_detail_favorites_group_unable_message">Criação de grupo sem sucesso :(</string>
+	<string name="product_detail_favorites_group_created_message">Grupo criado</string>
+	<string name="product_detail_favorites_group_existed_message">Grupo já existia, produto associado</string>
+	<string name="product_detail_favorites_group_already_associated_message">Produto já associado a este grupo</string>
+	<string name="product_detail_share_text">{name} | {supplier} - Via Qaalog\r\nApp iOS: https://itunes.apple.com/app/id928036482\r\nApp Android: https://play.google.com/store/apps/details?id=com.leverage.qaalog</string>
+	<!-- Barcode strings -->
+	<string name="barcode_input_title">Pesquisa código barras</string>
+	<string name="barcode_input_hint">Código de barras</string>
+    <string name="barcode_input_info">Digite o número ou active a câmara</string>
+    <string name="barcode_input_no_results">Nenhum resultado encontrado</string>
+    <string name="barcode_scan_tips">DICAS DE SCAN</string>
+    <string name="barcode_scan_hint">Centre o código de barras e mantenha o telefone imóvel. Tente várias distâncias focais com boa iluminação.</string>
+    <string name="barcode_scan_button_cancel">Cancelar scan</string>
+    <string name="barcode_scan_button_options">Mostrar opções</string>
+    <string name="barcode_scan_results_title">Selecionar código de barras</string>
+    <string name="barcode_scan_options_title">Configuração do scan</string>   
+    <string name="barcode_scan_options_auto_focus">Tipo de autofocus</string>
+    <string name="barcode_scan_options_image_size">Tamanho da imagem</string>
+    <string name="barcode_scan_options_title">Configuração do scan</string>    
+    <string name="barcode_scan_options_button_cancel">Cancelar</string>
+	<string name="barcode_scan_options_button_reset">Reinicializar</string>
+	<string name="barcode_scan_options_button_apply">Aplicar</string>
+	<string name="barcode_scan_options_reseted">Configuração reinicializada</string>
+	<string name="barcode_scan_options_applied">Configuração modificada</string>
+	<string name="barcode_scan_not_found_title">Qaalog Barcode Scanner</string>
+	<string name="barcode_scan_not_found_message">Código %s (%s) sem produto correspondente</string>
+	<string name="barcode_scan_not_found_button">Ok</string>
+	<string name="barcode_scan_config_error">Não foi possível alterar a configuração :(</string>
+	<!-- Product tree strings -->
+	<string name="product_tree_no_products">-- Sem produtos --</string>
+	<!-- Favorites manager strings -->
+	<string name="favorites_manager_tab_favorites_title">Favoritos</string>
+	<string name="favorites_manager_tab_products_title">Produtos</string>
+	<string name="favorites_manager_tab_products_select_group">Seleccione um grupo</string>
+	<string name="favorites_manager_group_empty">Adicione produtos através do ecran de detalhe do produto</string>
+	<string name="favorites_manager_remove_product_title">Remover favorito</string>
+	<string name="favorites_manager_remove_product_message">Remover produto do grupo?</string>
+	<string name="favorites_manager_remove_product_button_yes">Sim</string>
+	<string name="favorites_manager_remove_product_button_no">Não</string>
+	<string name="favorites_manager_remove_product_ok_message">Produto removido do grupo</string>
+	<string name="favorites_manager_remove_product_error_message">Remoção sem sucesso, tente novamente</string>
+	<string name="favorites_manager_manage_group_title">Gerir grupo %s</string>
+	<string name="favorites_manager_manage_group_button_rename"> Renomear</string>
+	<string name="favorites_manager_manage_group_button_remove"> Apagar</string>	
+	<string name="favorites_manager_rename_group_title">Renomear grupo</string>
+	<string name="favorites_manager_rename_group_hint">Nome do grupo</string>
+	<string name="favorites_manager_rename_group_button_rename">Renomear</string>	
+	<string name="favorites_manager_rename_group_button_cancel">Cancelar</string>	
+	<string name="favorites_manager_rename_group_ok_message">Grupo renomeado com sucesso</string>	
+	<string name="favorites_manager_rename_group_in_use_message">Grupo já existe, especifique um novo</string>		
+	<string name="favorites_manager_remove_group_title">Apagar grupo</string>
+	<string name="favorites_manager_remove_group_message">Confirma a remoção do grupo?</string>
+	<string name="favorites_manager_remove_group_button_remove">Sim</string>	
+	<string name="favorites_manager_remove_group_button_cancel">Cancelar</string>	
+	<string name="favorites_manager_remove_group_ok_message">Grupo apagado com sucesso</string>
+	<!-- Network strings -->
+	<string name="network_generic_no_network_title">Rede indisponível</string>
+	<string name="network_generic_no_network_message">Por favor verifique a sua ligação à rede.</string>
+	<string name="network_generic_loading_message">A carregar dados ...</string>
+	<string name="network_generic_error_title">Erro de rede</string>
+	<string name="network_generic_timeout_title">Timeout de rede</string>
+	<string name="network_generic_app_error_message">Lamentamos mas ocorreu um fenómeno do Entroncamento :(</string>
+	<string name="network_generic_timeout_message">Por favor verifique a sua ligação à internet e tente novamente.</string>
+	<string name="network_generic_error_message">Verifique a sua ligação à internet.</string>
+	<string name="network_generic_error_button_ok">OK</string>
+	<!-- Button strings  -->
+	<string name="button_yes_title">Sim</string>
+	<string name="button_no_title">Não</string>
+	<!-- Message strings  -->
+	<string name="message_title_ios">Mensagem (%d/%d)</string>
+	<string name="message_title_android">Mensagem (%d/%d)</string>
+</resources>

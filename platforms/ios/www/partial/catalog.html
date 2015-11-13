@@ -1,0 +1,49 @@
+<div class="barcode-wrap" ng-show="noResultVisiable">
+  <div class="result">
+    <h2>Sorry, you don't have any</br>catalogs to view</h2>
+  </div> 
+</div>
+<div class="page-wrap">
+  <div class="catalog-box">
+    <!--<h2 class="catalog-title" ng-hide="noResultVisiable" ng-class="{'ios':isIOS()}">Select catalog to use</h2>-->
+    <div class="group"
+         ng-class="{'is-favorite':group.name === FAVORITE_DEF,'opened': group.hidden}"
+         ng-repeat="group in rows"
+         ng-show="group.items.length > 0">
+      <div class="category-title" ng-fast-touch="toggleGroup(group,$event)">{{::group.name}} ({{group.items.length}})</div>
+      <div class="list-wrap">
+
+
+        <div class="cat-list" ng-style="group.style">
+
+
+          <div class="category" 
+               ng-repeat="cat in group.items" 
+               ng-show="group.hidden"
+               ng-finish-render="favRendered"
+               ng-fast-touch="selectCatalog(cat);">
+
+            <div class="cat-col">
+              <div class="image-wrapper">
+                <img onerror="app.onImgError(this)" ng-src="{{::imgPrefix + cat.image + imgSufix}}"/>
+              </div>
+            </div>
+
+            <div class="cat-col">
+              <div class="text-box">
+                <div class="cat-name">{{::cat.name}}</div>
+                <div class="cat-organisation">{{::cat.organisation}}</div>
+                <div class="cat-description">{{::cat.description}}</div>
+              </div>
+            </div>
+
+            <!--<div class="cat-col">-->
+              <div class="to-favorite" ng-class="{'added':cat.favorite !== 0}" ng-fast-touch="addToFavorites(cat,$event)"></div>
+            <!--</div>-->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

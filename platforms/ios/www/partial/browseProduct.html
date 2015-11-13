@@ -1,0 +1,45 @@
+ 
+<!--<div style="position: fixed; top: 6em; padding: 0.1em; font-size: 2em; z-index: 9999; background: #fff">-->
+  <!--<div style="margin-bottom: 2vw">-->
+    <!--<span>L: {{info.lowerLimit}}</span> <span>O: {{info.offset}}</span> <span>U: {{info.upperLimit}}</span>-->
+  <!--</div>-->
+  <!--<div style="margin-bottom: 2vw">-->
+    <!--<span>T: {{info.total}}</span> <span>Len: {{info.length}}</span> <span>R: {{info.row}}</span>-->
+  <!--</div>-->
+  <!--<div>-->
+    <!--<span>E: {{info.el}}</span> <span>MR: {{info.mr}}</span> <span>R2: {{info.row2}}</span>-->
+  <!--</div>-->
+  <!--<div>-->
+    <!--<span>UB: {{info.ub}}</span> <span>LB: {{info.lb}}</span> <span>MH: {{info.mh}}</span>-->
+  <!--</div>-->
+<!--</div> -->
+
+<div class="catalog-box grouped">
+  
+  <div class="product-load-up" ng-show="miniLoaderUpVisiable"></div>
+  <div class="grouped-prod-wrap browsed"
+       ng-cnt-height
+       ng-repeat="item in productList"
+       ng-finish-render="onRender"
+       ng-fast-touch="showProductDetail(item)">
+    <div class="prod-image">
+      <img onerror="app.onImgError(this)" ng-src="{{::imgPrefix + item.productImage + imgSufix}}">
+    </div>
+    <h2 class="ng-binding">{{::item.groupName}}</h2>
+    <div class="catalog-name">{{::currentParams.name}}</div>
+    <ul class="prod-desc">
+      <li>
+      <div ng-fast-touch="toogleLikes(item,$index);" ng-class="{'added': item.currentLike > 0}">
+        <i class="q-icons-non-favorite"></i>
+        <span class="likes">{{item.likes}}</span>
+      </div>
+      <div>
+        <i class="q-icons-price"></i>
+        <span class="price">{{::item.price1}}</span>
+      </div>
+        
+      </li>
+    </ul>
+  </div>
+  <div class="product-load-down" ng-hide="loadDownHidden"></div>
+</div>

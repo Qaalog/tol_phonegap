@@ -1,0 +1,37 @@
+<div>
+  <div style="border-bottom: 1px solid black; padding: 50px 0;">
+    <span style="margin-right: 150px; padding: 50px 0;" ng-class="{'active':activeView.char}" ng-fast-touch="changeView('char')">Characteristics</span>
+    <span style="margin-right: 150px; padding: 50px 0;" 
+          ng-repeat="tag in tagList"
+          ng-class="{'active':activeView[tag.list]}" 
+          ng-fast-touch="changeView(tag.list)"
+          >{{tag.list}}</span>
+  </div>
+  
+  <div ng-show="activeView.char">
+    <div ng-repeat="char in chars" style="border: 2px solid black; padding: 10px; font-size: 2em" ng-fast-touch="applyTagList(char)">
+      {{char.list}}
+    </div>
+  </div>
+  
+  <div ng-show="activeView.Products">
+    <span style="position: absolute; top: 50%; left: 50%;font-size: 2em">Select a characteristic</span>
+  </div>
+  
+  <div ng-show="!activeView.Products || activeView[currentChar.list]">
+    <div ng-repeat="item in charsValueList" style="border: 2px solid black; padding: 10px; font-size: 2em; margin-bottom: 10px" ng-fast-touch="openCharValueList(item)">
+     {{item.value}}
+     
+     <div ng-show="item.charValueList[0]">
+       <div ng-repeat="charValue in item.charValueList" ng-fast-touch="showProductDetail(charValue)">
+         <div><img onerror="app.onImgError(this)" ng-src="{{charValue.productImage}}" style="width: 500px"/></div>
+         <div>{{charValue.productHeader}}</div>
+         <div>{{charValue.productLike}}</div>
+       </div>
+     </div>
+     
+    </div>
+  </div>
+  
+  
+</div>
