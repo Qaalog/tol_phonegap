@@ -13,6 +13,7 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
                 , user: false
                 , catalogDB: false
                 , hotelId: false
+                , password: false
                 };
   
   $user.clear = function() {
@@ -100,5 +101,13 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
   
   $user.getCatalogDB = function() {
     return storage.catalogDB;
+  };
+  
+  $user.setPassword = function(password) {
+    storage.password = password;
+  };
+  
+  $user.getPassword = function() {
+    return storage.password;
   };
 }]);

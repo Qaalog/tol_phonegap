@@ -363,7 +363,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
 
     /*------- FACEBOOK -------*/
     $scope.getHtml = feed.getHtml;
-    facebook.toggleShareMenu = function(value, params) {
+    facebook.toggleShareMenu = function(value, params,img) {
       $scope.isShareShow = value;
       if (!value) page.navigatorPop();
       if (value) {
@@ -372,6 +372,13 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
           try {$scope.$digest();} catch(e){}
         });
         app.animate(document.getElementsByClassName('animate-fb-share')[0],250);
+        setTimeout(function(){
+          var canvas = document.getElementById('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        },300);
         $scope.shareItem = params;
         $scope.shareItem.hotel = userService.getHotelName();
       }
@@ -379,6 +386,9 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     
     $scope.closeShareMenu = function(event,force) {
       if (force || event.target.className.indexOf('popup-block') >= 0) {
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
         facebook.toggleShareMenu(false);
         page.setTabsVisiable(true);
       }

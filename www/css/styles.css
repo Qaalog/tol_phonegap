@@ -747,7 +747,7 @@ a:active {opacity: 0.9;}
 .give .t-icon_point {
   font-size: 1.25em;
   position: absolute;
-  left: 0.85em;
+  left: 0.65em;
   top: 50%;
   -webkit-transform: translateY(-50%);
           transform: translateY(-50%);

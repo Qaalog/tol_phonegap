@@ -223,7 +223,7 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
     },10);
   };
   
-  $network.get = function(methodName, params, callback) {
+  $network.get = function(methodName, params, callback, disableDefaultErrorHandler) {
     callback = callback || function(){};
     
     var path = $network.servisePathPHP + methodName;
@@ -251,7 +251,11 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
             })
           
           .error(function(data, status, headers, config, statusText) {
-            errorHandler(status, data, path, callback);
+            if (!disableDefaultErrorHandler) {
+              errorHandler(status, data, path, callback);
+              return true;
+            }
+            callback(false,data,status);
           });
   };
   

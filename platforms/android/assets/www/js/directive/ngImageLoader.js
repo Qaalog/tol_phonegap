@@ -10,6 +10,8 @@ tol.directive('ngImageLoader', ['$timeout',function ($timeout) {
     }
     
     var elementImgage = element[0].querySelector('img');
+    elementImgage.isLoaded = false;
+    scope.imageElement = elementImgage;
     var positionSetted = false;
     if (element[0].style.position !== '') {
       positionSetted = element[0].style.position;
@@ -47,7 +49,8 @@ tol.directive('ngImageLoader', ['$timeout',function ($timeout) {
         root.setAttribute('data-height', height + marginBottom);
         scope.rootHeight = height + marginBottom;
       });
-
+      elementImgage.isLoaded = true;
+      try{scope.$digest()}catch(e){};
     };
     
     var onImageError = function() {

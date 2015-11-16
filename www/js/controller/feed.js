@@ -12,6 +12,9 @@ tol.controller('feed',['$scope','page','network','feed','userService',
   $scope.imgPrefix = network.servisePathPHP + '/GetCroppedImage?i=';
   $scope.imgSuffix = '&h=256&w=256';
   
+  $scope.imgResizedPrefix = network.servisePathPHP + 'GetResizedImage?i=';
+  $scope.imgResizedSuffix = '&w=708';
+  
   page.onShow(settings,function(params) {
     
     console.log('feed params',params);

@@ -14,6 +14,7 @@ tol.controller('changePassword',['$scope','page','header','network','dialog','co
       $scope.passwords = {};
       $scope.params = params || {};
       header.save = save;
+      header.toggleSave(false);
 
       $timeout(function(){
         $scope.isInputsShow = true;
@@ -44,23 +45,23 @@ tol.controller('changePassword',['$scope','page','header','network','dialog','co
     save = function() {
       
       if (!$scope.passwords.new || $scope.passwords.new === '') {
-        $scope.passwords.new = '';
-        $scope.passwords.confirm = '';
-        dialog.create(dialog.INFO,'INFO','Password cannot be empty','OK').show();
+//        $scope.passwords.new = '';
+//        $scope.passwords.confirm = '';
+//        dialog.create(dialog.INFO,'INFO','Password cannot be empty','OK').show();
         return false;
       }
       
       if ($scope.passwords.new !== $scope.passwords.confirm) {
-        $scope.passwords.new = '';
-        $scope.passwords.confirm = '';
-        dialog.create(dialog.INFO,'INFO','Password does not match the<br>confirm password.','OK').show();
+        $scope.confirmError = true;
         return false;
       }
+      
+      $scope.confirmError = false;
       
       page.showLoader();
       testPassword(function(result){
         if (result) {
-          $scope.isOldPasswordError = false;
+          $scope.oldPasswordError = false;
           var data = { password: $scope.passwords.new
                      , 'password_reset': null
                      };
@@ -72,7 +73,7 @@ tol.controller('changePassword',['$scope','page','header','network','dialog','co
         } else {
           page.hideLoader();
           $scope.passwords.old = '';
-          $scope.isOldPasswordError = true;
+          $scope.oldPasswordError = true;
          // dialog.create(dialog.INFO,'ERROR','Please, check old password.','OK').show();
         }
       });
@@ -88,6 +89,24 @@ tol.controller('changePassword',['$scope','page','header','network','dialog','co
           inputs[i].blur();
         }
       }
+    };
+    
+    $scope.validate = function() {
+      if ($scope.passwords.old !== userService.getPassword()) {
+        $scope.oldPasswordError = true;
+        header.toggleSave(false);
+        return false;
+      }
+      
+      $scope.oldPasswordError = false;
+      $scope.confirmError = false;
+      if (!$scope.passwords.new || !$scope.passwords.confirm) {
+        header.toggleSave(false);
+        return false;
+      }
+      
+      header.toggleSave(true);
+      
     };
     
 }]);

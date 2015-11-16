@@ -35,7 +35,7 @@
             <img class="img"
                  onerror="app.onImgError(this)"
                  ng-fast-touch="showPictureInLightBox(feedItem.media_url)"
-                 ng-src="{{::feedItem.media_url}}">
+                 ng-src="{{:: imgResizedPrefix + feedItem.media_url + imgResizedSuffix}}">
           </div>
         </div>
         <div class="post-info" ng-fast-touch="showWhoGivePoints(feedItem)">
@@ -44,8 +44,8 @@
             so far
           </div>
           <div class="fb-share right" 
-               ng-show="::product.id*1 === feedItem.from_product_id*1"
-               ng-fast-touch="showShareMenu(feedItem)">
+               ng-show="product.id*1 === feedItem.from_product_id*1 && imageElement.isLoaded"
+               ng-fast-touch="showShareMenu(feedItem, $event)">
             <span class="t-icon_link_fb"></span>Share
           </div>
         </div>

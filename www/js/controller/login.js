@@ -48,33 +48,37 @@ tol.controller('login',['$scope','config','page','network','device','userService
     network.get('user',{},function(result,response) {
       if (result && response.length === 1) {
         console.log('user', response);
-        if (response[0])
-          userService.setUserId(response[0].id);
-          userService.setUser(response[0]);
-          userService.setUserCode(response[0].username);
-          if (response[0]['password_reset']*1 !== 1) {
-            page.show('facebookLink',response[0]);
-          } else {
-            localStorage.removeItem(AUTH_KEY);
-            page.show('changePassword',response[0]);
-            setTimeout(function(){
+        
+        var password = atob(login).split(':')[1];
+
+        userService.setPassword(password);
+        userService.setUserId(response[0].id);
+        userService.setUser(response[0]);
+        userService.setUserCode(response[0].username);
+
+        if (response[0]['password_reset']*1 !== 1) {
+          page.show('facebookLink',response[0]);
+        } else {
+          localStorage.removeItem(AUTH_KEY);
+          page.show('changePassword',response[0]);
+          setTimeout(function(){
+            page.navigatorClear();
+            page.navigatorPush(function() {
+              page.show('login',{hard: true});
               page.navigatorClear();
-              page.navigatorPush(function() {
-                page.show('login',{hard: true});
-                page.navigatorClear();
-              });
-            },300);
-          }
+            });
+          },300);
+        }
      //   page.show('catalog',{});
         
       } else {
         page.hideLoader();
         $scope.auth.password = '';
         if (!start) {
-          dialog.create(dialog.INFO,'Login failed','Incorrect username or password','OK').show();
+          loginError();
         }
       }
-    }, false, true);
+    }, true);
   };
   
   $scope.login = function(auth) {
@@ -85,13 +89,11 @@ tol.controller('login',['$scope','config','page','network','device','userService
     }
     
     if (!auth.login) {
-      dialog.create(dialog.INFO,'Login failed','User name should be email.','OK').show();
-      $scope.auth = {};
+      loginError();
       return false;
     }
     if (!auth.password) {
-      dialog.create(dialog.INFO,'Login failed','Password can not be empty.','OK').show();
-      $scope.auth = {};
+      loginError();
       return false;
     }
     page.showLoader();
@@ -176,6 +178,11 @@ tol.controller('login',['$scope','config','page','network','device','userService
       }
     }
   };
+  
+  function loginError() {
+    dialog.create(dialog.INFO,'Login failed','Incorrect username or password.','OK').show();
+    $scope.auth.password = '';
+  }
   
 }]);
 

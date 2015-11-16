@@ -67,9 +67,11 @@ tol.service('feed',['network','$sce','page','dialog','facebook','userService','$
     }
   });
   
-  $feed.showShareMenu = function(feedItem) {
+  $feed.showShareMenu = function(feedItem, event) {
     page.setTabsVisiable(false);
-    facebook.toggleShareMenu(true,feedItem);
+    var img = angular.element(event.target).scope().imageElement;
+    if (img.isLoaded)
+      facebook.toggleShareMenu(true,feedItem,img);
   };
   
   $feed.userMenuShow = function(feedItem,index) {

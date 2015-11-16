@@ -181,11 +181,12 @@
           <div class="post-box">
             <h2 class="post-title" ng-bind-html="getHtml(shareItem.message)"></h2>
             <div class="post-img-wrap">
-              <img class="img" 
+<!--              <img class="img" 
                    ng-hide="shareItem.hideImage"
                    onerror="app.onImgError(this)"
                    ng-fast-touch="showPictureInLightBox(shareItem.media_url)"
-                   ng-src="{{shareItem.media_url}}">
+                   ng-src="{{shareItem.media_url}}">-->
+             <canvas width="708" height="400" id="canvas"></canvas>
             </div>
           </div>
           <button class="light-btn text-center" ng-fast-touch="shareNow(shareItem)">share now</button>

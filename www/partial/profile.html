@@ -29,7 +29,7 @@
                    ng-hide="::product.id*1 === productId || post['my_points']">
                 <span class="t-icon_point"></span>Give
               </div>
-	          <div class="post-img-wrap">
+	          <div class="post-img-wrap" ng-image-loader="img/tol_loader_gr_wh.gif">
 	            <img class="img" onerror="app.onImgError(this)"
                      ng-fast-touch="showPictureInLightBox(post.media_url)"
 	                 ng-src="{{::post.media_url}}">
@@ -41,8 +41,8 @@
                 so far
               </div>
 	          <div class="fb-share right" 
-                   ng-show="::userProductId === post.from_product_id*1"
-                   ng-fast-touch="showShareMenu(post)">
+                   ng-show="userProductId === post.from_product_id*1 && imageElement.isLoaded"
+                   ng-fast-touch="showShareMenu(post,$event)">
                 <span class="t-icon_link_fb"></span>Share
               </div>
 	        </div>
