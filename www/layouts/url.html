@@ -1,0 +1,78 @@
+<!-- Post With Link Output Start -->
+    <div class="feed-box" data-repeat="feedItem" data-type="url-post">
+      <div class="whats-new" 
+           data-show="{%feedItem.update_reason%}"
+           data-binding="update_reason"
+           >{% feedItem.update_reason %}</div>
+      <div class="user-posted this-user">
+        <div class="image-wrap">
+          <div class="img-middle-wrap">
+            <div class="img-inner-wrap" data-touch="showProfile(feedItem.from_product_id)">
+              <img class="img" data-src="{%(feedItem.from_product_image) ?  scope.imgPrefix + feedItem.from_product_image + scope.imgSuffix : 'img/default-staff.png'%}">
+            </div>
+          </div>
+        </div>
+        <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}" >
+          <div class="feed-title">
+            <strong class="user-name" data-touch="showProfile(feedItem.from_product_id)">
+              <b>{% feedItem.from_product_name %}</b>
+            </strong>
+            <span class="black">published a new post</span>
+          </div>
+          <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
+        </div>
+        <div class="user-menu t-icon_menu" 
+             data-show="{%scope.product.id*1 === feedItem.from_product_id*1%}" 
+             data-touch="userMenuShow(feedItem)"></div>
+      </div>
+      <div class="post-box" data-touch="showPostDetails(feedItem)">
+        <h2 class="post-title" data-binding="getHtml(feedItem.message)">{%scope.getHtml(feedItem.message)%}</h2>
+        <div class="quote-wrap linked">
+          <span class="t-icon_link quote-icon"></span>
+          <div class="feed-box" data-touch="showPostDetails(feedItem)">
+            <div class="image-title">{%scope.getHtml(feedItem.attachments[0].data.title)%}</div>
+            <div style="height: 15em; position: relative"
+                 data-image-loader="img/tol_loader_gray_128.gif">
+              <!--              <div class="you-gave"
+                              data-binding="getYouGave(feedItem)"
+                              data-show="{% feedItem['my_points'] && !feedItem['my_points'] == 0 %}">
+                              {%scope.getYouGave(feedItem)%}
+                            </div>
+
+                            <div class="give"
+                                 data-touch="givePoints(feedItem)"
+                                 data-binding
+                                 data-show="{% (scope.product.id != feedItem.from_product_id && !feedItem.my_points && scope.product.id != feedItem.to_product_id) %}">
+                              <span class="t-icon_point"></span>Give
+                            </div>
+              -->
+            <img data-src="{% scope.imgResizedPrefix + feedItem.media_url + scope.imgResizedSuffix%}" alt="" class="img main_image" data-touch="showPostDetails(feedItem)">
+            </div>
+            <div class="image-link" data-touch="goToLink(feedItem.attachments[0].data.href)"><a href="javascript:;" class="link">{%feedItem.attachments[0].data.link%}</a></div>
+          </div>
+        </div>
+        <div class="post-info">
+          <div data-class-binding="giversFilter(feedItem)?'tapped points':'points'" class="{%(scope.giversFilter(feedItem)?'tapped ':'')%}points" data-touch="toggleGivePoints(feedItem,givePoints)">
+            <div class="mark-inner">
+              <span class="t-icon_point"></span>
+              <span data-binding="preparePoints(feedItem)">{% (feedItem.point_givers>0?feedItem.point_givers:'')%}</span>
+            </div>            
+          </div>
+          <div class="{% scope.getTappedByMe(feedItem,feedService.LIKE_TYPE_NORMAL)?'tapped ':''; %}likes" data-touch="setLikeFeedItem(feedItem,feedService.LIKE_TYPE_NORMAL,event)">
+            <div class="mark-inner">
+               <span class="t-icon_like"></span>
+              <span data-binding="prepareLikes(feedItem,feedService.LIKE_TYPE_NORMAL)">{% scope.getMarksCountByType(feedItem,feedService.LIKE_TYPE_NORMAL) || '' %}</span>
+            </div>           
+          </div>
+          <div class="{% scope.getTappedByMe(feedItem,feedService.LIKE_TYPE_FACEBOOK)?'tapped ':''; %}fb-share"
+               data-show="{%scope.getSharePermission(feedItem)%}"
+               data-touch="showShareMenu(feedItem, event)">
+               <div class="mark-inner">
+                 <span class="t-icon_link_fb"></span>
+                  <span data-binding="prepareLikes(feedItem,feedService.LIKE_TYPE_FACEBOOK)">{% scope.getMarksCountByType(feedItem,feedService.LIKE_TYPE_FACEBOOK) || '' %}</span>
+               </div>            
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Post With Link Output End -->

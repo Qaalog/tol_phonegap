@@ -1,94 +1,289 @@
-body {
-	background: #ededed;
-	color: #000;
-}
-.search-wrap,
-.barcode-wrap button,
+/* Backgrounds */
+.color-scheme {background: rgba(24,154,34,0.7);}
+.caption,
+.feed-box,
+.post-tabs,
+.chart-title,
+.img-inner-wrap,
+.white-box-input,
+.write-post-text,
+.recognition-wrap,
+.linked .image-link,
+.linked .image-title,
+.opened .catalog-title,
+.custom-checkbox .switcher,
+.add-recognized .add.added,
+.login-icons .t-icon_link_fb,
+.feed-on-u-mind .profile-user,
+.notification-wrap .user-posted,
+.chart-row.opened > .chart-title {background: #fff;}
+.notification-wrap .user-posted.latest {background: #ebfceb;}
 .header,
-.statusbar {background: #4bbee1;}
-.top-wrap span {color: #0498ba;}
-.title, 
-.in-group span, 
-.prod-titles h2,
-.barcode-wrap button,
-.statusbar,
-.control-nav li,
-.control-nav-screen li,
-.gallery-wrap .close {color: #fff;}
-.category-title {
-	background: #33a9cd;
-	color: #fff;
+.statusbar {background: #50b052;}
+/*.no-results,*/
+.content-wrapper,
+.no-result-wrap,
+.feed-on-u-mind {background: #eaeaea;}
+.catalog-title {background: #309737;}
+.popup-block,
+.popup-message,
+.toast-message,
+.lightbox-wrap {background: rgba(0,0,0,0.5);}
+.light-btn,
+.white-box,
+.footer-menu,
+.profile-header,
+.ranking-header,
+.footer-menu .inner {background: #fafafa;}
+.post-box .you-gave {background: #1572b8;}
+.login-input {background: #a4dda4;}
+.custom-checkbox {background: #969696;}
+.custom-checkbox.checked {background: #004C02;}
+.search {background: #a7d1a2;}
+.cat-box.active,
+.points-col.active .inner,
+.share .custom-checkbox.checked {background: #4eb051;}
+.table-head {background: #2e9737;}
+.table-wrap,
+.dropdown .chart-title,
+.full-list .table-wrap:nth-child(odd) {background: #f8f8f8;}
+.full-list .table-wrap,
+.table-wrap:nth-child(odd) {background: #f1f1f1;}
+/*.add-photo {background: #ddd;}*/
+/*.dropdown .dropdown .chart-title {background: #f2f2f2;}*/
+.cat-box,
+.example-btn,
+.points-col .inner,
+.give-points-box .write-post-text:disabled {background: #f4f4f4;}
+.third-place-col .stand,
+.second-place-col .stand {background: #c9caca;}
+.first-place-col .stand {background: #d3d3d3;}
+.rotate .t-icon_arrow_rotate {background: rgba(255,255,255,0.8);}
+.login-icons .icon-facebook {background: #2626a3;}
+.number-wrap,
+.footer-menu .inner .icon-notify {background: #ef3535;}
+.recognized .add-wrap {background: #e2efdf;}
+.recognized .remove {background: #939393;}
+.comment .user-posted .img-inner-wrap {background: #13bc57;}
+.comment .title-points .comment-points {background: #52b055;}
+.comment-part .minus {background: #ef0839;}
+.image-lightbox {background: rgba(0,0,0,0.9);}
+.add-recognized .add {background: #2db0ea;}
+
+/* Colors */
+.give,
+.title,
+.reco-btn,
+.org-icon,
+.table-head,
+.login-desc,
+.login-title,
+.fb-dont-link,
+.login-submit,
+.toast-message,
+.catalog-title,
+.number-notific,
+.forgot-pass-btn,
+.fb-login-submit,
+.logo-second-part,
+.place-col .place,
+.to-remember-label,
+.post-box .you-gave,
+.add-recognized .add,
+.catalog-title .arrow,
+.cat-box.active .cat-icon,
+.cat-box.active .cat-name,
+.recognized .remove:before,
+.login-icons .t-icon_point,
+.login-icons .icon-facebook,
+.points-col.active .points-name,
+.points-col.active .t-icon_point,
+.points-col.active .points-number,
+.comment .title-points .comment-points {color: #fff;}
+.logo,
+.black,
+.search,
+.points-name,
+.add-photo-btn,
+.no-result-text,
+.refresh-connect,
+.add-photo-btn.active,
+.light-btn .inner-btn,
+.full-list .table-body,
+.user-title .user-name,
+.share .to-remember-label,
+.add-photo .add-photo-btn,
+.change-pass-input.white-box-input {color: #000;}
+.login-input::-webkit-input-placeholder,
+.search-icon,
+.search::-webkit-input-placeholder,
+.login-input::-webkit-input-placeholder {color: #4ea54e;}
+.menu-item {color: #a4aba1;}
+.menu-item.active {color: #58b253;}
+.login-icons .t-icon_link {color: #a5d6a5}
+.light-btn,
+.white-box-title,
+.light-btn .inner-btn:before {color: #4dae51;}
+.fb-share.tapped,
+.tab-title.shared-tab.active,
+.post-info .fb-share.tapped .t-icon_link_fb {color: #2d398a;}
+.needs-to,
+.whats-new,
+.full-list .job,
+.white-box-input,
+.comment .author .place,
+.quote-wrap .post-title,
+.recognition-wrap .intro,
+.linked-quote .image-title,
+.category .cat-description,
+.add-photo .add-photo-label,
+.category .cat-organisation,
+.profile-user .user-position,
+.points-block .points-number,
+.white-box-input::-webkit-input-placeholder,
+.write-post-text::-webkit-input-placeholder,
+.change-pass-input::-webkit-input-placeholder {color: #969696;}
+.opened .catalog-title,
+.opened .catalog-title .arrow {color: #4ca434;}
+.category .cat-name {color: #343434;}
+.to-favorite,
+.user-menu {color: #a4a3a3;}
+.post-info,
+.user-title,
+.employee-number,
+.person-title .user-position,
+.feed-on-u-mind .profile-title,
+.quote-wrap .user-title .user-name {color: #8b8b8b;}
+.org-icon.active {color: #006800;}
+.to-next-lvl,
+.level .t-icon_level,
+.example-btn .inner-btn:before {color: #a0a0a0;}
+.full-list-btn,
+.tab-title.active,
+.cat-box .cat-icon,
+.points-col .t-icon_point,
+.level .t-icon_level.done,
+.add-recognized .icon-plus,
+.rotate .t-icon_arrow_rotate,
+.refresh-connect .t-icon_refresh,
+.add-photo-btn.active .t-icon_photo,
+.add-photo-btn .t-icon_photo {color: #4eb051;}
+.tab-title, 
+.config-title {color: #aaa;}
+.save,
+.doit,
+.back,
+.cancel,
+.post-now,
+.small-back {color: #c1e5be;}
+.doit.disabled,
+.save.disabled,
+.cancel.disabled,
+.post-now.disabled {color: #218e21;}
+.info-row,
+.info-row a,
+.hints .white-box-desc {color: #333;}
+.mark,
+.linked .link,
+.caption-link,
+.info-row .icon,
+.chart-title .icon,
+.comment-part .plus,
+.comment .star.tapped,
+.comment .author .name,
+/*.post-info .points.tapped,*/
+.chart-title .t-icon_account,
+.chart-row.opened > .chart-title {color: #52b055;}
+.show-full,
+.info-row .phone,
+.info-row .email,
+.ranking-stand .name,
+.recognized.add .text {color: #198e19;}
+.comment-text,
+.points-box .you-have,
+.ranking-stand .points-number {color: #787878;}
+.points-block,
+.cat-box.disabled .cat-icon,
+.post-info .likes.disabled,
+.post-info .points.disabled,
+.post-info .fb-share.disabled,
+.points-col.disabled .t-icon_point,
+.post-info .likes.disabled .t-icon_like,
+.post-info .points.disabled .t-icon_point,
+.post-info .fb-share.disabled .t-icon_link_fb {color: #bababa;}
+.points-block .on {color: #797979;}
+/*.add-photo-btn .t-icon_photo {color: #d3d3d3;}*/
+/*.cat-box.active .cat-icon {color: #4faf51;}*/
+.write-post-text:disabled::-webkit-input-placeholder {color: #bebebe;}
+.login-input {color: #005600;}
+.error-msg {color: #f20a37;}
+.version {color: #50b052;}
+.connection-icon {color: #d5d5d5;}
+.connection-text {color: #a2a2a2;}
+.quote-wrap .quote-icon {color: #cecece;}
+.recognized .add-wrap .plus-icon {color: #add8ac;}
+.comment .star {color: #c6e2c3;}
+.has-points,
+.post-info .points.tapped,
+.tab-title.recognized-tab.active,
+.post-info .points.tapped .t-icon_point {color: #3bade3;}
+.post-info .likes.tapped,
+.tab-title.liked-tab.active {color: #c10e3d;}
+.lightbox-wrap .close {color: #b3b3b3;}
+.add-recognized .add.added {color: #2db0ea;}
+.blue {color: #1572b8!important;}
+
+/* Border Colors */
+.header {border-color: #2d872d;}
+.login-submit,
+.fb-login-submit,
+.category .img-inner-wrap,
+.full-list .table-body .table-col {border-color: #fff;}
+.light-btn,
+.two-light-btns .light-btn {border-color: #c9c9c9;}
+.subtable,
+.white-box-input,
+.chart-title .t-icon_account {border-color: #eaeaea;}
+.user-title,
+.tab-header,
+.points-wrap {border-color: #e6e6e6;}
+.info-row,
+.person-found {border-color: #dcdcdc;}
+.post-box .you-gave:after {border-bottom-color: #1572b8;}
+.post-box .you-gave:before {border-top-color: #1572b8;}
+.tab-title.active,
+.full-list-btn {border-color: #4eb051;}
+.full-list .table-head .table-col {border-color: #97cb9b;}
+.footer-menu,
+.footer-menu .inner {border-color: #d6d6d6;}
+.custom-checkbox {border-color: #969696;}
+.custom-checkbox.checked {border-color: #004C02;}
+.share .custom-checkbox.checked {border-color: #4eb051;}
+.whats-new {border-color: #c4c4c4;}
+.quote-wrap .feed-box {border-color: #c3c3c3;}
+.has-points-box.reco {border-color: #bababa;}
+.recognized-tab.active {border-color: #3bade3;}
+.liked-tab.active {border-color: #c10e3d;}
+.shared-tab.active {border-color: #2d398a;}
+
+/* Combinations */
+.give,
+.reco-btn {
+	background: #3bade3;
+	border-color: #989898;
 }
-.to-favorite {color: #1ea0c8;}
-.cat-organisation {color: #33a9cd;}
-.cat-description,
-.prod-desc li,
-.prod-desc li:first-child span,
-.prod-desc li a {color: #868686;}
-.opened .category-title,
-.group-box .category-title {
-	background: #fff;
-	color: #1ea0c8;
+.loader {
+	background-color: #eaeaea;
+	background-image: url(../img/tol_loader_gr_wh.gif);
 }
-.tag-box li {color: #9ce2f2;}
-.tag-box li.active {
-	color: #fff;
-	border-color: #e1265d;
+.feed-loader .spinner {
+	background-image: url(../img/tol_loader_gr_wh.gif);
 }
-.products, 
-.search-tips, 
-.prod-details, 
-.item-related,
-.menu-wrap,
-.item-browse,
-.subitem-browse,
-.grouped-prod-wrap,
-.title.expanded .image-wrap,
-.image-wrapper,
-.category .image-wrapper,
-.list-view .products .middle-wrap,
-.barcode-wrap .input-wrap .search-close {background: #fff;}
-.in-group .corner {border-right-color: #26bc30;}
-.list-view .in-group {background: #26bc30;}
-.tag-box {
-	background: #4abde0;
-    color: #fff;
+.no-connection {
+  background-color: #eaeaea;
 }
-input.search {background: #c2e2ef;}
-.search-wrap:before, 
-.search-close {color: #38a2c6;}
-.search-item:before, 
-.menu-wrap li:before,
-.control-nav-screen li.active,
-.control-nav li.active,
-.barcode-wrap .search-item span {color: #4bbee1;}
-.search-result-title {color: #9a9a9a;}
-.prod-titles h3 {color: #b4b4b4;}
-.prod-desc i.q-icons-non-favorite:before {color: #f00;}
-.prod-desc i.q-icons-price:before {color: #00aa08;}
-.prod-desc .nearme:before {color: #3c61d6;}
-.prod-name .group-name, 
-.prod-desc li span, 
-.prod-desc li i:before,
-.item-browse.opened span,
-.item-browse.opened,
-.subitem-browse.opened span,
-.subitem-browse.opened,
-.catalog-name {color: #0a9bc8;}
-.prod-desc li {border-color: #ddd;}
-.menu-wrap ul {border-color: #e0e0e0;}
-.item-browse span,
-.subitem-browse span {color: #000;}
-.subitem-browse {color: #787878;}
-.group-title {
-	color: #9ce2f2;
-	background: #4bbee1;
+.back-button {
+  background: #fff;
+  color: #50b052;
+  border-color: #e6e6e6;
 }
-.list-view .in-group .corner {border-left-color: #26bc30;}
-.about-content p {color: #7c7c7c;}
-.barcode-wrap .scan {background: #aaa;}
-.barcode-wrap .scan h2,
-.catalog-title {background: #ededed;}
-.barcode-wrap h2,
-.barcode-wrap .scan .result,
-.catalog-title {color: #505050;}

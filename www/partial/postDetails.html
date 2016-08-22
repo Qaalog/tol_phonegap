@@ -1,0 +1,108 @@
+<div class="container">
+    <div class="feed-wrap single" id="post-detail-wrap" ng-non-bindable>
+
+    </div>
+    <div class="tab-header post-tabs">
+        <div class="tab-title recognized-tab" ng-class="{active : markTabs.activeTab === TABS.TAB_RECOGNIZED}"
+             ng-fast-touch="markTabs.togleTab(TABS.TAB_RECOGNIZED)">
+            Recognized
+        </div>
+        <div class="tab-title liked-tab" ng-class="{active : markTabs.activeTab === TABS.TAB_LIKED}"
+             ng-fast-touch="markTabs.togleTab(TABS.TAB_LIKED)">
+            Liked
+        </div>
+        <div class="tab-title shared-tab" ng-class="{active : markTabs.activeTab === TABS.TAB_SHARED}"
+             ng-fast-touch="markTabs.togleTab(TABS.TAB_SHARED)">
+            Shared
+        </div>
+    </div>
+    <div class="post-tab-container">
+        <div class="post-tab-body" ng-show="markTabs.activeTab === TABS.TAB_RECOGNIZED">
+            <div ng-hide="markTabs.currentFeedItem.point_givers>0">
+                <div class="text-center grey-title">
+                    <span>This recognition has no points</span>
+                </div>
+            </div>
+            <div ng-show="markTabs.currentFeedItem.point_givers>0">
+                <div class="has-points-box person-found">
+                    <strong class="has-title">This recognition has</strong>
+                    <strong class="has-points"
+                            ng-bind="markTabs.currentFeedItem.points + (markTabs.currentFeedItem.points==1?' point':' points')"></strong>
+                </div>
+                <div class="search-box">
+                    <div class="person-found" ng-repeat="person in markTabs.currentFeedItem.point_giver_product_list">
+                        <div class="image-wrap"
+                             ng-fast-touch="showProfile(person.product_id || person.from_product_id)">
+                            <div class="img-middle-wrap">
+                                <div class="img-inner-wrap">
+                                    <img class="img" ng-src="{{person.from_product_image}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="person-title"
+                             ng-fast-touch="showProfile(person.product_id || person.from_product_id)">
+                            <div class="user-name" ng-bind="person.from_product_name"></div>
+                            <div class="user-position" ng-bind="person.from_product_header_name"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="post-tab-body" ng-repeat="tab in MARKS_TABS_LIST" ng-show="markTabs.activeTab === tab.type">
+            <div ng-hide="markTabs.currentFeedItem.mark_count>0 && markTabs.itemHasMark(tab.markType)">
+                <div class="text-center grey-title">
+                    <span ng-bind="tab.emptyText"></span>
+                </div>
+            </div>
+            <div ng-show="markTabs.currentFeedItem.mark_count>0 && markTabs.itemHasMark(tab.markType)">
+<!--
+                <div class="has-points-box person-found">
+                    <strong class="has-title" ng-bind="tab.titleText"></strong>
+                    <strong class="has-points"
+                            ng-bind="markTabs.getMarksCountByType(tab.markType)+' '+(markTabs.getMarksCountByType(tab.markType)==1?tab.textSingular:tab.text)"></strong>
+                </div>
+-->
+                <div class="search-box">
+                    <div class="person-found" ng-repeat="person in markTabs.getPersonListByMarkType(tab.markType)">
+                        <div class="image-wrap"
+                             ng-fast-touch="showProfile(person.product_id || person.from_product_id)">
+                            <div class="img-middle-wrap">
+                                <div class="img-inner-wrap">
+                                    <img class="img" ng-src="{{person.from_product_image}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="person-title"
+                             ng-fast-touch="showProfile(person.product_id || person.from_product_id)">
+                            <div class="user-name" ng-bind="person.from_product_name"></div>
+                            <div class="user-position" ng-bind="person.from_product_header_name"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--
+                <div class="post-tab-body"  ng-show="markTabs.activeTab === TABS.TAB_SHARED">
+                    <div class="has-points-box person-found">
+                        <strong class="has-title">This recognition has</strong>
+                        <strong class="has-points">55 points</strong>
+                    </div>
+                    <div class="search-box">
+                        <div class="person-found">
+                            <div class="image-wrap">
+                                <div class="img-middle-wrap">
+                                    <div class="img-inner-wrap">
+                                        <img class="img" src="http://hostneria.com/cpanel/theme/img/user-default-avatar.jpg">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="person-title">
+                                <div class="user-name">Some Name</div>
+                                <div class="user-position">Some Position</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        -->
+    </div>
+</div>

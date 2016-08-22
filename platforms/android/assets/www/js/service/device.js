@@ -23,7 +23,6 @@ tol.service('device',['$rootScope',function($rootScope){
     var fontSize = document.getElementsByTagName('body')[0].style.fontSize.replace('em','') * 1;
     var pxInEm = 16 * fontSize;
     pxInEm = (pxInEm >= 6) ? pxInEm : 6;
-    console.log(em,pxInEm, em * pxInEm);
     return  em * pxInEm;
   };
   

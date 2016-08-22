@@ -1,0 +1,98 @@
+<!-- Default Start -->
+<div class="feed-box detail-root" data-repeat="feedItem" data-type="normal">
+      <div class="whats-new" 
+           data-show="{%feedItem.update_reason%}"
+           data-binding="update_reason"
+           >{% feedItem.update_reason %}</div>
+      <div class="user-posted this-user" data-touch="showPostDetails(feedItem)">
+        <div class="image-wrap"
+             data-show="{% feedItem.from_product_id  && !feedItem.to_product_id %}"
+             data-touch="showProfile(feedItem.from_product_id)">
+          <div class="img-middle-wrap">
+            <div class="img-inner-wrap">
+              <img class="img" data-src="{% (feedItem.from_product_image) ?  scope.imgPrefix + (feedItem.from_product_image) + scope.imgSuffix : 'img/default-staff.png' %}">
+            </div>
+          </div>
+        </div>
+
+        <div class="image-wrap"
+             data-show="{% !feedItem.from_product_id  && feedItem.to_product_id %}"
+             data-touch="showProfile(feedItem.to_product_id)">
+          <div class="img-middle-wrap">
+            <div class="img-inner-wrap">
+              <img class="img" data-src="{% (feedItem.to_product_image) ?  scope.imgPrefix + (feedItem.to_product_image) + scope.imgSuffix : 'img/default-staff.png' %}">
+            </div>
+          </div>
+        </div>
+
+        <div class="image-wrap" 
+             data-show="{% feedItem.from_product_id && feedItem.to_product_id %}"
+             data-touch="showProfile(feedItem.from_product_id)">
+          <div class="img-middle-wrap">
+            <div class="img-inner-wrap">
+              <img class="img" data-src="{% (feedItem.from_product_image) ?  scope.imgPrefix + (feedItem.from_product_image) + scope.imgSuffix : 'img/default-staff.png' %}">
+            </div>
+          </div>
+        </div>
+        
+        <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
+          <div class="feed-title" 
+               data-show="{% (feedItem.from_product_id && !feedItem.to_product_id) %}">
+            <strong class="user-name" data-touch="showProfile(feedItem.from_product_id)">
+              <b>{% feedItem.from_product_name || 'Anonymous user' %}</b>
+            </strong>
+            <span class="black">published a new post</span>
+          </div>
+          <div class="feed-title"
+               data-show="{% (!feedItem.from_product_id && feedItem.to_product_id) %}">
+            <strong class="user-name" data-touch="showProfile(feedItem.to_product_id)">
+              <b>{% feedItem.to_product_name || 'Anonymous user' %}</b>
+            </strong>
+            <span class="black">{% feedItem.message%}</span>
+          </div>
+          <div class="feed-title"
+               data-show="{% feedItem.from_product_id && feedItem.to_product_id %}">
+            <span class="user-name" data-touch="showProfile(feedItem.from_product_id)">
+              <b>{% feedItem.from_product_name %}</b> says:<br>
+            </span>
+            <strong class="user-name blue" data-touch="showProfile(feedItem.to_product_id)">
+            <b>{% feedItem.to_product_name %}</b>
+            </strong>
+            <span class="blue">
+            {% ' is '+feedItem.points_alias+' on '+feedItem.points_alias_characteristic %}
+            </span>
+          </div>
+          <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
+        </div>
+        <div class="user-menu t-icon_menu" 
+             data-show="{%scope.product.id*1 === feedItem.from_product_id*1%}" 
+             data-touch="userMenuShow(feedItem)"></div>
+      </div>
+      <div class="post-box">
+        <h2 class="post-title" data-binding="getHtml(feedItem.message)" data-show="{%feedItem.from_product_id%}"  data-touch="showPostDetails(feedItem)">{%scope.getHtml(feedItem.message)%}</h2>
+        <layout name="points-wrap" expression="(feedItem.attachment_count*1 > 0) ? 'url-wrap' : 'points-wrap'"></layout>
+        <div class="post-info">
+          <div data-class-binding="giversFilter(feedItem)?'tapped points':'points'" class="{%(scope.giversFilter(feedItem)?'tapped ':'')%}points" data-touch="toggleGivePoints(feedItem,givePoints)">
+            <div class="mark-inner">
+              <span class="t-icon_point"></span>
+              <span data-binding="preparePoints(feedItem)">{% (feedItem.point_givers>0?feedItem.point_givers:'')%}</span>
+            </div>            
+          </div>
+          <div class="{% scope.getTappedByMe(feedItem,feedService.LIKE_TYPE_NORMAL)?'tapped ':''; %}likes" data-touch="setLikeFeedItem(feedItem,feedService.LIKE_TYPE_NORMAL,event)">
+            <div class="mark-inner">
+              <span class="t-icon_like"></span>
+              <span data-binding="prepareLikes(feedItem,feedService.LIKE_TYPE_NORMAL)">{% scope.getMarksCountByType(feedItem,feedService.LIKE_TYPE_NORMAL) || ''%}</span>
+            </div>            
+          </div>
+          <div class="{% scope.getTappedByMe(feedItem,feedService.LIKE_TYPE_FACEBOOK)?'tapped ':''; %}fb-share"
+               data-show="{%scope.getSharePermission(feedItem)%}"
+               data-touch="showShareMenu(feedItem, event)">
+               <div class="mark-inner">
+                 <span class="t-icon_link_fb"></span>
+                  <span data-binding="prepareLikes(feedItem,feedService.LIKE_TYPE_FACEBOOK)">{% scope.getMarksCountByType(feedItem,feedService.LIKE_TYPE_FACEBOOK) || '' %}</span>
+               </div>            
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Default End -->

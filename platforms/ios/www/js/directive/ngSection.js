@@ -1,4 +1,4 @@
-qaalog.directive('ngSection',[function(){
+tol.directive('ngSection',[function(){
   return {
     restrict: 'A',
     scope: {},

@@ -11,5 +11,13 @@
   <div id="test1" style="margin-top: 2em; font-size: 3em;">
   </div>
   
+  <div style="margin-top: 2em; text-align: center; border: 1px solid #999">
+    <div>
+      <input type="text" ng-model="itemForDelete" style="background: #fff;width: 95%;height: 2em;font-size: 1.5em;margin: 0 0.5em"/>
+    </div>
+    <button style="font-size: 3em;" ng-fast-touch="deleteFeedItem(itemForDelete)">Delete feed item</button>
+    <button style="font-size: 3em;" ng-fast-touch="recoverFeedItem(itemForDelete)">Recover feed item</button>
+  </div>
+  
   
 </div>

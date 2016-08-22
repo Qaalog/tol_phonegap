@@ -22,9 +22,9 @@ tol.controller('changePassword',['$scope','page','header','network','dialog','co
       },300);
     });
     
-    $scope.$on('freeMemory',function(){
-      $scope.isInputsShow = false;
-    });
+//    $scope.$on('freeMemory',function(){
+//      $scope.isInputsShow = false;
+//    });
     
     testPassword = function(callback) {
       callback = callback || function(){};
@@ -107,6 +107,10 @@ tol.controller('changePassword',['$scope','page','header','network','dialog','co
       
       header.toggleSave(true);
       
+    };
+    
+    $scope.test = function(a) {
+      return a+1;
     };
     
 }]);

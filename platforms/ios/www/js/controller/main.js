@@ -1,29 +1,46 @@
-qaalog.controller('main',['$rootScope','$scope','page','search','network','config','$timeout','pager','menu','share','device',
-  function($rootScope,$scope,page,search,network,config,$timeout,pager,menu,share,device){
+tol.controller('main',['$rootScope','$scope','page','searchService','network','config','$timeout','pager',
+  'menu','device','facebook','dialog','$sce','header','feed','userService','imageUpload', 'lightbox', 'analytics','pagerItera','notification','utils',
+  function($rootScope,$scope,page,searchService,network,config,$timeout,pager,menu,
+    device,facebook,dialog,$sce,header,feed,userService,imageUpload,lightbox,analytics, 
+    pagerItera,notification,utils){
     
     $scope.isIOS = device.isIOS;
-    console.log($scope.isIOS());
-    $scope.imgPrefix = network.servisePath+'GetResizedImage?i=';
-    var imgSize = Math.floor(device.emToPx(16));
-    $scope.imgSufix = '&w='+imgSize+'&h='+imgSize;
+    $scope.isBigScreen = app.isBigScreen;
     $scope.app = app;
-    
+    $scope.main = {};
     $scope.activePage = {};
-    //$scope.activePage[config.startPage] = true;
-    $scope.title = config.defaultTitle;
     $scope.currentPage = config.startPage;
-    $scope.resultVisiable = false;
+    
     $scope.isLoaderVisiable = false;
-    $scope.noResultVisiable = false;
-    $scope.searchResult = {};
+    $scope.isFeedLoaderVisible = false;
     $scope.activeView = {};
-    $scope.tabs = [{name: 'list', value: 'list'},{name: 'browse', value: 'browse'}];
-    $scope.catalogTitleVisiable = true;
-    $scope.noResultText = 'No results found';
-    $scope.resultsTitle = 'Results for ';
-    //$scope.selectionTitle = 'Select catalog to use';
+    $scope.searchModel = {};
+    $scope.shareMenuShowedEvent = {};
+    $scope.hideDeleteButton = false;
+    //$scope.imgPrefix = network.servisePathPHP + '/GetCroppedImage?i=';
+    $scope.imgPrefix = network.servisePathPHP + '/GetResizedImage?i=';
+    $scope.imgSuffix = '&h=256&w=256';
 
-    $scope.selectionTitle = app.translate('catalog_selection_subtitle','Select catalog to use');
+    $scope.$on('savedDataChanged',function(event,value){
+      $scope.main.savedData = value;
+    });
+    $scope.$on('recognizeListChanged',function(event,value){
+      $scope.main.recognizeList = value;
+    });
+    $scope.$on('clearSavedDataEvent',function(event){
+      $scope.clearSavedData();
+    });
+    $scope.$on('shareMenuShowedEvent',function(event,value){
+      $scope.shareMenuShowedEvent = value;
+    });
+
+    $scope.$on('recognizeButtonClickNeeded',function(event,value){
+      $scope.recognizeButtonClick('recobutton');
+    });
+    $scope.clearSavedData = function(){
+      $scope.main.recognizeList = [];
+      $scope.main.savedData = {};
+    };
     if (navigator.connection) {
       $scope.connection = navigator.connection;
       $scope.$watch('connection.type',function(value) {
@@ -31,7 +48,6 @@ qaalog.controller('main',['$rootScope','$scope','page','search','network','confi
         network.getConnection();
       });
     }
-
 
     page.setHeaderVisiable = function(value){
       $scope.headerIsHidden = !value;
@@ -43,80 +59,150 @@ qaalog.controller('main',['$rootScope','$scope','page','search','network','confi
       } else {
         $scope.scrollType = '';
       }
-
-    };
-    
-    page.setStatusbarHidden = function(value) {
-        $scope.isStatusbarHidden = value;
     };
 
-    page.setCatalogTitleVisiable = function(value){
-      $scope.catalogTitleVisiable = value;
-    };
-
-    page.setResultsTitle = function(title){
-      $scope.resultsTitle = title;
-    };
-
-    page.setNoResultText = function(text){
-      $scope.noResultText = text;
-    };
-
-    page.hideBackBtn = function(){
-      $scope.canBack = false;
-    };
-
-    page.hideMenu = function(){
-      $scope.menuAvailable = false;
-      $scope.tabsAvailable = false;
-      $scope.canShare = false;
-
-    };
-    page.hideSearch = function(){
-      $scope.canSearch = false;
-    };
-
-    page.setTabsVisiable = function(value){
-      $scope.tabsAvailable = value;
-    };
-    
     page.setTitle = function(title) {
       $scope.title = title;
     };
     
-    page.setExtendedImage = function(image) {
-      $scope.extendedImage = image;
+    var loaderTimerId;
+    page.showLoader = function(topSelector,bottomSelector) {
+      $rootScope.$broadcast('setMindVisible',false);
+      if (loaderTimerId) clearTimeout(loaderTimerId);
+      
+      var loader = document.getElementById('loader');
+      if (topSelector) {
+        var element = document.querySelector(topSelector);
+        try {
+          var rect = element.getBoundingClientRect();
+          var top = rect.top + rect.height;
+          loader.style.top = top+'px';
+        } catch(e) {}
+      }
+      
+      if (bottomSelector) {
+        var element = document.querySelector(bottomSelector);
+        try {
+          var rect = element.getBoundingClientRect();
+          var bottom = innerHeight - rect.top;
+          loader.style.bottom = bottom+'px';
+        } catch(e) {}
+      }
+      if(['catalog','facebookLink'].indexOf(page.currentPage)!==-1){
+        $scope.isLoaderVisiable = false;
+        $scope.isFeedLoaderVisible = true;
+      } else {
+        $scope.isLoaderVisiable = true;
+        $scope.isFeedLoaderVisible = false;
+      }
+
+      
+      loaderTimerId = setTimeout(function() {
+        $timeout(function() {
+          if (!$scope.isLoaderVisiable && !$scope.isFeedLoaderVisible) return false;
+          network.stopAll();
+          
+          dialog.create(dialog.INFO,'Oooops!',
+                'Something went wrong...<br>Let\'s reload!','OK','', function() {
+                  network.repeatLastRequest(function(result) {
+                    if (!result) {
+                      if(page.currentPage =='catalog'){
+                        $scope.isLoaderVisiable = false;
+                        $scope.isFeedLoaderVisible = true;
+                      } else {
+                        $scope.isLoaderVisiable = true;
+                        $scope.isFeedLoaderVisible = false;
+                      }
+                      dialog.create(dialog.INFO,'Gosh!',
+                        'Looks like the problem is serious.<br>Please try again later','OK','', function() {
+                          page.hideLoader();
+                          page.goBack();
+                        }).show();
+                        
+                    }
+                  }, config.DEFAULT_TIMEOUT);
+                  
+                }).show();
+        });
+      }, config.DEFAULT_TIMEOUT);
+    };
+    
+    page.hideLoader = function(){
+      $rootScope.$broadcast('setMindVisible',true);
+      document.getElementById('loader').style.top = '';
+      document.getElementById('loader').style.bottom = '';
+      $scope.isLoaderVisiable = false;
+      $scope.isFeedLoaderVisible = false;
+    };
+    
+    $scope.hideLoader = page.hideLoader;
+    
+    page.showNoConnection = function(retryFunction, priority) {
+      $scope.retryFunction = retryFunction;
+      $timeout(function(){
+        page.hideLoader();
+        $scope.noConnection = true;
+        document.getElementById('no_connection').style.zIndex = priority || '';
+      });
+    };
+       
+    page.hideNoConnection = function() {
+      $timeout(function(){
+        $scope.noConnection = false;
+      });
+    };
+    
+    $scope.hideNoConnection = page.hideNoConnection;
+    
+    $scope.retry = function() {
+      page.showLoader();
+      if (typeof $scope.retryFunction === 'function')
+        $scope.retryFunction();
     };
 
-    $scope.onNoResultClick = function() {};
-    page.setOnNoResultClick = function(callback){
-      $scope.onNoResultClick = callback;
-    };
+    /*--------- NAVIGATION --------*/
+    $scope.onCancel = function() {
+      $scope.blurTextAreas();
+      //$scope.clearSavedData();
+      var delay = 100;
+      if (device.isIOS())  {
+        // "over ckick" on iOS prevent.
+        delay = 300;
+        //if (['searchPage','givePoints','postDetails'].indexOf(page.currentPage) !==-1) delay = 300;
+      }
+      if(userService.getAuthProduct()){
+        $timeout(function() {
+          page.show('feed', {});
+        },delay);
+      } else {
+        $timeout(function() {
+          page.show('login',{logout:true})
+        },delay);
+      }
+      page.navigatorClear();
 
+    };
+    
     $scope.onBack = function() {
       console.log('GO BACK');
+      $scope.blurTextAreas();
       if (!network.getConnection()){
         return false;
       }
-      $scope.resultVisiable = false;
-      if (device.isIOS()) {
-        document.getElementById('barcode-input').blur();
-      }
-      
       return page.goBack();
     };
 
+    $scope.blurTextAreas = function(){
+      document.getElementById('post_textarea').blur();
+      document.getElementById('givePoints_textarea').blur();
+    };
 
-    page.goBack = function() {
-    //  network.stopAllHttpRequests();
-      console.log('COUNT',network.getActiveRequestsCount());
-      if (network.getActiveRequestsCount() > 0) {
-        network.setAbortBlock(true);
-      }
-      network.stopAll();
-      page.hideNoResult();
+    page.goBack = function(stopAllDeny) {
+      document.getElementById('search-input').blur();
+      
+      if (!stopAllDeny) network.stopAll();
+      if(page.currentPage === 'feed') return false;//native android backbutton exit from app
       var oldPage = page.navigatorPop();
-      console.log('OLD PAGE',oldPage);
       if (oldPage) {
         
         if (oldPage.callback) {
@@ -124,9 +210,12 @@ qaalog.controller('main',['$rootScope','$scope','page','search','network','confi
           return true;
         }
         
-        $scope.resultVisiable = oldPage.params.resultVisiable;
-        var delay = 0;
-        if (device.isIOS()) delay = 100;
+        var delay = 100;
+        if (device.isIOS())  {
+          // this code prevent "over ckick" on iOS.
+          delay = 300;
+          //if (page.currentPage === 'searchPage') delay = 300;
+        }
         $timeout(function() {
           page.show(oldPage.name,oldPage.params,true);
         },delay);
@@ -137,298 +226,1065 @@ qaalog.controller('main',['$rootScope','$scope','page','search','network','confi
     };
     
     document.addEventListener("backbutton", function(event){
-      $scope.$apply(function(){
+      $timeout(function(){
         if(!$scope.onBack()){
           navigator.app = navigator.app || {};
           navigator.app.exitApp();
         };
       });
     }, false);
-    
-    document.addEventListener('keyup', function(event){
-      if (event.keyCode === 27) {
-        $rootScope.$broadcast('escapePressed');
+
+    page.show = function(pageId, params, isBack, skipConnectionCheck, denyMemoryFree) {
+      
+      if (app.inputs) {
+        for (var i = 0, ii = app.inputs.length; i < ii; i++) {
+          if (app.inputs[i].id !== 'search-input') {
+            app.inputs[i].blur();
+          }
+        }
       }
-    }, false);
-    
-    page.show = function(pageId,params,isBack, force) {
-      if (!force) {
+      
+      if (device.isIOS() && window.StatusBar) {
+        StatusBar.show();
+      }
+      page.toggleNoResults(false);
+      page.hideNoConnection();
+//      if (!page.getPermission(pageId)) {
+//        var savedTab = page.getActiveTabView();
+//        page.hideLoader();
+//        dialog.create(dialog.INFO,'Page unavailable',
+//          'Sorry, this page will be available<br>in sprint '+page.getPageSprint(pageId),'OK').show();
+//        page.setActiveTabView(savedTab);
+//        return false;
+//      };
+      
+      if (!skipConnectionCheck) {
         if (!network.getConnection()){
           return false;
         }
       }
-      //document.getElementById('barcode-input').blur();
-      $rootScope.$broadcast('freeMemory');
-      page.setOnNoResultClick(function(){});
+      if (!denyMemoryFree) $rootScope.$broadcast('freeMemory');
       page.showLoader();
-      page.hideNoResult();
       params = params || {};
-      $scope.stopSearching();
       if (!isBack) {
         params.isBack = false;
-        
-        var state =  pager.saveState();
-        if (state) {
-          page.addToCurrentParams({'state': state});
-        }
-        
-        page.addToCurrentParams({'resultVisiable': $scope.resultVisiable});
         page.navigatorPush();
-        $scope.resultVisiable = false;
       } else {
         params.isBack = true;
       }
-      pager.stopPager();
+      
+      pager.stop();
+      pagerItera.stop();
+      feed.postDetailUpdateStop();
+
       $scope.activePage = {};
       $scope.activePage[pageId] = true;
       $scope.currentPage = pageId;
       
-      if (pageId !== 'menu') {
-        menu.setIsSortable(false);
-        menu.setListViewChangeEnabled(false);
+      if (analytics.isEnabled)
+        analytics.trackView($scope.currentPage);
+      
+      page.setActiveTabView(pageId);
+      page.toggleVersionVisiable(false);      
+      imageUpload.setAllowEdit(true);//Image Allow EDit
+      params.callPage = page.currentPage;
+      page.runOnShow(pageId,params,isBack);
+    };
+
+    page.applyParams = function(params,isBack){
+      params = params || {};
+      
+      $scope.canChart = params.chart;
+      $scope.chartActive = params.chartActive;
+      $scope.canCancel = params.cancel;
+      $scope.canPost = params.post;
+      $scope.canSave = params.save;
+      $scope.canSmallBack = params.smallBack;
+      $scope.canDoIt = params.doIt;
+      $scope.canBack = params.back;
+
+      $scope.canSearch = params.search;
+      $scope.canSearchChart = params.searchChart;
+      $scope.smallSearch = params.smallSearch;
+      if (params.smallSearch) {
+        var classSelector = (!params.searchChart) ? '.search-product' : '.search_chart';
+        app.animate(document.querySelector(classSelector),250);
       }
       
-      page.runOnShow(pageId,params,isBack);
-      $timeout(function(){
-        page.setHeaderHeight(document.getElementsByTagName('header')[0].getBoundingClientRect().height);
+      $scope.profileHeaderShow = params.profileHeader;
+      $scope.rankingHeaderShow = params.rankingHeader;
+      page.setTabsVisiable(params.tabs);
+      $scope.title = params.title;
+    };
+    
+    page.showForResult = function(pageId,params,resultCallback, keepControl) {
+      resultCallback = resultCallback || function(){};
+      params = params || {};
+      params.requestResult = true;
+      var waitPage = page.currentPage;
+      page.show(pageId,params);
+      if (typeof page.pageRequestResults[pageId] === 'function') {
+        page.pageRequestResults[pageId](params,function(response){
+          params.response = response;
+          if (!keepControl) page.show(waitPage,params);
+          resultCallback(response);
+        });
+      } else {
+        delete params.requestResult;
+        page.show(waitPage,params);
+        resultCallback(false);
+      }
+    };
+    
+    page.changePageSettings = function(settings) {
+      page.applyParams(settings);
+    };
+    
+    page.toggleNoResults = function (isShow, text, bgColor,removeTop) {
+      removeTop = removeTop || false;
+      $timeout(function() {
+        var wrap = document.getElementById('no_result_wrap');
+        wrap.style.backgroundColor = '';
+        if(removeTop) {
+          wrap.style.top = '0em'
+        } else {
+          wrap.style.top = '';
+        }
+        $scope.isNoResultShow = isShow;
+        $scope.noResultText = text || 'No result.';
+        if (bgColor) {
+          wrap.style.backgroundColor = bgColor;
+        }
+      });
+      
+    };
+    /*------- AVATAR -------*/
+    
+    var uploadAvatar = function(data) {
+      var img = document.getElementById('avatar_img');
+      img.src = 'img/tol_loader_gr_wh.gif';
+      
+      network.post('product/changeMainMedia/',data,function(result,response){
+        if (result) {
+          console.log(response);
+          userService.setAvatar(response.image_url);
+          network.pagerReset();
+          img.src = $scope.imgPrefix + response.image_url + $scope.imgSuffix;
+          img.onerror = function() {
+            img.src = 'img/default-staff.png';
+          };
+          
+        }
       });
     };
-
-
     
-    page.applyParams = function(params,isBack){
-      console.log('PARAMS >>>' ,params);
-      params = params || {};
-      $scope.canSearch = params.search;
-      $scope.canBack = params.back;
-      $scope.canShare = params.share;
-      $scope.menuAvailable = params.menu;
-      $scope.tabsAvailable = params.tabs;
-      if (!isBack) {
-        $scope.isHeaderExtended = params.extendedHeader;
-      }
-      $scope.isGroupTitleVisiable = params.groupTitle;
-      $scope.title = params.title || config.defaultTitle;
-      if (params.swipeHeader) {
-        page.startSwipeHeader();
-      } else {
-        page.stopSwipeHeader();
-      }
-    };
-    
-    page.toggleSearchIcon = function(state) {
-      $scope.canSearch = state;
-    };
-    
-    page.toggleShareIcon = function(state) {
-      $scope.canShare = state;
-    };
-    
-    page.setGroupTitle = function(title) {
-      $scope.groupTitle = title;
-    };
-    
-    page.hideExtendedHeader = function() {
-      $scope.isHeaderExtended = false;
-    };
-
-    $scope.$watch('activeView',function(newValue, oldValue){
-      console.log(newValue, oldValue);
-      if (Object.keys(newValue)[0] === 'list' 
-              && Object.keys(oldValue)[0] !== 'detail'
-              && Object.keys(oldValue)[0] !== 'related') {
-        page.showExtendedHeader();
-      }
-    });
-    page.showExtendedHeader = function(force) {
-      
-      if (Object.keys($scope.activePage)[0] === 'products' && Object.keys($scope.activeView)[0] === 'list') {
-        if (force) {
-          $scope.isHeaderExtended = true;
-          return true;
-        }
-
-        page.tryExtendedHeader();
-      }
-
-    };
-    
-    page.setTabs = function(tabs){
-      $scope.tabs = tabs;
-    };
-    
-    page.setTab = function(view){
-      $scope.changeView(view);
-    };
-    
-    $scope.changeView = function(view){
-      if (!network.getConnection()){
+    $scope.changeAvatar = function(product) {
+      console.log(product.id, userService.getProductId());
+      if (product.id*1 !== userService.getProductId()) {
+        feed.showPictureInLightBox(product.image_url);
         return false;
       }
+      
+      if (!device.isWindows()) dialog.togglePhotoMenu('true');
+    };
+    
+    if (device.isWindows()) imageUpload.addFileInput('avatar_selector_input', 'avatar_wrap', uploadAvatar);
+    page.onProfileShow = function() {
+      
+      imageUpload.setOnSucces(function(imageData) {
+//        var img = document.getElementById('avatar_img');
+//        img.src = "data:image/jpeg;base64," + imageData;
+        var data = { media_data: { content: imageData
+                                 , mime_type: 'image/jpeg'
+                                 }
+                   , id: userService.getProductId()
+                   };
+        uploadAvatar(data);
+      });
+
+      imageUpload.setOnFail(function(message) {
+        console.log('Some thing went wrong when capturing photo', message);
+      });
+      
+    };
+    
+    
+    
+    /*---------- TABS --------*/
+    $scope.profileTabs = [
+      {title: 'bio'},
+      {title: 'posts'},
+      /*{title: 'points'},*/
+
+      {title: 'config'}
+    ];
+    
+    page.addProfileTab = function(tabTitle) {
+      for (var i = $scope.profileTabs.length-1; i >= 0; i-- ) {
+        if ($scope.profileTabs[i].title === tabTitle) {
+          return false;
+        }
+      }
+      $scope.profileTabs.push({title: tabTitle});
+    };
+    
+    page.removeProfileTab = function(tabTitle){
+      for (var i = $scope.profileTabs.length-1; i >= 0; i-- ) {
+        if ($scope.profileTabs[i].title === tabTitle) {
+          $scope.profileTabs.splice(i,1);
+          break;
+        }
+      }
+    };
+    
+    page.setTabsVisiable = function(value, force){
+      if (value) {
+        var footerHeight = (app.emToPx(app.isBigScreen()?6.25:6.25) + 1);
+        if (force) {
+          app.wrapper.style.height = (innerHeight - footerHeight) + 'px';
+        } else {
+          app.wrapper.style.height = (app.innerHeight - footerHeight) + 'px';
+        }
+      } else {
+        app.wrapper.style.height = app.innerHeight + 'px';
+      }
+      $scope.tabsAvailable = value;
+    };
+    
+    
+//    function iOSRecalculateHeight() {
+//      return false;
+//      if (isHeightWatchStopped) return false;
+//      if ($scope.tabsAvailable) {
+//        var footerHeight = (app.emToPx(6.25) + 1);
+//        app.wrapper.style.height = (innerHeight - footerHeight) + 'px';
+//      } else {
+//        app.wrapper.style.height = (innerHeight + 18) + 'px';
+//      }
+//      app.innerHeight = innerHeight;
+//      app.savedHeight = innerHeight;
+//    }
+    
+    document.addEventListener("resume", function() {
+//      if (device.isIOS()) {
+//        iOSRecalculateHeight();
+//      }
+      
+      if (userService.getAuthProduct().id) {
+        notification.getNewNotificationCount(userService.getAuthProduct().id);
+      }
+      
+    });
+    
+//    var isHeightWatchStopped = false;
+//    var heightWatcher = null;
+//    
+//    if (device.isIOS()) {
+//      setTimeout(function() {
+//        app.textAreas = document.querySelectorAll('textarea');
+//        if (app.textAreas) {
+//          for (var i = 0, ii = app.textAreas.length; i < ii; i++) {
+//            app.textAreas[i].addEventListener('focus',stopHeightWatch);
+//            app.textAreas[i].addEventListener('blur',startHeightWatch);
+//          }
+//        }
+//      }, 1000);
+//      
+//      
+//      
+//      app.savedHeight = window.innerHeight;
+//      function heightWatch() {
+//        if (isHeightWatchStopped) return false;
+//        if (app.savedHeight !== window.innerHeight) {
+//          iOSRecalculateHeight();
+//        }
+//
+//       heightWatcher = window[app.requestFrame](heightWatch);
+//      }
+//      startHeightWatch();
+//    }
+//    
+//    function stopHeightWatch() {
+//      console.log('stopHeightWatch');
+//      isHeightWatchStopped = true;
+//      window[app.cancelFrame](heightWatcher);
+//    }
+//    
+//    function startHeightWatch() {
+//      isHeightWatchStopped = false;
+//      heightWatcher = window[app.requestFrame](heightWatch);
+//    }
+
+    
+    page.onTabChange = function(pageName) {
+      page.show(pageName,{fromTabChange:true});
+    };
+      
+    page.setActiveTabView = function(view) {
       $scope.activeView = {};
       $scope.activeView[view] = true;
-      page.onTabChange(view);
     };
     
-    var startSearchingFlag = false;
-    $scope.startSearching = function() {
-      if (!network.getConnection()){
+    page.getActiveTabView = function() {
+      return Object.keys($scope.activeView)[0];
+    };
+    
+    var requestFrame = window[app.requestFrame];
+    
+    function fastScroll() {
+      if (app.wrapper.scrollTop <= 0) return false;
+      app.wrapper.scrollTop = app.wrapper.scrollTop - 500;
+      requestFrame(fastScroll);
+    }
+    
+    $scope.changeView = function(view){
+      if (view === 'feed' && page.getActiveTabView() === 'feed') {
+        fastScroll();
+      }
+      
+      if (page.getActiveTabView() === view){
+        if (view === 'profile' && $scope.userProductId == $scope.profileProductId) {
+          return false;
+        }
+      }
+
+      page.toggleNoResults(false);
+      page.hideNoConnection();
+      pager.stop();
+      pagerItera.stop();
+      page.showLoader('.header','.footer-menu');
+      page.onTabChange(view);
+      page.navigatorPop();
+    };
+    
+    $scope.onProfileTabTouch = function(tab) {    
+      page.toggleNoResults(false);
+      page.hideNoConnection();
+      page.setProfileTab(tab.title);
+    };
+    
+    page.setProfileTab = function(tab) {
+      $scope.product = userService.getProduct();
+      
+      for (var i in $scope.profileTabs) {
+        if (tab === $scope.profileTabs[i].title) {
+          $scope.profileTabs[i].isActive = true;
+          continue;
+        } 
+        $scope.profileTabs[i].isActive = false;
+      }
+      
+      page.onProfileTabChange(tab);
+    };
+    
+    page.setProfileProductId = function(id) {
+      $timeout(function() {
+        $scope.userProductId = userService.getProductId();
+        $scope.profileProductId = id;
+      });
+    };
+    
+    
+    var currDate = new Date();
+    $scope.rankingTabs = [ {id:'prev_month',title: utils.getShrotMonthName((currDate.getMonth()-1>=0?currDate.getMonth()-1:11))}
+                         , {id:'this_month',title: utils.getShrotMonthName(currDate.getMonth())}
+                         , {id:'prev_year',title: currDate.getFullYear()-1+''}
+                         , {id:'this_year',title: currDate.getFullYear()+''}
+                         ];
+    
+    $scope.onRankingTabTouch = function(tab) {  
+      page.setRankingTab(tab);
+    };
+    
+    page.setRankingTab = function(tab) {
+      
+      for (var i in $scope.rankingTabs) {
+        if (tab.id === $scope.rankingTabs[i].id) {
+          $scope.rankingTabs[i].isActive = true;
+          continue;
+        } 
+        $scope.rankingTabs[i].isActive = false;
+      }
+      
+      page.onRankingTabChange(tab);
+    };
+    
+    /*------ HEADER CONTROL ------*/
+    
+    $scope.showMenu = function() {
+      page.show('menu',{});     
+    };
+    
+    $scope.postNow = function() {
+      $scope.blurTextAreas();
+      //page.showLoader();
+      header.post();
+    };
+    
+    $scope.save = function() {
+      $scope.blurTextAreas();
+      header.save();
+    };
+    
+    $scope.onDoIt = function() {
+      $scope.blurTextAreas();
+      header.doIt();
+    };
+    
+    $scope.goToChart = function() {
+      var data = {recognizeList:$scope.main.recognizeList,savedData:$scope.main.savedData};
+      if (page.currentPage === 'searchPage') {
+        data.saveList = true;
+      }
+      page.show('chart',data);
+    };
+    
+    header.togglePost = function(value) {
+      $scope.isPostEnabled = value;
+    };
+    
+    header.toggleSave = function(value) {
+      $scope.isSaveEnabled = value;
+    };
+    
+    header.toggleDoIt = function(value) {
+      $scope.isDoItEnabled = value;
+    };
+    
+    header.switchPost = function(switchTo) {
+      if (!$scope.canPost && !$scope.canSave) {
         return false;
       }
-      $scope.searchModel = {};
-      $scope.isSearchPanelVisiable = true;
-      page.hideExtendedHeader();
-      var el = document.getElementById('search-input');
+      switch (switchTo) {
+        
+        case header.POST:
+          $scope.canPost = true;
+          $scope.canSave = false;
+          break;
+        
+        case header.SAVE:
+          $scope.canPost = false;
+          $scope.canSave = true;
+          break;
+      }
+      
+    };
+    
+    $scope.getHotelName = function() {
+      var name = userService.getHotelName();
+      if (name.length > 30) {
+        return name.slice(0, 27 - name.length) + '...';
+      }
+
+      return name;
+    };
+    
+    /*------- FOOTER CONTROL --------*/
+    
+    $scope.isVersionShow = false;
+    
+    page.toggleVersionVisiable = function(value) {
+      $scope.isVersionShow = value;
+    };
+
+    /*------- FACEBOOK -------*/
+    
+    /* iOS hack (textarea focus) */
+    var fbTextarea, fbTextareaLayout;
+    function focus() {
+      fbTextareaLayout = fbTextareaLayout || document.getElementById('fb_message_layout');
+      fbTextarea = fbTextarea || document.getElementById('fb_message');
+      if (device.isIOS()) {
+        var rect = fbTextareaLayout.getBoundingClientRect();
+        fbTextarea.style.top = rect.top + 'px';
+        fbTextarea.style.left = rect.left + 'px';
+        fbTextarea.style.width = rect.width + 'px';
+        fbTextarea.style.height = rect.height + 'px';
+        fbTextarea.style.opacity = 1;
+        fbTextarea.style.background = '#fff';
+        fbTextarea.focus();
+      } else {
+        fbTextareaLayout.focus();
+      }
+    };
+    
+    function blur() {
+      if (device.isIOS()) {
+        if (!fbTextarea) return false;
+        fbTextarea.style.top = '-10em';
+        fbTextarea.style.left = 0;
+        fbTextarea.style.width = '';
+        fbTextarea.style.height = '';
+        fbTextarea.style.opacity = 0;
+        fbTextarea.style.background = '';
+        fbTextarea.blur();
+      } else {
+        if (!fbTextareaLayout) return false;
+        fbTextareaLayout.blur();
+      }
+      
+    }
+    /*iOS hack end*/
+    
+    $scope.getHtml = feed.getHtml;
+    facebook.toggleShareMenu = function(value, params,img) {
+      $scope.isShareShow = value;
+      if (!value) page.navigatorPop();
+      if (value) {
+        page.navigatorPush(function(){
+          $timeout(function(){
+            $scope.closeShareMenu(false,true);
+          });
+        });
+        app.animate(document.getElementsByClassName('animate-fb-share')[0],250);
+        
+          var canvas = document.getElementById('canvas');
+          var canvasWrap = canvas.parentElement;
+          var description = document.getElementById('fb-preview-desc');
+          
+          var ctx = canvas.getContext('2d');
+          
+          if (img && img.width < img.height) {
+            canvasWrap.style.width = '30%';
+            canvasWrap.style.float = 'left';
+            canvasWrap.style.marginRight = '0.5em';
+            description.style.marginTop = '0';
+
+            setTimeout(function(){
+              canvas.width = img.width;
+              canvas.height = img.height;
+              ctx.drawImage(img,0, 0, img.width, img.height);
+            }, 300);
+          } else if(img){
+            canvasWrap.style.width = '';
+            canvasWrap.style.float = '';
+            canvasWrap.style.marginRight = '';
+            description.style.marginTop = '0.5em';
+
+            setTimeout(function(){
+              var rect = canvasWrap.getBoundingClientRect();
+              canvas.width = rect.width;
+              canvas.height = rect.height;
+              var start = (img.height / 2) - (canvas.height / 2);
+              if (img.height <= canvas.height) {
+                ctx.drawImage(img,0, 0, img.width, img.height);
+              } else {
+                ctx.drawImage(img,0,start, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+              }
+              
+            },300);
+          }
+          console.log(params);
+        $scope.fbMessage = '';
+        $scope.shareItem = params;
+        $scope.shareItem.hotel = userService.getHotelName();
+      }
+    };
+    
+    $scope.closeShareMenu = function(event,force) {
+      if (force || event.target.className.indexOf('popup-block') >= 0) {
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        facebook.toggleShareMenu(false);
+        page.setTabsVisiable(true);
+      }
+    };
+    
+    $scope.shareNow = function(shareItem, fbMessage) {
+      blur();
       $timeout(function(){
-          console.log('focus',el);
-        el.focus();
-      },500);
-      if (!startSearchingFlag) {
-        page.navigatorPush($scope.stopSearching);
-        startSearchingFlag = true;
+        facebook.toggleShareMenu(false);
+        page.setTabsVisiable(true);
+        page.showLoader();
+      });
+      
+      var share = function() {
+        var data = { message: fbMessage || ''
+                   //, message: shareItem.message.replace(/<br>/gim,'')
+                   , link: 'http://www.teamoutloud.com'
+                   , picture: shareItem.media_url
+                   , name: userService.getHotelName()
+                   //, caption: ''
+                   , description: 'Increase your employee engagement.'
+                   };
+        facebook.api('POST','me/feed',data,function(result, response){
+          page.hideLoader();
+          console.log('send',result, response);
+          //feed.setLikeFeedItem(shareItem,feed.LIKE_TYPE_FACEBOOK,$scope.shareMenuShowedEvent);
+          if (result) {
+            feed.setLikeFeedItem(shareItem,feed.LIKE_TYPE_FACEBOOK,$scope.shareMenuShowedEvent);
+            $timeout(function(){
+              dialog.create(dialog.INFO, 'Thanks!', 'Your post was successfully<br/>published in Facebook', 'OK', null).show();
+            });
+            
+            if (shareItem.from_product_id*1 !== userService.getAuthProduct().id && shareItem.can_share*1 > 0) {
+              var data = { post_id: shareItem.id
+                         , by_product_id: userService.getAuthProduct().id
+                         , product_id: shareItem.from_product_id
+                         , message: 'share your post on Facebook'
+                         };
+               network.put('post_notification',data);
+            }
+            
+            
+          }
+        });
+      };
+      
+      openFB.getLoginStatus(function(status) {
+        if (status.status !== 'connected') {
+          facebook.toggleShareMenu(false);
+          page.setTabsVisiable(true);
+          localStorage.removeItem('do_not_link'+userService.getUser().id);
+          page.showForResult('facebookLink',shareItem,function(result){
+            if (result) {
+              share();
+            }
+          });
+          return false;
+        }
+        share();
+
+    
+      });
+      
+    };
+    
+    page.requestFBAvatar = function(callback){
+      callback = callback || function(){};
+      if (facebook.isActive()) { 
+        dialog.create(dialog.QUESTION,'Use Facebook picture?','Do you want to user your Facebook profile<br>\
+          picture on TeamOutLoud?','Yes','No',function(answer){
+          if (answer) {
+            facebook.getBase64Avatar(function(base,mimeType){
+              var data = { media_data: { content: base
+                                       , mime_type: mimeType
+                                       }
+                         , id: userService.getProductId()
+                         };
+              document.getElementById('avatar_img').src = 'data:image/jpeg;base64,'+base;
+              uploadAvatar(data);
+            },true);
+            network.pagerReset();
+          }
+          callback(answer);
+        }).show();
       }
     };
 
-    search.stopSearching = function(){
-      $scope.isSearchPanelVisiable = false;
-      $scope.tips = [];
-      document.getElementById('search-input').blur();
-      startSearchingFlag = false;
+    /*------- DIALOGS -------*/
+    dialog.create = function(type, title, message, positiveBtn, negativeBtn, callback) {
+      callback = callback || function(){};
+      var dialogType;
+      $scope['isInfoShow'] = false;
+      $scope['isQuestionShow'] = false;
+      if (type === dialog.INFO) {
+         dialogType = 'isInfoShow';
+      }
+      if (type === dialog.QUESTION) {
+        dialogType = 'isQuestionShow';
+      }
+      
+      $scope.dialog = { title: title
+                      , message: $sce.trustAsHtml(message)
+                      , positiveBtn: positiveBtn
+                      , negativeBtn: negativeBtn
+                      };           
+      $scope.positiveBtnTouch = function() {
+        page.navigatorPop();
+        $scope[dialogType] = false;
+        callback(true);
+      };
+      
+      $scope.negativeBtnTouch = function() {
+        page.navigatorPop();
+        $scope[dialogType] = false;
+        callback(false);
+      };
+      
+      return { show: function() {
+                  $timeout(function() {
+                    $scope[dialogType] = true;
+                    page.navigatorPush(function(){
+                      $timeout(function() {
+                        $scope[dialogType] = false;
+                        callback(false);
+                      });
+                    });
+                  });
+                  
+               },
+               hide: function() {
+                 $timeout(function() {
+                   $scope[dialogType] = false;
+                 });
+               }
+             };
+    };
+     
+    dialog.toggleUserMenu = function(value,hideDeleteButton) {
+      hideDeleteButton = hideDeleteButton || false;
+      $scope.hideDeleteButton = hideDeleteButton;
+      if (value) page.navigatorPush(function(){
+        $timeout(function() {
+          $scope.closeUserMenu(false,true);
+          console.log('back');
+        });
+        
+      });
+      if (!value) page.navigatorPop();
+      
+      $scope.isUserMenuShow = value;
+    };
+    dialog.toggleMindMenu = function(value) {
+      if (value) page.navigatorPush(function(){
+        $timeout(function() {
+          $scope.closeMindMenu(false,true);
+          console.log('back');
+        });
+
+      });
+      if (!value) page.navigatorPop();
+
+      $scope.isMindMenuShow = value;
+    };
+    dialog.addActionListener('all',function(action) {
+      switch (action) {
+        case 'create_post':
+          dialog.toggleMindMenu(false);
+          page.navigatorPush();
+          $scope.changeView('post')
+          break;
+
+        case 'create_recognition':
+          dialog.toggleMindMenu(false);
+          page.navigatorPush();
+          $scope.recognizeButtonClick('mindmenu');
+          break;
+      }
+    });
+    
+    $scope.recognizeButtonClick = function(from){
+      var backPage = { name: 'feed'
+        , params: {}
+      };
+      if(from == 'profile'){
+        $scope.product.isAdded = true;
+        $scope.product.productId = $scope.product.id;
+        $scope.main.recognizeList = [$scope.product];
+        $scope.main.savedData = {};
+        $rootScope.$broadcast('recognizeListChanged',$scope.main.recognizeList);
+        page.show('givePoints',{backPage: backPage, recognizeList:$scope.main.recognizeList,savedData:{}})
+      } else {
+        $rootScope.$broadcast('recognizeListChanged',$scope.main.recognizeList);
+        page.show('givePoints',{recognizeList: $scope.main.recognizeList||[], backPage: backPage, savedData: $scope.main.savedData || {},fromRecognizeButton:(from=='recobutton'),fromMindMenu:(from=='mindmenu')});
+      }
+    };
+
+    dialog.togglePhotoMenu = function(value) {
+      if (value) page.navigatorPush(function(){
+        $timeout(function() {
+          $scope.closePhotoMenu(false,true);
+        });
+        
+      });
+      if (!value) page.navigatorPop();
+      
+      $scope.isPhotoMenuShow = value;
     };
     
-    $scope.stopSearching = search.stopSearching;
+    $scope.dialogAction = function(action) {
+      dialog.action(action);
+    };
     
-    $scope.onSearchChange = function() {
-      var data = { catalogDB: network.getCatalogDB()
-                 , searchTerm: $scope.searchModel.value
-                 , maxRows: 3
-                 };
+    $scope.closeUserMenu = function(event,force) {
+      if (force || event.target.className.indexOf('popup-message') >= 0) {
+        dialog.toggleUserMenu(false);
+      }
+    };
+    $scope.closeMindMenu = function(event,force) {
+      if (force || event.target.className.indexOf('popup-message') >= 0) {
+        dialog.toggleMindMenu(false);
+      }
+    };
+    $scope.closePhotoMenu = function(event,force) {
+      if (force || event.target.className.indexOf('popup-message') >= 0) {
+        dialog.togglePhotoMenu(false);
+      }
+    };
+    
+    dialog.togglePointsMenu = function(value, postType){
+      if (value) {
+        page.navigatorPush(function(){
+          $timeout(function() {
+            $scope.closePointsMenu(false,true);
+          });
+        });
+        $scope.menuPostType = postType;
+      }
+      if (!value) page.navigatorPop();
       
-      network.get('SearchAutocomplete',data,function(result,response){
-        if (result) {
-          $scope.tips = response;
-          console.log(response);
-        } else {
+      $scope.isPointsMenuShow = value;
+    };
+    
+     $scope.closePointsMenu = function(event,force) {
+      if (force || event.target.className.indexOf('popup-message') >= 0) {
+        dialog.togglePointsMenu(false);
+      }
+    };
+
+    dialog.toggleExternalMenu = function(value, postType){
+      if (value) {
+        page.navigatorPush(function(){
+          $timeout(function() {
+            $scope.closeExternalMenu(false,true);
+          });
+        });
+        $scope.menuPostType = postType;
+      }
+      if (!value) page.navigatorPop();
+
+      $scope.isExternalMenuShow = value;
+    };
+
+     $scope.closeExternalMenu = function(event,force) {
+      if (force || event.target.className.indexOf('popup-message') >= 0) {
+        dialog.toggleExternalMenu(false);
+      }
+    };
+
+    
+    $scope.toast = { isExist: false
+                   , isHidden: true
+                   };
+    
+    
+    dialog.toggleToastMessage = function(value, text) {
+      console.log(value, text);
+      if (value) {
+        $scope.toast.isExist = true;
+        $scope.toast.text = text;
         
+        $timeout(function() {
+         $scope.toast.isHidden = false; 
+        });
+        
+        $timeout(function() {
+          dialog.toggleToastMessage(false);
+        },5000);
+      } else {
+        $scope.toast.isHidden = true;
+        $timeout(function(){
+          $scope.toast.isExist = false;
+        },500);
+      }
+    };
+    
+    /*------- SEARCH --------*/
+    var body = document.body;
+    searchService.setInputValue = function(value) {
+      $scope.searchModel.value = value;
+    };
+    
+    $scope.onSearchInputFocus = function() {
+//      if (device.isIOS()) {
+//        console.log('preventScroll set');
+//        body.addEventListener('touchmove', preventScroll);
+//      }
+      var data = {saveList:false,savedData:$scope.main.savedData,recognizeList:$scope.main.recognizeList};
+/*
+      if (page.currentPage === 'chart') {
+        data.saveList = true;
+      }
+*/
+      if (page.currentPage !== 'searchPage') {
+        page.show('searchPage',data);
+      }
+    };
+    
+    $scope.onSearchInputBlur = function() {
+//      if (device.isIOS()) {
+//        console.log('preventScroll cancel');
+//        body.removeEventListener('touchmove', preventScroll);
+//      }
+    };
+    
+    function preventScroll(event) {
+      if (body.scrollTop !== 0) {
+        event.preventDefault();
+        event.stopPropagation();
+        body.scrollTop = 0;
+        setTimeout(function(){
+          body.scrollTop = 0;
+        });
+      }
+    }
+    
+    $scope.onSearchChange = function(value) {
+      searchService.onSearch(value);
+    };
+    
+    $scope.onSearchChartChange = function(value) {
+      searchService.onSearchChart(value);
+    };
+    
+    $scope.onSearchChart = function(event) {
+      if (event.keyCode === 13) {
+        searchService.doSearchChart();
+      }
+    };
+    
+    searchService.clearSearchChartInput = function(){
+      $scope.chartSearchModel = '';
+    };
+
+    /*------- LIGHTBOX -------*/
+
+    lightbox.visiable = function(value) {
+      $scope.isLightBoxShow = value;
+      if (value) {
+        if (device.isIOS() && window.StatusBar) {
+          StatusBar.hide();
+        }
+        $scope.toggleCloseBtn(true);
+        page.navigatorPush(function(){
+          lightbox.visiable(false);
+          if (screen.lockOrientation) screen.lockOrientation('portrait');
+        });
+        if (screen.unlockOrientation) screen.unlockOrientation();
+      }
+    };
+    
+    $scope.closeLightBox = function() {
+      $timeout(function() {
+        page.navigatorPop();
+        lightbox.visiable(false);
+        $scope.toggleCloseBtn(false);
+        if (device.isIOS() && window.StatusBar) {
+          StatusBar.show();
+        }
+        if (screen.lockOrientation) {
+          screen.lockOrientation('portrait');
+        }
+      }, 300); //timeout for iOS to prevent search input focus
+    };
+    
+    $scope.toggleCloseBtn = function(value) {
+      $scope.isCloseBtnShow = value;
+    };
+    
+    $scope.swipe = lightbox.swipe;
+    
+    $scope.showPictureInLightBox = lightbox.showPicture;
+    
+    /*------- NOTIFICATIONS -------*/
+    
+    $scope.notificationCount = notification.getCount() || 0;
+
+    notification.incCount = function(){
+      var count = notification.getCount();
+      count++;
+      applyNotificationCount(count);
+    };
+    
+    notification.decCount = function(){
+      var count = notification.getCount();
+      if (count <= 0) return false;
+      count--;
+      applyNotificationCount(count);
+    };
+    
+    function applyNotificationCount(count) {
+      $scope.notificationCount = count;
+      notification.setCount(count);
+    }
+    
+    notification.setCount = function(count){
+      $scope.notificationCount = count;
+      localStorage.setItem('tol-notification-count', count);
+    };
+    
+    notification.getCount = function(){
+      return localStorage.getItem('tol-notification-count')*1;
+    };
+    
+    if (app.push) {
+      app.push.on('notification', function(data) {
+        if (data.additionalData.coldstart) {
+          app.coldStart = data;
+        } 
+
+        if (data.additionalData.foreground === false) {
+          app.coldStart = data;
+        }
+        notification.getNewNotificationCount(userService.getAuthProduct().id);
+        console.log('notification', data);
+      });
+    }
+    
+    notification.getNewNotificationCount = function(productId) {
+      network.post('post_notification/getFeedSections',{product_id: productId}, function(result, response) {
+        if (result) {
+          notification.setCount(response.not_seen*1);
+          
+          try {
+            if (response.not_seen*1 < 1) {
+              cordova.plugins.notification.badge.clear();
+            } else {
+              cordova.plugins.notification.badge.set(response.not_seen*1);
+            }
+          } catch(e) {
+            console.log('cordova.plugins.notification.badge', e);
+          }
+          
         }
       });
     };
-
-    $scope.stopBlurSearching = function(value) {
-     // console.log('$scope.searchModel.value',value);
-     // if (!value) {
-        $scope.stopSearching();
-        page.navigatorPop();
-     // }
-    };
     
-    $scope.completeSearchValue = function(tip) {
-      if (!network.getConnection()){
-        return false;
+    /*------- INIT BLOCK --------*/
+    
+    document.querySelector('html').addEventListener('keydown',function(event){
+      if (event.altKey && event.keyCode === 77) {//Alt-M System Menu
+          $timeout(function() {
+            $scope.showMenu();
+          });
+          
       }
-      $scope.searchModel = $scope.searchModel || {};
-      $scope.searchModel.value = tip;
-      $scope.tips = [];
-      $scope.onSearch();
-      $scope.stopSearching();
-    };
-    
-    $scope.onSearch = function(event) {
-      if (!network.getConnection()){
-        return false;
+      if (event.altKey && event.keyCode === 66) {//Back Alt-B
+        page.goBack();
+      } 
+      if (event.altKey && event.keyCode === 86) {//Alt-v  current HTMLCUT work
+        page.show('cut',{});
       }
-      if (!event || event.keyCode === 13) {
-        page.showLoader();
-        page.navigatorPop();
-        search.onSearch($scope.searchModel.value);
-        $scope.isSearchPanelVisiable = false;
-        $scope.resultVisiable = true;
-        $scope.stopSearching();
-      }
-    };
-    
-    search.setSearchCount = function(count) {
-        $scope.searchModel.count = count;
-    };
-    
-    $scope.showMenu = function() {
-      var delay = 0;
-      if (device.isIOS()) deley = 100;
-      var pageName = Object.keys($scope.activePage)[0];
-      
-      var data = { menuType: (pageName === 'productDetail') ? 'detail' : 'main'
-                 , title: $scope.title
-                 };
-     
-      $timeout(function(){
-        page.show('menu',data);     
-      },delay)
-      
-    };
-    
-    $scope.share = function() {
-      share.exec();
-    };
-    
-    page.showLoader = function() {
-      $scope.isLoaderVisiable = true;
-    };
-    
-    page.hideLoader = function(){
-      $scope.isLoaderVisiable = false;
-    };
-    
-    page.showNoResult = function(text) {
-      $scope.noResultVisiable = true;
-      if (text) {
-        page.setNoResultText(text);
-        return true;
-      }
-      page.setNoResultText(app.translate('messages_nothing_found','Nothing found'));
-    };
-    
-    page.hideNoResult = function(){
-      $scope.noResultVisiable = false;
-    };
-
-    device.setIsLoaded = function(isLoaded) {
-      $scope.isLoaded = isLoaded;
-      console.log($scope.isLoaded);
-    };
-
-    $scope.goToCatalogInfo = function() {
-      if ($scope.menuAvailable) {
-        menu.showCatalogInfo(true);
-      }
-    };
-
-    $scope.onSearchInputFocus = function() {
-      console.log('!!!FOCUS!!!');
-      if (device.isIOS()) {
-        $scope.startSearching();
-        return false;
-      }
-      $timeout(function(){
-        $scope.startSearching();
-      },100);
-    };
-
-    $timeout(function(){
-      page.show(config.startPage,{},false);
     });
 
-
-
-    //$timeout(function() {
-    //  var searchInput = document.getElementById('search-input');
-    //  searchInput.addEventListener('focus',function(){
-    //
-    //  });
-    //
-    //  searchInput.addEventListener('blur',function(){
-    //
-    //  });
-    //},2000);
+    network.get('/info', false, function(result, response) {//Get version of WEB Service
+      if (result) {
+        $scope.WSVersion = response.version;
+      }
+    },true);
+    
+    page.getPermission = function(pageId) {
+      if (config.IS_DEBUG) return true;
+      if (!config.pagesInSprints[pageId]) return false;
+      if (config.pagesInSprints[pageId] <= config.SPRINT) return true;
+      return false;
+    };
+    
+    page.getPageSprint = function(pageId) {
+      if (!config.pagesInSprints[pageId]) return 'n/a';
+      return config.pagesInSprints[pageId];
+    };
+    
+    $scope.getPostAge = page.getPostAge;//
+       
+    document.addEventListener('pages_ready',function(){
+      if (window.analytics) analytics.init();
+      page.show(config.startPage,{start: true},false);
+    });
+    page.showLoader();
+    
     
 }]);
 

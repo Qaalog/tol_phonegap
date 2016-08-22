@@ -29,7 +29,25 @@ tol.controller('menu',['$scope','page','menu','device','$timeout','network','fac
       page.show('sql',{});
     };
 
+    $scope.deleteFeedItem = function(id) {
+      id = parseInt(id);
+      var data = { deleted: 'X'
+                 };
+      network.post('post/'+id,data,function(result, response){
+         console.log(response);
+      });
+      network.pagerReset();
+    };
     
+    $scope.recoverFeedItem = function(id) {
+      id = parseInt(id);
+      var data = { deleted: null
+                 };
+      network.post('post/'+id,data,function(result, response){
+         console.log(response);
+      });
+      network.pagerReset();
+    };
   
     
 }]);

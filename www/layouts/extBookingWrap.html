@@ -1,0 +1,40 @@
+<div class="quote-wrap linked" data-repeat="feedItem" data-type="external-booking-wrap">
+    <span class="t-icon_quote quote-icon"></span>
+    <div class="feed-box comment" data-show="{%feedItem.parent_post.auto_post_name =='BookingCom'%}" data-touch="showPostDetails(feedItem)">
+        <div class="user-posted this-user">
+            <div class="image-wrap">
+                <div class="img-middle-wrap">
+                    <div class="img-inner-wrap">
+                        <img class="img" src="img/icon_booking.svg">
+                    </div>
+                </div>
+            </div>
+            <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
+                <div class="feed-title">
+                    <div class="user-name">New Booking.com comment</div>
+                </div>
+                <div class="time-published">{%scope.getPostAge(feedItem.parent_post)%} - {%scope.hotelName%}</div>
+            </div>
+        </div>
+        <div class="post-box">
+            <div class="post-title title-points">
+                {%scope.getHtml(feedItem.parent_post.message,false,true)%}
+                <div class="comment-points">{%feedItem.parent_post.attachments[0].data.stars%}</div>
+            </div>
+            <div class="comment-text">
+                <div class="comment-part" data-show="{%feedItem.parent_post.attachments[0].data.text_pos%}"><span
+                        class="icon plus">+</span> {%feedItem.parent_post.attachments[0].data.text_pos%}
+                </div>
+                <div class="comment-part" data-show="{%feedItem.parent_post.attachments[0].data.text_neg%}"><span
+                        class="icon minus"></span> {%feedItem.parent_post.attachments[0].data.text_neg%}
+                </div>
+            </div>
+            <div class="author">
+                <div class="name">{%feedItem.parent_post.attachments[0].data.userName%}</div>
+                <div class="place">{%feedItem.parent_post.attachments[0].data.userLocation%},
+                    {%scope.formatDate(feedItem.parent_post.datetime_published)%}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

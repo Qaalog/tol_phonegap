@@ -1,0 +1,40 @@
+<div class="quote-wrap linked" data-repeat="feedItem" data-type="external-tripadvisor-wrap">
+  <span class="t-icon_quote quote-icon"></span>
+  <div class="feed-box comment" data-show="{%feedItem.parent_post.auto_post_name =='TripAdvisor'%}" data-touch="showPostDetails(feedItem)">
+    <div class="user-posted this-user">
+      <div class="image-wrap">
+        <div class="img-middle-wrap">
+          <div class="img-inner-wrap">
+            <img class="img" src="img/icon_tripadvisor.svg">
+          </div>
+        </div>
+      </div>
+      <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
+        <div class="feed-title">
+          <div class="user-name">New TripAdvisor comment</div>
+        </div>
+        <div class="time-published">{%scope.getPostAge(feedItem.parent_post)%} - {%scope.hotelName%}</div>
+      </div>
+      <!--    <div class="user-menu t-icon_menu"></div>-->
+    </div>
+    <div class="post-box">
+      <div class="post-title">
+        {%scope.getHtml(feedItem.parent_post.message,true)%}
+        <div class="stars">
+          <div class="star t-icon_star2 {%(feedItem.parent_post.attachments[0].data.stars*1 > 0) ? 'tapped' : ''%}"></div>
+          <div class="star t-icon_star2 {%(feedItem.parent_post.attachments[0].data.stars*1 > 1) ? 'tapped' : ''%}"></div>
+          <div class="star t-icon_star2 {%(feedItem.parent_post.attachments[0].data.stars*1 > 2) ? 'tapped' : ''%}"></div>
+          <div class="star t-icon_star2 {%(feedItem.parent_post.attachments[0].data.stars*1 > 3) ? 'tapped' : ''%}"></div>
+          <div class="star t-icon_star2 {%(feedItem.parent_post.attachments[0].data.stars*1 > 4) ? 'tapped' : ''%}"></div>
+        </div>
+      </div>
+      <div class="comment-text">
+        {%scope.getHtml(feedItem.parent_post.attachments[0].data.text,false,true)%}
+      </div>
+      <div class="author">
+        <div class="name">{%feedItem.parent_post.attachments[0].data.userName%}</div>
+        <div class="place">{%feedItem.parent_post.attachments[0].data.userLocation%}</div>
+      </div>
+    </div>
+  </div>
+</div>

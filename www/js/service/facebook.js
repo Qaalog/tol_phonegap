@@ -2,6 +2,7 @@ tol.service('facebook',['network','userService',function(network,userService){
   
   var $facebook = this;
   var currentAvatar = false;
+  var currentName = '';
   
   $facebook.toggleShareMenu = function() {};
   
@@ -46,6 +47,21 @@ tol.service('facebook',['network','userService',function(network,userService){
       }
       
     });
+  };
+  
+  $facebook.loadName = function(callback) {
+    callback = callback || function(){};
+    var data = {fields:'id,name'};
+    $facebook.api('GET','me',data,function(result,response){
+      if (result) {
+        currentName = response.name;
+      }
+      callback(result,response);
+    });
+  };
+  
+  $facebook.getName = function() {
+    return currentName;
   };
   
   $facebook.postToFeed = function(post) {

@@ -65,7 +65,7 @@ var openFB = (function () {
 
         if (params.appId) {
             fbAppId = params.appId;
-            console.log(fbAppId);
+            console.log('Facebook AppId',fbAppId);
             
             //runningInCordova = true;
         } else {
@@ -142,8 +142,7 @@ var openFB = (function () {
         // Inappbrowser exit handler: Used when running in Cordova only
         function loginWindow_exitHandler() {
             console.log('exit and remove listeners');
-            // Handle the situation where the user closes the login window manually before completing the login process
-            if (loginCallback && !loginProcessed) loginCallback({status: 'user_cancelled'});
+            // Handle the situation where the user closes the login window manually before completing the login processs
             loginWindow.removeEventListener('loadstop', loginWindow_loadStartHandler);
             loginWindow.removeEventListener('exit', loginWindow_exitHandler);
             loginWindow = null;

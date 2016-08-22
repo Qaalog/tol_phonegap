@@ -1,30 +1,23 @@
-<div class="menu-wrap" ng-class="{'ios': isIOS()}">
+<div class="menu-wrap" ng-class="{'ios': isIOS()}" style="margin-top: 6em">
 
-  <ul ng-show="menuType === 'main' && (listViewChangeEnabled || catalogInfoAvailable)">
-    <li class="q-icons-catalog-info" ng-show="catalogInfoAvailable" ng-fast-touch="showCatalogInfo()">{{translate.catalogInfo}}</li>
-    <li class="q-icons-list-view" 
-        ng-fast-touch="toggleViewStyle(STYLE_LIST)" 
-        ng-show="listStyle === STYLE_GRID && listViewChangeEnabled">{{translate.listView}}</li>
-    <li class="q-icons-gallery-view" 
-        ng-fast-touch="toggleViewStyle(STYLE_GRID)" 
-        ng-show="listStyle === STYLE_LIST && listViewChangeEnabled">{{translate.galleryView}}</li>
-  </ul>
+  <div style="margin-top: 2em; text-align: center">
+    <button style="font-size: 3em;" ng-fast-touch="sqlTester()">TEST SQLLite</button>
+  </div>
   
-  <ul>
-    <li class="q-icons-non-favorite" ng-fast-touch="showFavorites()">{{translate.favorites}}</li>
-    <li class="q-icons-near-me" ng-fast-touch="showNearMe()" style="display: none" ng-show="menuType === 'main'">Near Me</li>
-    <li class="q-icons-sort-ascend" ng-class="{'sort-selected': sortSelected === 'A'}"
-        ng-fast-touch="sort('A')" ng-show="isSortable" ng-show="menuType === 'main'">{{translate.sortAZ}}</li>
-    <li class="q-icons-sort-descend" ng-class="{'sort-selected': sortSelected === 'D'}"
-        ng-fast-touch="sort('D')" ng-show="isSortable" ng-show="menuType === 'main'">{{translate.sortZA}}</li>
-  </ul>
+  <div style="margin-top: 2em; text-align: center">
+    <button style="font-size: 3em;" ng-fast-touch="fontView()">Font View</button>
+  </div>
   
-  <ul ng-show="menuType === 'detail' && isShareShow">
-    <li class="q-icons-share" ng-fast-touch="share()">{{translate.share}}</li>
-  </ul>
+  <div id="test1" style="margin-top: 2em; font-size: 3em;">
+  </div>
   
-  <ul ng-hide="hideChangeCatalog">
-    <li class="q-icons-catalog" ng-fast-touch="changeCatalog()">{{translate.changeCatalog}}</li>
-  </ul>
+  <div style="margin-top: 2em; text-align: center; border: 1px solid #999">
+    <div>
+      <input type="text" ng-model="itemForDelete" style="background: #fff;width: 95%;height: 2em;font-size: 1.5em;margin: 0 0.5em"/>
+    </div>
+    <button style="font-size: 3em;" ng-fast-touch="deleteFeedItem(itemForDelete)">Delete feed item</button>
+    <button style="font-size: 3em;" ng-fast-touch="recoverFeedItem(itemForDelete)">Recover feed item</button>
+  </div>
+  
   
 </div>

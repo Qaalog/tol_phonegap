@@ -1,4 +1,4 @@
-tol.service('lightbox',[function(){
+tol.service('lightbox',['device','config',function(device,config){
     
   var $lightbox = this;
   
@@ -6,7 +6,7 @@ tol.service('lightbox',[function(){
   var lightBoxPointer = 0;
   var imageQueue = [];
   var hrefQueue = [];
-  var queueLimit = 1;
+  var queueLimit = config.galleryLength || 1;
   
   $lightbox.visiable = function(){};
   
@@ -16,6 +16,7 @@ tol.service('lightbox',[function(){
     wrap.className = 'swipe-wrap to-right';
     var img = document.createElement('img');
     img.src = href;
+    img.style.display = 'none';
     img.onload = function(event) {
       $lightbox.calculateImageSize(event.target);
     };
@@ -45,8 +46,28 @@ tol.service('lightbox',[function(){
     hrefQueue.splice(from, to);
   };
   
+  function addLoader() {
+    var wrap = document.createElement('div');
+    wrap.className = 'swipe-wrap';
+    wrap.id = 'lightbox_loader';
+    wrap.style.zIndex = 1;
+    var img = document.createElement('img');
+    img.style.width = device.emToPx(5)+'px';
+    img.src = 'img/tol_loader_gray_128.gif';
+    wrap.appendChild(img);
+    document.querySelector('.lightbox-wrap').appendChild(wrap);
+  }
+  
+  function removeLoader() {
+    var lightboxLoader = document.getElementById('lightbox_loader');
+    if (lightboxLoader) {
+      document.querySelector('.lightbox-wrap').removeChild(lightboxLoader);
+    }
+  }
+  
   
   $lightbox.showPicture = function(href) {
+    if (!href) return false;
     $lightbox.addImageToLightboxQueue(href);
     lightBoxPointer = 0;
     if (imageQueue.length > queueLimit) {
@@ -57,6 +78,7 @@ tol.service('lightbox',[function(){
     }
     imageQueue[0].className = 'swipe-wrap';
     $lightbox.visiable(true);
+    addLoader();
   };
   
   
@@ -84,43 +106,54 @@ tol.service('lightbox',[function(){
   
   window.addEventListener("orientationchange", function(){
     for (var i = 0, l = imageQueue.length; i < l; i++) {
+      console.log('call calc');
       $lightbox.calculateImageSize(imageQueue[i].querySelector('img'));
     }
   });
   
   
   $lightbox.calculateImageSize = function(target) {
+    target.style.display = 'none';
     target.style.height = '';
     screen.orientation = screen.orientation || {};
     var orientation = screen.orientation.type || screen.orientation;
     //alert(window.innerWidth+'X'+window.innerHeight+' '+screen.width+'X'+screen.height);
+    setTimeout(function(){
+      var width = window.innerWidth;
+      var height = window.innerHeight;
 
-    var width = window.innerWidth;
-    var height = window.innerHeight;
 
-    if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
-//      width = trueWidth;
-//      height = trueHeight;
-      if (orientation.toLowerCase().indexOf('landscape') > -1) {
-        width = height;
-        height = width;
+      if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
+  //      width = trueWidth;
+  //      height = trueHeight;
+        if (orientation.toLowerCase().indexOf('landscape') > -1) {
+  //        var tmp = height;
+  //        height = width;
+  //        width = tmp;
+        }
+
+      }
+      if (navigator.userAgent.toLowerCase().indexOf('windows') > -1) {
+        orientation = 'portrait';
+        width = 384;
+        height = 640;
       }
 
-    }
-    if (navigator.userAgent.toLowerCase().indexOf('windows') > -1) {
-      orientation = 'portrait';
-      width = 768;
-      height = 1280;
-    }
-    var heightRatio = height / target.height;
-    var newWidth = target.width * heightRatio;
-    if (newWidth <= width) {
-      target.style.height = height + 'px';
-    } else {
-      var widthRatio = width / target.width;
-      newWidth = target.height * widthRatio;
-      target.style.height = newWidth + 'px';
-    }
+      var heightRatio = height / target.height;
+      var newWidth = target.width * heightRatio;
+
+      if (newWidth <= width) {
+        target.style.height = height + 'px';
+      } else {
+        var widthRatio = width / target.width;
+        newWidth = target.height * widthRatio;
+        target.style.height = newWidth + 'px';
+      }
+
+      target.style.display = '';
+      removeLoader();
+
+    },300);
   };
   
     

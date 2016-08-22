@@ -1,5 +1,5 @@
-tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','network','userService','dialog',
-  function($scope, page,config, $timeout,facebook,network,userService,dialog){
+tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','userService','dialog','device',
+  function($scope, page,config, $timeout,facebook,userService,dialog,device){
 
   $scope.FB = {};
   
@@ -47,6 +47,11 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','n
                  };         
                  
   page.onShow(settings,function(params) {
+    
+    if (device.isIOS() && window.StatusBar) {
+      StatusBar.hide();
+    }
+    
     if (localStorage.getItem('fbAccessToken'+userService.getUser().id)) {
       localStorage.setItem('fbAccessToken', localStorage.getItem('fbAccessToken'+userService.getUser().id));
     } else {
@@ -59,13 +64,18 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','n
     $scope.onResult = false;
     openFB.getLoginStatus(function(status) {
       if (status.status === 'connected') {
-        page.show('catalog',$scope.params);
-      } else {
-        var doNotLink = localStorage.getItem('do_not_link'+userService.getUser().id);
-        if (doNotLink) {
-           page.show('catalog',$scope.params);
-           return false;
+        if (checkTokenExpireDate()) {
+          facebook.loadName();
+          page.show('catalog',$scope.params);
+        } else {
+          page.hideLoader();
         }
+      } else {
+//        var doNotLink = localStorage.getItem('do_not_link'+userService.getUser().id);
+//        if (doNotLink) {
+//           page.show('catalog',$scope.params);
+//           return false;
+//        }
         page.hideLoader();
       }
     });
@@ -75,12 +85,12 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','n
   page.onRequestResult(settings,function(params,onResult) {
     $scope.onResult = onResult;
   });
-    
+
   $scope.linkNow = function() {
     
-    if (!config.IS_DEBUG && config.SPRINT < 2) {
+    if (!config.IS_DEBUG && config.SPRINT < 3) {
       dialog.create(dialog.INFO,'Page unavailable',
-          'Sorry, this functionality will be available<br>in sprint 2','OK').show();
+          'Sorry, this functionality will be available<br>in sprint 3','OK').show();
         return false;
     }
     
@@ -88,6 +98,7 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','n
       console.log('login',response.authResponse.accessToken);
       
       $scope.longLife(function() {
+        facebook.loadName();
         if ($scope.params.requestResult) {
           $scope.onResult(true);
           return false;
@@ -105,14 +116,19 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','n
   
   $scope.doNotLink = function() {
    localStorage.setItem('do_not_link'+userService.getUser().id,true);
+   clearToken();
    if(!$scope.params.username) {
      if ($scope.params.requestResult) {
-       $scope.onResult(false);
+       if(typeof $scope.onResult == 'function') {
+         $scope.onResult(false);
+       } else {
+         page.goBack();
+       }
        return false;
      }
      page.goBack();
      return false;
-   }; 
+   };
    page.show('catalog',$scope.params);
    
 //    openFB.logout(function(info){
@@ -141,10 +157,43 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','n
         localStorage.setItem('fbTokenExpire'+userService.getUser().id, new Date().getTime() + (parsedResponse[2]*1000) );
         callback();
         return true;
+      } else {
+        clearToken();
       }
       if ($scope.params.requestResult) $scope.onResult(false);
     });
   };
+  
+  function checkTokenExpireDate() {
+    var expireDate = localStorage.getItem('fbTokenExpire'+userService.getUser().id);
+    var currentDate = new Date().getTime();
+    var daysLeft = 0;
+    if (expireDate) {
+      daysLeft = Math.round( (expireDate - currentDate) / 24 / 60 / 60 / 1000 );
+    } else {
+      clearToken();
+      return false;
+    }
+    console.log('FB Token Expire in', daysLeft, 'days');
+    if (daysLeft < 2) {
+      clearToken();
+      console.log('FB TOKEN EXPIRE!!!');
+      return false;
+    }
+    
+    if (daysLeft < 5) {
+      console.log('longLife');
+      $scope.longLife();
+    }
+    
+    return true;
+  }
+  
+  function clearToken() {
+    localStorage.removeItem('fbAccessToken');
+    localStorage.removeItem('fbAccessToken'+userService.getUser().id);
+    localStorage.removeItem('fbTokenExpire'+userService.getUser().id);
+  }
   
   /*FACEBOOK TEST METHODS*/
 

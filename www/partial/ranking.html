@@ -1,49 +1,129 @@
-<div class="ranking-background is-admin">
-  <div class="points-box">
-		<div class="points-header">
-			<div class="arrow-prev arrow"><span class="t-icon_arrow_left"></span></div>
-			<div class="arrow-next arrow"><span class="t-icon_arrow_right"></span></div>
-			<h2 class="points-title">Punctuality</h2>
+<div ng-if="!hideValuePodiums">
+	<div class="ranking-background" ng-class="{'is-admin': isAdmin}">
+		<div class="points-box"
+			 ng-swipe
+			 ng-on-left="changeRanking('prev')"
+			 ng-on-right="changeRanking('next')"
+		>
+
+			<div class="points-header">
+				<div class="arrow-prev arrow"
+					 ng-fast-touch="changeRanking('prev')"
+					 ng-show="showPrevArrow"><span class="t-icon_arrow_left"></span></div>
+				<div class="arrow-next arrow"
+					 ng-fast-touch="changeRanking('next')"
+					 ng-show="showNextArrow"><span class="t-icon_arrow_right"></span></div>
+				<h2 class="points-title">{{currentRanking.long_name}}</h2>
+			</div>
+
+			<div class="ranking-stand">
+				<div class="second-place-col place-col">
+					<div class="name" ng-if="currentRanking.places[1]" ng-fast-touch="showProfile(currentRanking.places[1])">
+						{{currentRanking.places[1].name}}
+					</div>
+					<div class="image-wrap" ng-if="currentRanking.places[1]" ng-fast-touch="showProfile(currentRanking.places[1])">
+						<div class="img-middle-wrap">
+							<div class="img-inner-wrap">
+								<img class="img"
+									 ng-src="{{(currentRanking.places[1].product_image) ? imgPrefix + currentRanking.places[1].product_image + imgSuffix : 'img/default-staff.png'}}">
+							</div>
+						</div>
+					</div>
+					<div ng-if="currentRanking.places[1]"
+						 class="points-number">{{currentRanking.places[1].points + ' ' + ((currentRanking.places[1].points == 1)?'point':'points')}}</div>
+					<div class="stand"><strong class="place">2</strong></div>
+				</div>
+				<div class="first-place-col place-col">
+					<div class="name" ng-if="currentRanking.places[0]" ng-fast-touch="showProfile(currentRanking.places[0])">
+						{{currentRanking.places[0].name}}
+					</div>
+					<div class="image-wrap" ng-if="currentRanking.places[0]" ng-fast-touch="showProfile(currentRanking.places[0])">
+						<div class="img-middle-wrap">
+							<div class="img-inner-wrap">
+								<img class="img"
+									 ng-src="{{(currentRanking.places[0].product_image) ? imgPrefix + currentRanking.places[0].product_image + imgSuffix : 'img/default-staff.png'}}">
+							</div>
+						</div>
+					</div>
+					<div ng-if="currentRanking.places[0]"
+						 class="points-number">{{currentRanking.places[0].points + ' ' + ((currentRanking.places[0].points == 1)?'point':'points')}}</div>
+					<div class="stand"><strong class="place">1</strong></div>
+				</div>
+				<div class="third-place-col place-col">
+					<div class="name" ng-if="currentRanking.places[2]" ng-fast-touch="showProfile(currentRanking.places[2])">
+						{{currentRanking.places[2].name}}
+					</div>
+					<div class="image-wrap" ng-if="currentRanking.places[2]" ng-fast-touch="showProfile(currentRanking.places[2])">
+						<div class="img-middle-wrap">
+							<div class="img-inner-wrap">
+								<img class="img"
+									 ng-src="{{(currentRanking.places[2].product_image) ? imgPrefix + currentRanking.places[2].product_image + imgSuffix : 'img/default-staff.png'}}">
+							</div>
+						</div>
+					</div>
+					<div ng-if="currentRanking.places[2]"
+						 class="points-number">{{currentRanking.places[2].points + ' ' + ((currentRanking.places[2].points == 1)?'point':'points')}}</div>
+					<div class="stand"><strong class="place">3</strong></div>
+				</div>
+			</div>
+
+			<div class="you-have text-center" ng-bind-html="currentUserPlace"></div>
+			<button class="login-submit full-list-btn text-center" ng-fast-touch="showFullList()">full list</button>
 		</div>
-		<div class="ranking-stand">
-			<div class="second-place-col place-col">
-				<div class="name">Leroy<br>Kelley</div>
-				<div class="image-wrap">
-					<div class="img-middle-wrap">
-						<div class="img-inner-wrap">
-							<img class="img" src="http://www.sthildas.qld.edu.au/wp-content/themes/hildas-2014/images/img-default-staff.png">
-						</div>
-					</div>
-				</div>
-				<div class="points-number">37 points</div>
-				<div class="stand"><strong class="place">2</strong></div>
-			</div>
-			<div class="first-place-col place-col">
-				<div class="name">Eduardo<br>Phillips</div>
-				<div class="image-wrap">
-					<div class="img-middle-wrap">
-						<div class="img-inner-wrap">
-							<img class="img" src="http://www.sthildas.qld.edu.au/wp-content/themes/hildas-2014/images/img-default-staff.png">
-						</div>
-					</div>
-				</div>
-				<div class="points-number">56 points</div>
-				<div class="stand"><strong class="place">1</strong></div>
-			</div>
-			<div class="third-place-col place-col">
-				<div class="name">Christine<br>Bradley</div>
-				<div class="image-wrap">
-					<div class="img-middle-wrap">
-						<div class="img-inner-wrap">
-							<img class="img" src="http://www.sthildas.qld.edu.au/wp-content/themes/hildas-2014/images/img-default-staff.png">
-						</div>
-					</div>
-				</div>
-				<div class="points-number">25 points</div>
-				<div class="stand"><strong class="place">3</strong></div>
-			</div>
-		</div>
-		<div class="you-have text-center">You have <strong>103 points</strong> (10th place)</div>
-		<button class="login-submit full-list-btn text-center" ng-fast-touch="showFullList()">full list</button>
 	</div>
 </div>
+<div ng-if="hideValuePodiums">
+	<div ng-class="{'is-admin': isAdmin}">
+		<div class="points-box ranking-background-bordered"  ng-repeat="currentRanking in ranking track by $index" ng-class="{first:$index==0}">
+			<div class="points-header">
+				<h2 class="points-title">{{currentRanking.long_name}}</h2>
+			</div>
+			<div class="ranking-stand">
+				<div class="second-place-col place-col">
+					<div class="name" ng-if="currentRanking.places[1]" ng-fast-touch="showProfile(currentRanking.places[1])" ng-bind-html="splitName(currentRanking.places[1].name)"></div>
+					<div class="image-wrap" ng-if="currentRanking.places[1]" ng-fast-touch="showProfile(currentRanking.places[1])">
+						<div class="img-middle-wrap">
+							<div class="img-inner-wrap">
+								<img class="img"
+									 ng-src="{{(currentRanking.places[1].product_image) ? imgPrefix + currentRanking.places[1].product_image + imgSuffix : 'img/default-staff.png'}}">
+							</div>
+						</div>
+					</div>
+					<div ng-if="currentRanking.places[1]"
+						 class="points-number">{{currentRanking.places[1].points + ' ' + ((currentRanking.places[1].points == 1)?'point':'points')}}</div>
+					<div class="stand"><strong class="place">2</strong></div>
+				</div>
+				<div class="first-place-col place-col">
+					<div class="name" ng-if="currentRanking.places[0]" ng-fast-touch="showProfile(currentRanking.places[0])" ng-bind-html="splitName(currentRanking.places[0].name)"></div>
+					<div class="image-wrap" ng-if="currentRanking.places[0]" ng-fast-touch="showProfile(currentRanking.places[0])">
+						<div class="img-middle-wrap">
+							<div class="img-inner-wrap">
+								<img class="img"
+									 ng-src="{{(currentRanking.places[0].product_image) ? imgPrefix + currentRanking.places[0].product_image + imgSuffix : 'img/default-staff.png'}}">
+							</div>
+						</div>
+					</div>
+					<div ng-if="currentRanking.places[0]"
+						 class="points-number">{{currentRanking.places[0].points + ' ' + ((currentRanking.places[0].points == 1)?'point':'points')}}</div>
+					<div class="stand"><strong class="place">1</strong></div>
+				</div>
+				<div class="third-place-col place-col">
+					<div class="name" ng-if="currentRanking.places[2]" ng-fast-touch="showProfile(currentRanking.places[2])" ng-bind-html="splitName(currentRanking.places[2].name)"></div>
+					<div class="image-wrap" ng-if="currentRanking.places[2]" ng-fast-touch="showProfile(currentRanking.places[2])">
+						<div class="img-middle-wrap">
+							<div class="img-inner-wrap">
+								<img class="img"
+									 ng-src="{{(currentRanking.places[2].product_image) ? imgPrefix + currentRanking.places[2].product_image + imgSuffix : 'img/default-staff.png'}}">
+							</div>
+						</div>
+					</div>
+					<div ng-if="currentRanking.places[2]"
+						 class="points-number">{{currentRanking.places[2].points + ' ' + ((currentRanking.places[2].points == 1)?'point':'points')}}</div>
+					<div class="stand"><strong class="place">3</strong></div>
+				</div>
+			</div>
+			<div class="you-have text-center" ng-bind-html="getCurrentUserPlace(currentRanking)"></div>
+			<button class="ranking-link full-list-btn text-center" ng-fast-touch="showFullList(currentRanking)">See full list</button>
+		</div>
+	</div>
+˚</div>

@@ -1,4 +1,4 @@
-tol.service('dialog',[function(){
+tol.service('dialog',['page',function(page){
     
   var $dialog = this;
   $dialog.INFO = 0;
@@ -11,20 +11,29 @@ tol.service('dialog',[function(){
   
   $dialog.toggleUserMenu = function(){};
   $dialog.togglePhotoMenu = function(){};
+  $dialog.togglePointsMenu = function(){};
+  $dialog.toggleToastMessage = function(){};
   
   var actions = {};
   var actionId = 0;
   $dialog.action = function(action){
-    for (var key in actions) {
+    var pageId = page.currentPage;
+    for (var key in actions[pageId]) {
       try {
-        actions[key](action);
+        actions[pageId][key](action);
+      } catch(e){}
+    }
+    for (var key in actions['all']) {
+      try {
+        actions['all'][key](action);
       } catch(e){}
     }
   };
   
-  $dialog.addActionListener = function(callback) {
+  $dialog.addActionListener = function(pageId, callback) {
     actionId++;
-    actions[actionId] = callback;
+    actions[pageId] = actions[pageId] || {};
+    actions[pageId][actionId] = callback;
     return actionId;
   };
   

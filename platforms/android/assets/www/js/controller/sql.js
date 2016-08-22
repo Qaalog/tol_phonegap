@@ -5,6 +5,7 @@ tol.controller('sql',['$scope','page',function($scope,page) {
   var db_select = document.getElementById('sql_db_name');
   var settings = { name: 'sql'
                  , title: 'SQLLite tester'
+                 , back: true
                  };         
         
   page.onShow(settings,function(params) {

@@ -1,0 +1,68 @@
+<div class="feed-box comment" data-repeat="feedItem" data-type="booking-com">
+    <div class="user-posted this-user" data-touch="showPostDetails(feedItem)">
+        <div class="image-wrap">
+            <div class="img-middle-wrap">
+                <div class="img-inner-wrap">
+                    <img class="img" src="img/icon_booking.svg">
+                </div>
+            </div>
+        </div>
+        <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
+            <div class="feed-title">
+                <div class="user-name">New Booking.com comment</div>
+            </div>
+            <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
+        </div>
+        <!--    <div class="user-menu t-icon_menu"></div>-->
+    </div>
+    <div class="post-box">
+        <div data-touch="showPostDetails(feedItem)">
+        <div class="post-title title-points">
+            {%scope.getHtml(feedItem.message,false,true)%}
+            <div class="comment-points">{%feedItem.attachments[0].data.stars%}</div>
+        </div>
+        <div class="comment-text">
+            <div class="comment-part" data-show="{%feedItem.attachments[0].data.text_pos%}"><span
+                    class="icon plus">+</span> {%feedItem.attachments[0].data.text_pos%}
+            </div>
+            <div class="comment-part" data-show="{%feedItem.attachments[0].data.text_neg%}"><span
+                    class="icon minus"></span> {%feedItem.attachments[0].data.text_neg%}
+            </div>
+        </div>
+        <div class="author">
+            <div class="name">{%feedItem.attachments[0].data.userName%}</div>
+            <div class="place">{%feedItem.attachments[0].data.userLocation%},
+                {%scope.formatDate(feedItem.datetime_published)%}
+            </div>
+        </div>
+        </div>
+        <div class="post-info">
+            <div data-class-binding="giversFilter(feedItem)?'tapped points':'points'" class="{% scope.giversFilter(feedItem)?'tapped ':''; %}points" data-touch="quoteExternal(feedItem)">
+                <div class="mark-inner">
+                    <span class="t-icon_point"></span>
+                    <span data-binding="preparePoints(feedItem)">{% feedItem.point_givers>0?feedItem.point_givers:'' %}</span>
+                </div>                
+            </div>
+
+            <div class="{% scope.getTappedByMe(feedItem,feedService.LIKE_TYPE_NORMAL)?'tapped ':''; %}likes"
+                 data-touch="setLikeFeedItem(feedItem,feedService.LIKE_TYPE_NORMAL,event)">
+                 <div class="mark-inner">
+                     <span class="t-icon_like"></span>
+                    <span data-binding="prepareLikes(feedItem,feedService.LIKE_TYPE_NORMAL)">{% scope.getMarksCountByType(feedItem,feedService.LIKE_TYPE_NORMAL) || '' %}</span>
+                 </div>                 
+            </div>
+            <div class="{% scope.getTappedByMe(feedItem,feedService.LIKE_TYPE_FACEBOOK)?'tapped ':''; %}fb-share"
+                 data-show="{%scope.getSharePermission(feedItem)%}"
+                 data-touch="showShareMenu(feedItem, event)">
+                 <div class="mark-inner">
+                     <span class="t-icon_link_fb"></span>
+                    <span data-binding="prepareLikes(feedItem,feedService.LIKE_TYPE_FACEBOOK)">{% scope.getMarksCountByType(feedItem,feedService.LIKE_TYPE_FACEBOOK) || '' %}</span>
+                 </div>                
+            </div>
+
+            <!--      <div class="fb-share right">
+                    <span class="t-icon_link_fb"></span>Share
+                  </div>-->
+        </div>
+    </div>
+</div>

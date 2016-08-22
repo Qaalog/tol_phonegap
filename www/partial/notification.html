@@ -1,0 +1,138 @@
+<div class="container">
+	<div class="notification-wrap">
+    
+    <div class="user-posted" 
+         ng-class="{latest: !notification.read_at}"
+         ng-fast-touch="postDetail(notification)"
+         ng-repeat="notification in notifications">
+			<div class="image-wrap">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" ng-src="{{getAvatar(notification)}}">
+					</div>
+				</div>
+				<span class="mark t-{{notification.notification_icon_url}}">
+                	<span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
+                </span>
+			</div>
+			<div class="user-title">
+				<div class="feed-title">
+					<span class="user-name">{{notification.by_product_name}}</span> {{notification.notification_message}}</div>
+				<div class="time-published">{{getPostAge(notification)}} - {{hotelName}}</div>
+			</div>
+		</div>
+    
+    
+<!--		<div class="user-posted latest">
+			<div class="image-wrap">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" src="http://www.clker.com/cliparts/b/1/f/a/1195445301811339265dagobert83_female_user_icon.svg.med.png">
+					</div>
+				</div>
+				<span class="mark t-icon_points">
+                	<span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
+                </span>
+			</div>
+			<div class="user-title">
+				<div class="feed-title">
+					<span class="user-name">Ana Maria</span> considers You Awesome on Passion</div>
+				<div class="time-published">1h ago - Hotel Corinthia Lisboa</div>
+			</div>
+		</div>
+    
+		<div class="user-posted latest">
+			<div class="image-wrap">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" src="http://www.clker.com/cliparts/b/1/f/a/1195445301811339265dagobert83_female_user_icon.svg.med.png">
+					</div>
+				</div>
+				<span class="mark t-icon_join">
+                	<span class="path1"></span><span class="path2"></span>
+                </span>
+			</div>
+			<div class="user-title">
+				<div class="feed-title">
+					<span class="user-name">Azevedo Guilizzoni</span> just joined Corinthia Lisboa</div>
+				<div class="time-published">2h ago - Hotel Corinthia Lisboa</div>
+			</div>
+		</div>
+    
+		<div class="user-posted">
+			<div class="image-wrap">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" src="http://www.clker.com/cliparts/b/1/f/a/1195445301811339265dagobert83_female_user_icon.svg.med.png">
+					</div>
+				</div>
+				<span class="mark t-icon_birthday">
+                	<span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
+                </span>
+			</div>
+			<div class="user-title">
+				<div class="feed-title">
+					Today is <span class="user-name">Pedro Miguel</span> Birthday
+				</div>
+				<div class="time-published">3h ago - Hotel Corinthia Lisboa</div>
+			</div>
+		</div>
+    
+		<div class="user-posted">
+			<div class="image-wrap">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" src="http://www.clker.com/cliparts/b/1/f/a/1195445301811339265dagobert83_female_user_icon.svg.med.png">
+					</div>
+				</div>
+				<span class="mark t-icon_quote"></span>
+			</div>
+			<div class="user-title">
+				<div class="feed-title">
+					<span class="user-name">Azevedo Guilizzoni</span> quote your post <span class="black">"Good job"</span></div>
+				<div class="time-published">4h ago - Hotel Corinthia Lisboa</div>
+			</div>
+		</div>
+    
+		<div class="user-posted">
+			<div class="image-wrap">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" src="http://www.clker.com/cliparts/b/1/f/a/1195445301811339265dagobert83_female_user_icon.svg.med.png">
+					</div>
+				</div>
+				<span class="mark t-icon_annivers">
+                	<span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
+                </span>
+			</div>
+			<div class="user-title">
+				<div class="feed-title">
+					<span class="user-name">Pedro Miguel</span> celebrates today 2 years with us</div>
+				<div class="time-published">5h ago - Hotel Corinthia Lisboa</div>
+			</div>
+		</div>
+    
+		<div class="user-posted">
+			<div class="image-wrap">
+				<div class="img-middle-wrap">
+					<div class="img-inner-wrap">
+						<img class="img" src="http://www.clker.com/cliparts/b/1/f/a/1195445301811339265dagobert83_female_user_icon.svg.med.png">
+					</div>
+				</div>
+				<span class="mark t-icon_share">
+                	<span class="path1"></span><span class="path2"></span>
+                </span>
+			</div>
+			<div class="user-title">
+				<div class="feed-title">
+					<span class="user-name">Vale e Azevedo</span> share your post on Facebook
+				</div>
+				<div class="time-published">6h ago - Hotel Corinthia Lisboa</div>
+			</div>
+		</div>
+    -->
+    
+    
+    
+	</div>
+</div>

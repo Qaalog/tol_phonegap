@@ -1,12 +1,12 @@
-var firstFlag = true;
-var scrollBlock = false;
 tol.directive('ngFastTouch', function() {
   return function(scope, element, attr) {
     var fn = function() {
       if(scope != undefined) {
-        scope.$apply(function() { 
-          scope.$eval(attr.ngFastTouch); 
-        });
+       // window[app.requestFrame](function() {
+          scope.$apply(function() { 
+            scope.$eval(attr.ngFastTouch); 
+          });
+        //});
       }
     };
     
@@ -15,15 +15,6 @@ tol.directive('ngFastTouch', function() {
     var isTouchSupported = 'ontouchstart' in window;
     var coords = {};
     var square = 10;
-    
-    var onScroll = function() {
-      scrollBlock = true;
-    };
-    
-    if (firstFlag) {
-      app.wrapper.addEventListener('scroll', onScroll);
-      firstFlag = false;
-    };
 
     if (isTouchSupported) {
       

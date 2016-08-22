@@ -1,4 +1,4 @@
-qaalog.directive('ngToggleList',['$timeout','$rootScope',function($timeout,$rootScope){
+tol.directive('ngToggleList',['$timeout','$rootScope',function($timeout,$rootScope){
   return {
        scope: {
          options: '=ngToggleList'

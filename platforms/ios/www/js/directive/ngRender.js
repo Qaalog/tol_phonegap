@@ -1,4 +1,4 @@
-qaalog.directive('ngFinishRender', ['$timeout', function ($timeout) {
+tol.directive('ngFinishRender', ['$timeout', function ($timeout) {
   return function (scope, element, attr) {
     
       if (scope.$last === true) {

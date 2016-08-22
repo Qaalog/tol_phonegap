@@ -1,95 +1,54 @@
-qaalog.controller('menu',['$scope','page','menu','share','device','$timeout',function($scope,page,menu,share,device,$timeout){
+tol.controller('menu',['$scope','page','menu','device','$timeout','network','facebook','$sce',
+  function($scope,page,menu,device,$timeout,network,facebook,$sce){
     
-    var closeMenu;
-    $scope.STYLE_LIST = 1;
-    $scope.STYLE_GRID = 0;
     $scope.isIOS = device.isIOS;
-    $scope.listStyle = $scope.STYLE_GRID;
-    $scope.sortSelected = 'A';
-
-    $scope.translate = { sortAZ:        app.translate('menu_sort_asc_title','Sort A-Z')
-                       , sortZA:        app.translate('menu_sort_desc_title','Sort Z-A')
-                       , favorites:     app.translate('menu_favorites','Favorites')
-                       , listView:      app.translate('menu_list_view','List view')
-                       , galleryView:   app.translate('menu_gallery_view','Gallery view')
-                       , catalogInfo:   app.translate('menu_catalog_info','Catalog information')
-                       , changeCatalog: app.translate('menu_change_catalog','Change catalog')
-                       , share:         app.translate('menu_share','Share')
-                       };
     
     var settings = { name: 'menu'
                    , title: 'menu'
                    , back: true
                    };
     page.onShow(settings,function(params) {
-      page.setTitle(params.title);
-      $scope.menuType = params.menuType || 'main';
       page.hideLoader();
-      $scope.catalogInfoAvailable = (menu.getParams().info && menu.getParams().info !== '');
     });
-
-  menu.setShareShow = function(value) {
-    $scope.isShareShow = value;
-  };
     
+    $scope.fonts = [];
     
-    $scope.showCatalogInfo = function(outside) {
-      var params = menu.getParams();
-      if (params.info && params.info !== '') {
-        page.show('catalogInfo', params);
-        if (!outside) page.navigatorPop();
+    $scope.fontView = function() {
+      var parent = document.getElementById('test1');
+      parent.style.display = 'none';
+      for (var i = 59648; i < 60138; i++) {
+        var hex = i.toString(16);
+        var div = document.createElement('div');
+        div.innerHTML = 'icon: <span class="q-icon">&#x'+hex+';</span>  hex: '+hex;
+        parent.appendChild(div);
       }
+      parent.style.display = '';
+    };
+    
+    $scope.sqlTester = function() {
+      page.show('sql',{});
     };
 
-    menu.showCatalogInfo = $scope.showCatalogInfo;
-    
-    $scope.toggleViewStyle = function(style) {
-      $scope.listStyle = style;
-      menu.onChangeViewStyle(style);
-      closeMenu();
-    };
-    
-    $scope.showFavorites = function() {
-      var data = { params: menu.getParams()
-                 , item: {listName: app.translate('menu_favorites')}
+    $scope.deleteFeedItem = function(id) {
+      id = parseInt(id);
+      var data = { deleted: 'X'
                  };
-      page.show('browseProduct',data);
-      page.navigatorPop();
-    };
-    
-    $scope.sort = function(type) {
-      $scope.sortSelected = type;
-      menu.sort(type);
-      closeMenu();
-    };
-    
-    $scope.changeCatalog = function() {
-      page.show('catalog',{refresh: true});
-      $timeout(function(){
-        page.navigatorPop();
+      network.post('post/'+id,data,function(result, response){
+         console.log(response);
       });
-    };
-
-    $scope.share = function() {
-      share.exec();
-    };
-
-
-    closeMenu = function() {
-      page.goBack();
+      network.pagerReset();
     };
     
-    menu.setIsSortable = function(isSortable){
-      $scope.isSortable = isSortable;
+    $scope.recoverFeedItem = function(id) {
+      id = parseInt(id);
+      var data = { deleted: null
+                 };
+      network.post('post/'+id,data,function(result, response){
+         console.log(response);
+      });
+      network.pagerReset();
     };
-    
-    menu.setListViewChangeEnabled = function(listViewChangeEnabled){
-      $scope.listViewChangeEnabled = listViewChangeEnabled;
-    };
-
-    menu.hideChangeCatalog = function() {
-      $scope.hideChangeCatalog = true;
-    };
+  
     
 }]);
 

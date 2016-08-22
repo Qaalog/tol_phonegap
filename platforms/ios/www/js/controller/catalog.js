@@ -1,10 +1,9 @@
-qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config', 'device', 'httpAdapter', '$timeout',
-  function($rootScope,$scope, network, page, config, device, httpAdapter, $timeout) {
+tol.controller('catalog', ['$rootScope','$scope','network', 'page', 'config', 'device', 'httpAdapter', '$timeout','userService','dialog','notification','analytics',
+  function($rootScope,$scope, network, page, config, device, httpAdapter, $timeout,userService,dialog,notification,analytics) {
 
-    device.setIsLoaded(true);
     var onScroll;
     $scope.imgPrefix = network.servisePath+'GetCroppedImage?i=';
-    var imgSize = Math.floor(device.emToPx(9));
+    var imgSize = Math.floor(device.emToPx(7));
     var favElement;
     var favHeight = 0;
     var categoryTitleHeight;
@@ -14,21 +13,25 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
     $scope.scrollPosition;
 
     $scope.rows = {};
-    //$scope.def = 'Generic';
-    //$scope.FAVORITE_DEF = 'Favorites';
-    $scope.def = app.translate('catalog_selection_default_tag','Generic');
-    $scope.FAVORITE_DEF = app.translate('catalog_selection_favorite_tag','Favorites');
+    $scope.def = 'Generic';
+    $scope.FAVORITE_DEF = 'Favorites';
+
     $scope.self = { 'name':  'catalog'
-                  , 'title': 'Qaalog'
-                  , 'back':  false
+                  , 'title': 'Select your organization'
+                  , smallBack: true
                   };
+    var isUpdate;
     page.onShow($scope.self, function(data, update){
-      if (data.refresh) {
-        $scope.rows = {};
-        $scope.getCatalogs();
-        return true;
-      }
-      page.hideLoader();
+      
+      app.innerHeight = window.innerHeight;
+      page.setTabsVisiable(true); // fixed short container when application started with wrong orientation
+
+      isUpdate = update;
+      $scope.data = data;
+      $scope.rows = {};
+      $scope.getCatalogs(data);
+      $scope.user = data;
+      
       if ($scope.scrollPosition) {
         $timeout(function(){
           app.wrapper.scrollTop = $scope.scrollPosition;
@@ -36,33 +39,149 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
         });
       }
 
-      app.wrapper.addEventListener('scroll',onScroll);
+      //app.wrapper.addEventListener('scroll',onScroll);
 
     });
 
     $scope.$on('freeMemory',function(){
-      app.wrapper.removeEventListener('scroll',onScroll);
+      //app.wrapper.removeEventListener('scroll',onScroll);
     });
 
     onScroll = function() {
 
 
       if ($scope.rows[$scope.FAVORITE_DEF].hidden) {
-        favHeight = favElement.getBoundingClientRect().height;
-        if (app.wrapper.scrollTop > favHeight) {
-          $scope.$apply(function(){
-            $scope.rows[$scope.FAVORITE_DEF].hidden = false;
-            categoryTitleHeight = categoryTitleHeight || document.getElementsByClassName('category-title')[0].getBoundingClientRect().height;
-            app.wrapper.scrollTop = categoryTitleHeight;
-          });
-        }
+//        favHeight = favElement.getBoundingClientRect().height;
+//        if (app.wrapper.scrollTop > favHeight) {
+//          $scope.$apply(function(){
+//            $scope.rows[$scope.FAVORITE_DEF].hidden = false;
+//            categoryTitleHeight = categoryTitleHeight || document.getElementsByClassName('catalog-title')[0].getBoundingClientRect().height;
+//            app.wrapper.scrollTop = categoryTitleHeight;
+//          });
+//        }
       }
+    };
+    
+    function sendNotificationId(productId) {
+      if (device.isWindows()) return false;
+      var deviceType = '';
+      if (device.isAndroid()) {
+        deviceType = 'android';
+      }
+      if (device.isIOS()) {
+        deviceType = 'ios';
+      }
+      var data = { device_id: device.getUUID()
+                 , device_type: deviceType
+                 , product_id: productId
+                 , registration_id: app.notificationId || '0'
+                 };
+                 
+      network.post('user/registerDevice',data);
+    }
+    
+    var getProductId = function() {
+      
+      network.get('product/',{code:userService.getUser().username},function(result,response){
+        if (result) {
+            if (response.length < 1) {
+              console.log('response',response);
+              if (!isUpdate) {
+                //network.post('user/'+$scope.user['id'],{catalog_id: null},function(result, response){
+                  page.show('catalog',$scope.data,true);
+                //});
+              }
+              dialog.create(dialog.QUESTION,'Access is denied','You are not created as a user on this hotel.<br>Please notify your HR manager.<br>Do you want logout?',
+              'YES','NO',function(answer){
+                if (answer) network.logout();
+              }).show();
+            }
+            if (!response[0].image_url || response[0].image_url == null) {
+              page.requestFBAvatar();
+            }
+            userService.setProductId(response[0].id);
+            userService.setAuthProduct(response[0]);
+            userService.setAvatar(response[0].image_url);
+            userService.normalizeOrgLevels(response[0].characteristics);
+            var isAdmin = userService.checkForAdmin(response[0].characteristics);
+            if (isAdmin) {
+              analytics.trackCustomDimension(analytics.USER_TYPE, 'Manager');
+            } else {
+              analytics.trackCustomDimension(analytics.USER_TYPE, 'Employee');
+            }
+            
+            if (userService.getOrgLevel(1)) {
+              analytics.trackCustomDimension(analytics.ORG_LEVEL_1, userService.getOrgLevel(1));
+            }
+            if (userService.getOrgLevel(2)) {
+              analytics.trackCustomDimension(analytics.ORG_LEVEL_2, userService.getOrgLevel(2));
+            }
+            if (userService.getOrgLevel(3)) {
+              analytics.trackCustomDimension(analytics.ORG_LEVEL_3, userService.getOrgLevel(3));
+            }
+            
+            sendNotificationId(response[0].id);
+            notification.getNewNotificationCount(response[0].id);
+            if (app.coldStart && !app.started) {
+              page.show('notification',{});
+              app.started = true;
+            } else {            
+              page.show('feed',{});
+              app.started = true;
+            }
+            page.navigatorClear();
+        } else {
+          //if (response.code == 501) {
+            page.hideLoader();
+            //network.post('user/'+$scope.user['id'],{catalog_id: null},function(result, response){});
+            dialog.create(dialog.QUESTION,'Access is denied','You are not created as a user on this hotel.<br>Please notify your HR manager.<br>Do you want logout?',
+              'YES','NO',function(answer){
+                if (answer) network.logout();
+              }).show();
+          //}
+        }
+      },false,true);  
     };
 
     $scope.selectCatalog = function(catalog) {
-      $scope.scrollPosition = app.wrapper.scrollTop;
-      network.setCatalogDB(catalog.db);
-      page.show('products',catalog);
+      page.showLoader();
+      userService.setHotelName(catalog.name);
+      userService.setHotelId(catalog.id);
+
+      network.post('entity_catalog/CatalogProductExist',{'catalog_id': catalog.id, 'product_code':$scope.user.username}, 
+        function(result, response) {
+          
+        if (result) {
+          if (response.result === true) {
+            console.log('catalog pager update');
+            network.pagerReset();
+            network.post('user/'+$scope.user['id'],{catalog_id: catalog.id, entity_id: catalog.entity_id},function(result, response){
+              if (result) {
+                analytics.trackCustomDimension(analytics.CATALOG, catalog.name);
+                analytics.trackCustomDimension(analytics.ENTITY, catalog.entity_name);
+                getProductId();
+              }
+            });
+            return true;
+          }
+        }
+        
+        page.hideLoader();
+        dialog.create(dialog.QUESTION,'Access is denied','You are not created as a user on this hotel.<br>Please notify your HR manager.<br>Do you want logout?',
+              'YES','NO',function(answer){
+                if (answer) network.logout();
+              }).show();
+        
+        console.log(response);
+      });
+      
+
+     
+      
+      
+//      $scope.scrollPosition = app.wrapper.scrollTop;
+//      network.setCatalogDB(catalog.db);
+//      page.show('products',catalog);
     };
 
     $scope.toggleGroup = function(group,event){
@@ -89,47 +208,53 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
       element.className = element.className.replace(' opened','');
     });
 
-    $scope.getCatalogs = function() {
-      var params =  { applicationID:  config.appId
-                    , deviceID:       device.getUUID() || '3005624abc78c4ec'
+    $scope.getCatalogs = function(data) {
+      var params =  { 'app_id':  config.appId
+                    , 'device_id': device.getUUID() || 'pc11'
                     , language:       navigator.language
                     };
-      network.get('GetCatalogs', params, function(result, response){
+
+      network.get('entity_catalog/',params, function(result, response){
         if(result) {
-          //var test = '[{"o":"Descontos até 30% em cartão","n":"QAS - Well\u0027s Christmas Catalogue","db":"Qaalog_Wells","d":"Exclusive online","info":"","i":"http://image.qas.qaalog.com/logos/wells.jpg","f":0,"t":[]}]';
-          //var test = '[]';
-          //test = JSON.parse(test);
-          response = httpAdapter.convert(response);
+
+          if (response.length === 0) {
+            page.hideLoader();
+            dialog.create(dialog.INFO,'INFO','Your hotel list is empty. Please change username<br>or contact your administrator','OK').show();
+          }
+          
+          if ($scope.user.catalog_id) {
+            for (var i in response) {
+              if (response[i].id*1 === $scope.user.catalog_id*1) {
+                $scope.selectCatalog(response[i]);
+              }
+            }
+            return false;
+          }
+          
+          
           page.hideLoader();
           if (response.length === 0) {
             $scope.noResultVisiable = true;
-            page.setCatalogTitleVisiable(false);
             return true;
           }
 
-          if (response.length === 1) {
-            response[0].canBackDisable = true;
-            $scope.selectCatalog(response[0]);
-            return false;
-          }
+//          if (response.length === 1) {
+//            response[0].canBackDisable = true;
+//            $scope.selectCatalog(response[0]);
+//            return false;
+//          }
 
           $scope.rows[$scope.FAVORITE_DEF] = {'name':$scope.FAVORITE_DEF, 'items':[], 'hidden':false, style:{}};
           angular.forEach(response, function(item) {
-            var data =  { image:        item.image
-                        , name:         item.name
-                        , organisation: item.organisation
-                        , description:  item.description
-                        , db:           item.db
-                        , favorite:     item.favorite
-                        , info:         item.info
-                        };
-            var groupInfo = item.tag[0] || {};
-            var group = groupInfo.name || $scope.def;
+            item.tags = item.tags || [];
+            var groupInfo = item.tags[0];
+            
+            var group = groupInfo || $scope.def;
             $scope.rows[group] = $scope.rows[group] || {'name':group, 'items':[], 'hidden':false, style:{}};
-            $scope.rows[group]['items'].push(data);
+            $scope.rows[group]['items'].push(item);
 
-            if(item.favorite > 0) {
-              $scope.rows[$scope.FAVORITE_DEF]['items'].push(data);
+            if(item['is_favorite'] == 1) {
+              $scope.rows[$scope.FAVORITE_DEF]['items'].push(item);
             }
 
           });
@@ -139,9 +264,11 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
           $scope.rows[$scope.def] = temp;
 
         } else {
-         // page.showError('catalog', response);
-          $scope.noResultVisiable = true;
-          page.setCatalogTitleVisiable(false);
+          page.hideLoader();
+          dialog.create(dialog.INFO,'INFO','Your hotel list is empty. Please change username<br>or contact your administrator','OK',null,
+            function(){
+              page.show('login',{logout: true});
+            }).show();
           console.log("ERROR");
           return false;
         }
@@ -152,7 +279,7 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
       });
     };
 
-    $scope.getCatalogs();
+    
     var categoryHeight;
     $scope.$on('favRendered',function(){
       console.log('rendered');
@@ -160,12 +287,13 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
     });
 
     var like = function(catalog) {
-      catalog.favorite++;
+      console.log('like');
+      catalog['is_favorite'] = 1;
       $scope.rows[$scope.FAVORITE_DEF]['items'].push(catalog);
 
       if ($scope.rows[$scope.FAVORITE_DEF]['items'].length > 1) {
         if ($scope.rows[$scope.FAVORITE_DEF].hidden) {
-          favHeight = favElement.getBoundingClientRect().height;
+          //favHeight = favElement.getBoundingClientRect().height;
           $scope.rows[$scope.FAVORITE_DEF].hidden = false;
           // app.wrapper.scrollTop = app.wrapper.scrollTop + (favHeight - 110);
         }
@@ -176,7 +304,8 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
     };
 
     var unlike = function(catalog) {
-      catalog.favorite--;
+      console.log('unlike');
+      catalog['is_favorite'] = 0;
       for (var i in $scope.rows[$scope.FAVORITE_DEF]['items']) {
         var item = $scope.rows[$scope.FAVORITE_DEF]['items'][i];
         if (catalog.db === item.db) {
@@ -187,35 +316,34 @@ qaalog.controller('catalog', ['$rootScope','$scope','network', 'page', 'config',
 
       if ($scope.rows[$scope.FAVORITE_DEF]['items'].length < 1) {
         $scope.rows[$scope.FAVORITE_DEF]['hidden'] = false;
-        categoryTitleHeight = categoryTitleHeight || document.getElementsByClassName('category-title')[0].getBoundingClientRect().height;
+        categoryTitleHeight = categoryTitleHeight || document.getElementsByClassName('catalog-title')[0].getBoundingClientRect().height;
         app.wrapper.scrollTop = app.wrapper.scrollTop + categoryTitleHeight;
       }
     };
 
     $scope.addToFavorites = function(catalog,event) {
+      console.log('addToFavorites');
       favElement = document.getElementsByClassName('group')[0];
       event.stopPropagation();
       categoryHeight = categoryHeight || document.getElementsByClassName('category')[0].getBoundingClientRect().height;
 
-      if (catalog.favorite < 1) {
+      var value = 0;
+      if (catalog['is_favorite'] != 1) {
         like(catalog);
-        var action = 'like';
+        value = 1;
       } else {
         unlike(catalog);
-        var action = 'unlike';
       }
 
       $rootScope.$broadcast('recalculateListHeight');
-      var data = { catalogDB: catalog.db
-                 , deviceID: device.getUUID() || 'asdqwe'
+      var data = { 'catalog_id': catalog.id
+                 , 'device_id': device.getUUID() || 'pc11'
+                 , 'value': value
                  };
-      network.get('ToggleCatalogFavorite', data, function(result, response){
+                 console.log(data);
+      network.post('entity_catalog/SetIsFavorite', data, function(result, response){
         if (result) {
-          console.log(response, response != 'true');
-         if (response != 'true' && response != true) {
-           $scope.rows = {};
-           $scope.getCatalogs();
-         }
+          console.log(response);
         } else {
           if (action === 'like') unlike(catalog);
           if (action === 'unlike') like(catalog);

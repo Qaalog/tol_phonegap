@@ -1,4 +1,4 @@
-qaalog.service('httpAdapter',[function(){
+tol.service('httpAdapter',[function(){
     var $adapter = this;
     
     var aliases = {};

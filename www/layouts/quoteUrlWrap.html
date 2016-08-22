@@ -1,0 +1,33 @@
+<div class="quote-wrap" data-repeat="feedItem" data-type="quote-url-wrap">
+  <span class="t-icon_quote quote-icon"></span>
+  <div class="feed-box">
+    <div class="user-posted this-user">
+      <div class="image-wrap" data-touch="showProfile(feedItem.parent_post.from_product_id)">
+        <div class="img-middle-wrap">
+          <div class="img-inner-wrap">
+            <img class="img" data-src="{% (feedItem.parent_post.from_product_image) ?  scope.imgPrefix + (feedItem.parent_post.from_product_image) + scope.imgSuffix : 'img/default-staff.png' %}">
+          </div>
+        </div>
+      </div>              
+      <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
+        <div class="feed-title" >
+          <strong class="user-name" data-touch="showProfile(feedItem.parent_post.from_product_id)">
+            {% feedItem.parent_post.from_product_name || 'Anonymous user' %}
+          </strong> 
+          published a new post
+        </div>
+        <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
+      </div>
+    </div>
+    <div class="post-box linked linked-quote" data-touch="showPostDetails(feedItem)">
+      <h2 class="post-title">{%scope.getHtml(feedItem.parent_post.message)%}</h2>
+    <div style="height: 15em" data-image-loader="img/tol_loader_gray_128.gif">
+      <img data-src="{% scope.imgResizedPrefix + feedItem.attachments[0].data.urlImage + scope.imgResizedSuffix%}" alt="" class="img main_image" data-touch="showPostDetails(feedItem)">
+    </div>
+    <div class="image-title">{%feedItem.attachments[0].data.title%}</div>
+    <div class="image-link" data-touch="goToLink(feedItem.attachments[0].data.href)">
+      <a href="javascript:;" class="link"><span class="site-icon t-icon_link"></span>{%feedItem.attachments[0].data.link%}</a>
+    </div>	          
+    </div>
+  </div>
+</div>

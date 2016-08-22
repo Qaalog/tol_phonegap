@@ -1,4 +1,4 @@
-qaalog.directive('ngSwipeHeader',['page','device','$timeout','search',function(page,device,$timeout,search){
+tol.directive('ngSwipeHeader',['page','device','$timeout','searchService',function(page,device,$timeout,searchService){
   return {
        scope: {
        },
@@ -101,7 +101,7 @@ qaalog.directive('ngSwipeHeader',['page','device','$timeout','search',function(p
          };
           
          var toggleHeader = function() {
-           search.stopSearching();
+           searchService.stopSearching();
            height = header.getBoundingClientRect().height;
            if (app.wrapper.scrollTop > firstStep) {
              page.hideExtendedHeader();

@@ -1,57 +1,13 @@
-<div class="container profile-container">
+<div class="container profile-container" id="profile_container">
   <div class="tab-wrap" ng-show="isPostsShow">
-  	<div class="feed-wrap">      
-      <div class="feed-box" ng-repeat="post in posts">
-	      <div class="user-posted this-user">
-	        <div class="image-wrap" ng-fast-touch="showPictureInLightBox(post.from_product_image)">
-	          <div class="img-middle-wrap">
-	            <div class="img-inner-wrap">
-	              <img class="img" 
-                       ng-src="{{::(post.from_product_image) ? imgPrefix + post.from_product_image + imgSuffix : 'img/default-staff.png'}}">
-	            </div>
-	          </div>
-	        </div>
-	        <div class="user-title">
-	          <div class="feed-title"><span class="user-name">{{::post.from_product_name}}</span> published a new post</div>
-	          <div class="time-published">{{::getPostAge(post)}} - {{::hotelName}}</div>
-	        </div>
-	        <div class="user-menu t-icon_menu" ng-show="::userProductId === post.from_product_id*1" ng-fast-touch="userMenuShow(post,$index)"></div>
-	      </div>
-	      <div class="post-box">
-	        <h2 class="post-title" ng-bind-html="::getHtml(post.message)"></h2>
-	        <div class="points-wrap">
-              <div class="you-gave" 
-                   ng-hide="::productId === post.from_product_id*1 || !post['my_points'] || post['my_points'] == 0">
-                   {{::'You gave ' + (post['my_points'] || 0) + ((post['my_points'] == 1) ? ' point' : ' points')}}
-              </div>
-              <div class="give" 
-                   ng-fast-touch="givePoints(feedItem)"
-                   ng-hide="::product.id*1 === productId || post['my_points']">
-                <span class="t-icon_point"></span>Give
-              </div>
-	          <div class="post-img-wrap" ng-image-loader="img/tol_loader_gr_wh.gif">
-	            <img class="img" onerror="app.onImgError(this)"
-                     ng-fast-touch="showPictureInLightBox(post.media_url)"
-	                 ng-src="{{::post.media_url}}">
-	          </div>
-	        </div>
-	        <div class="post-info" ng-fast-touch="showWhoGivePoints(post)">
-	          <div class="points left"><span class="t-icon_point"></span>This post has 
-                <strong>{{::(post.points || 0) + ((post.points == 1) ? ' point' : ' points')}}</strong> 
-                so far
-              </div>
-	          <div class="fb-share right" 
-                   ng-show="userProductId === post.from_product_id*1 && imageElement.isLoaded"
-                   ng-fast-touch="showShareMenu(post,$event)">
-                <span class="t-icon_link_fb"></span>Share
-              </div>
-	        </div>
-	      </div>
-	    </div>      
+    <div class="bottom_loader" id="profile_top_loader" style="display:none"></div>
+  	<div class="feed-wrap" id="profile_feed" ng-class="(params.productId != userProductId)?'profile-posts-has-recobutton':''">
+      
 	  </div>
+    <div class="bottom_loader" id="profile_loader" style="display:none"></div>
   </div>  
   <div class="tab-wrap" ng-show="isPointsShow">
-  	<div class="points-box">
+  	<div class="points-box" ng-class="(params.productId != userProductId)?'profile-has-recobutton':''">
   		<div class="points-header" ng-show="currentPoint.long_name">
   			<div class="arrow-prev arrow" ng-fast-touch="changePoint('prev')" ng-show="showPrevArrow">
               <span class="t-icon_arrow_left"></span>
@@ -73,10 +29,18 @@
   				<div class="table-col first">Period</div>
   				<div class="table-col text-center">Level</div>
   				<div class="table-col text-center">Points</div>
-  			</div>
-        <div class="table-wrap">
+			</div>
+
+        <div class="table-wrap has-subtable"
+             ng-class="{'opened': point.isMonthOpened}"
+             ng-fast-touch="(!isEmptyObject(point.points_per_month)) ? point.isMonthOpened = !point.isMonthOpened : false">
           <div class="table-body">
-            <div class="table-col first text-center"><span class="date">{{getMonth(point.points_current_period.month)}}</span></div>
+            <div class="table-col first text-center">
+              <span class="date">
+                {{getMonth(point.points_current_period.month)}}
+                <span ng-if="!isEmptyObject(point.points_per_month)" class="t-icon_arrow_down"></span>
+              </span>
+            </div>
             <div class="table-col text-center">
               <div class="level">
                 <span class="t-icon_level" ng-show="maxLevel > 0" ng-class="{'done':point.current_level > 0}"></span>
@@ -87,17 +51,37 @@
               </div>
             </div>
             <div class="table-col text-center">{{::point.points_current_period.points}}
-              <div class="to-next-lvl">({{::point.to_next_level}} to next level)</div>
+              <div class="to-next-lvl" ng-show="point.to_next_level">({{::point.to_next_level}} to next level)</div>
+            </div>
+            
+          </div>
+          
+          <div class="subtable">
+            <div class="table-body" ng-repeat="month in point.points_per_month">
+              <div class="table-col first text-center"><span class="date">{{getMonth(month.month)}}</span></div>
+              <div class="table-col text-center">
+                <div class="level">
+                  <span class="t-icon_level" ng-show="maxLevel > 0" ng-class="{'done':point.current_level > 0}"></span>
+                  <span class="t-icon_level" ng-show="maxLevel > 1" ng-class="{'done':point.current_level > 1}"></span>
+                  <span class="t-icon_level" ng-show="maxLevel > 2" ng-class="{'done':point.current_level > 2}"></span>
+                  <span class="t-icon_level" ng-show="maxLevel > 3" ng-class="{'done':point.current_level > 3}"></span>
+                  <span class="t-icon_level" ng-show="maxLevel > 4" ng-class="{'done':point.current_level > 4}"></span>
+                </div>
+              </div>
+              <div class="table-col text-center">{{::month.points}}</div>
             </div>
           </div>
-        </div>  			
+        </div>  
+        
           <div class="table-wrap has-subtable" 
                ng-class="{'opened': point.isOpened}" 
                ng-show="::point.points_per_year"
-               ng-fast-touch="point.isOpened = !point.isOpened">
+               ng-fast-touch="(point.points_per_year.length > 1) ? point.isOpened = !point.isOpened : false">
           <div class="table-body">
             <div class="table-col first text-center">
-              <span class="date">{{::point.points_per_year[0][0].year}}<span class="t-icon_arrow_down"></span></span>
+              <span class="date">{{::point.points_per_year[0].year}}
+                <span ng-if="point.points_per_year.length > 1" class="t-icon_arrow_down"></span> 
+              </span>
             </div>
             <div class="table-col text-center">
               <div class="level">
@@ -108,11 +92,12 @@
                 <span class="t-icon_level" ng-show="maxLevel > 4" ng-class="{'done':point.current_level > 4}"></span>
               </div>
             </div>
-            <div class="table-col text-center">{{::point.points_per_year[0][0].total}}</div>
+            <div class="table-col text-center">{{::point.points_per_year[0].points}}</div>
           </div>
+            
           <div class="subtable">
-            <div class="table-body" ng-repeat="year in point.points_per_year[0]">
-              <div class="table-col first text-center"><span class="date">{{::getMonth(year.month)}}</span></div>
+            <div class="table-body" ng-repeat="year in point.points_per_year" ng-if="!$first">
+              <div class="table-col first text-center"><span class="date">{{::year.year}}</span></div>
               <div class="table-col text-center">
                 <div class="level">
                   <span class="t-icon_level" ng-show="maxLevel > 0" ng-class="{'done':point.current_level > 0}"></span>
@@ -125,43 +110,60 @@
               <div class="table-col text-center">{{::year.points}}</div>
             </div>
           </div>
+            
         </div>
-        <div class="text-center"
-             ng-hide="::userProductId === productId" 
-             ng-fast-touch="givePoints({id: productId, 'from_product_name': product.name, 'image_url': product.image_url})">
+<!--        <div class="text-center"
+             ng-hide="::userProductId == productId" 
+             ng-fast-touch="givePoints({from_product_id: productId, 'from_product_name': product.name, 'from_product_image': product.image_url, point: currentPoint})">
           <div class="give-points give"><span class="t-icon_point"></span>Give points</div>
-        </div>
+        </div>-->
   		</div>
       
            
   	</div>
   </div>
   <div class="tab-wrap" ng-show="isBioShow">
-    <div class="bio-box">
-      <div class="info-row" ng-if="telephone.value">
+    <div class="bio-box" ng-class="(params.productId != userProductId)?'profile-has-recobutton':''">
+<!--      <div class="info-row" ng-if="telephone.value">
         <span class="t-icon_phone icon"></span><a class="phone" href="tel:{{telephone.value}}">{{telephone.value}}</a>
       </div>
-      <div class="info-row">
+     <div class="info-row">
         <span class="t-icon_email icon"></span><a class="email" href="mailto:{{product.code}}">{{product.code}}</a>
-      </div>
-      <div class="info-row" ng-repeat="bio in product.characteristics" ng-if="::bio.short_name !== 'rate'" ng-fast-touch="showMap(bio)">
+      </div>-->
+      <div class="info-row" 
+           ng-repeat="bio in product.characteristics" 
+           ng-if="::bio.short_name !== 'rate' && bio.short_name !== 'role'" 
+           ng-fast-touch="showMap(bio)">
         <strong class="strong">{{::bio.long_name}}</strong><span ng-bind-html="::bio.value"></span>
       </div>
     </div>
   </div>
+  
   <div class="tab-wrap" ng-show="isConfigShow">
     <div class="config-box">
       <div class="info-row" ng-fast-touch="goToChangePassword()">
         <span class="t-icon_password icon"></span><div class="config">Change Password</div>
       </div>
       <div class="info-row" ng-hide="isFBLinked" ng-fast-touch="loginToFb()">
-        <span class="t-icon_link_fb icon"></span><div class="config">Link Facebook account</div>
+        <span class="t-icon_link_fb icon"></span>
+        <div class="config">
+          <div>Link Facebook account</div>
+<!--          <div class="config-title">{{getUserName()}}</div>-->
+        </div>
       </div>
       <div class="info-row" ng-show="isFBLinked" ng-fast-touch="logoutToFb()">
-        <span class="t-icon_unlink_fb icon"></span><div class="config">Unlink Facebook account</div>
+        <span class="t-icon_unlink_fb icon"></span>
+        <div class="config">
+          <div>Unlink Facebook account</div>
+          <div class="config-title">{{getFBName()}}</div>
+        </div>
       </div>
       <div class="info-row" ng-fast-touch="changeOrganization()">
-        <span class="t-icon_organization icon"></span><div class="config">Change organization</div>
+        <span class="t-icon_organization icon"></span>
+        <div class="config">
+          <div>Change organization</div>
+          <div class="config-title">{{getHotelName()}}</div>
+        </div>
       </div>
       <div class="info-row no-border" ng-fast-touch="logout()">
         <span class="t-icon_logout icon"></span><div class="config">Log Out</div>

@@ -1,23 +1,108 @@
-<div class="container">
-	<div class="search-box">
-		<h1 class="search-title" ng-hide="searchStarted">Recent searches</h1>
-        
-		<div class="person-found" ng-repeat="product in products" ng-fast-touch="showProfile(product)">
-			<div class="image-wrap" ng-fast-touch="showPictureInLightBox(product.image_url || product.from_product_image)">
-				<div class="img-middle-wrap">
-					<div class="img-inner-wrap">
-						<img class="img" 
+<div class="recognition-wrap reco-search">
+    <div class="intro text-center" ng-show="recognizeList.length < 1" style="display: none">Tap <strong>Add</strong> to select people for
+        recognition
+    </div>
+<!--
+    <div class="reco-middle" id="search-reco-scroll" ng-hide="((departmentName!='')?(recognizeListDep.length < 1):(recognizeList.length < 1))"
+         ng-class="{one: ((departmentName!='')?(recognizeListDep.length === 1):(recognizeList.length === 1)),
+                    two: ((departmentName!='')?(recognizeListDep.length === 2):(recognizeList.length === 2)),
+                    three: ((departmentName!='')?(recognizeListDep.length === 3):(recognizeList.length === 3))}">
+-->
+    <div class="reco-middle" id="search-reco-scroll" ng-hide="recognizeList.length < 1">
+        <div class="reco-inner" id="search-reco-inner">
+            <div class="reco-list">
+<!--                    <div class="recognized search-recognized" ng-repeat="recoProduct in recognizeList track by $index" ng-if="departmentFilter(recognizeList,$index,products,'id',(departmentName=='')).data.length>0"-->
+                <div class="searchs recognized stripped">
+                    <div class="image-wrap"></div>
+                    <div class="stripes">
+                        <div class="line"></div>
+                        <div class="line bottom"></div>
+                    </div>
+                </div>
+                <div class="recognized search-recognized" ng-repeat="recoProduct in recognizeList"
+                ng-finish-render="searchRecognizeListRendered">
+                    <div class="image-wrap">
+                        <div class="img-middle-wrap">
+                            <div class="img-inner-wrap" ng-fast-touch="showProfile(recoProduct)">
+                                <img ng-src="{{(recoProduct.image_url || recoProduct.from_product_image) ? imgPrefix + (recoProduct.image_url || recoProduct.from_product_image) + imgSuffix : 'img/default-staff.png'}}">
+                            </div>
+                        </div>
+                        <span class="remove t-icon_close" ng-fast-touch="removeFromRecognizeList($index)"></span>
+                    </div>
+                    <div class="text" ng-bind-html="splitName(recoProduct)" ng-fast-touch="showProfile(recoProduct)"></div>
+                </div>                
+            </div>
+        </div>
+    </div>
+<!--
+    <div class="reco-btn"
+         ng-fast-touch="recognize()"
+         ng-hide="((departmentName!='')?(recognizeListDep.length < 1):(recognizeList.length < 1))">
+        <div class="inner">
+            <span class="t-icon_point"></span>
+            Recognize
+        </div>
+    </div>
+-->
+    <div class="reco-btn"
+         ng-fast-touch="recognize()"
+         ng-hide="recognizeList.length < 1">
+        <div class="inner">
+            <span class="t-icon_point"></span>
+            Recognize
+        </div>
+    </div>
+</div>
+
+<div class="container search-container" ng-class="{'reco-added':recognizeList.length>0}">
+    <div class="has-points-box reco person-found" ng-show="departmentName!=''">
+        <strong class="has-title" ng-bind="departmentName"></strong>
+        <div class="employee-number"
+             ng-bind="departmentEmployeesCount+(departmentEmployeesCount>1?' employees':' employee')"></div>
+        <div class="add-recognized">
+            <div class="add"  ng-show="addAllVisible" ng-fast-touch="addAll()">
+                <span class="inner"><span class="icon t-icon_point"></span>Add all</span>
+            </div>
+            <div class="add added" ng-hide="addAllVisible" ng-fast-touch="removeAll()">
+                <span class="inner">Remove all</span>
+            </div>
+        </div>
+    </div>
+    <div class="search-box reco">
+        <h1 class="search-title" ng-hide="searchStarted">Recent searches</h1>
+<!--
+        <div class="no-results fixed-screen" id="no_result_wrap" ng-show="isNoResultShow">
+            <h1 class="result-title text-center">{{noResultText}}</h1>
+        </div>
+-->
+        <div class="person-found" ng-repeat="product in products">
+            <div class="image-wrap"
+                 ng-fast-touch="showProfile(product)">
+                <div class="img-middle-wrap">
+                    <div class="img-inner-wrap">
+                        <img class="img"
                              onerror="app.onAvatarError(this)"
                              ng-src="{{(product.image_url || product.from_product_image) ? imgPrefix + (product.image_url || product.from_product_image) + imgSuffix : 'img/default-staff.png'}}">
-					</div>
-				</div>
-			</div>
-			<div class="person-title">
-              <div class="user-name">{{product.name || product.from_product_name}}</div>
-              <div class="user-position">{{product.header_name || product.from_product_header_name}}</div>
+                    </div>
+                </div>
             </div>
-            <div ng-if="product.productId != currentProductId" class="give" ng-fast-touch="goToGivePoints(product)"><span class="t-icon_point"></span>Give</div>
+            <div class="person-title">
+                <div class="user-name" ng-fast-touch="showProfile(product)">{{product.name || product.from_product_name}}</div>
+                <div class="user-position">{{product.header_name || product.from_product_header_name}}</div>
+            </div>
+            <div class="add-recognized"
+                 ng-if="isAddButtonVisiable(product)"
+                 ng-fast-touch="addToRecognizeList(product)">
+                <div class="add" ng-hide="product.isAdded">
+                    <span class="inner"><span class="icon t-icon_point"></span>Add</span>
+                </div>
+                <div class="add added"
+                     ng-show="product.isAdded" ng-fast-touch="removeFromRecognizeList(getIndexAtRecognizeList(product))">
+                    <span class="inner">Remove</span>
+                </div>
+            </div>
+            <!--             <div ng-if="product.productId != currentProductId" class="give" ng-fast-touch="goToGivePoints(product)"><span class="t-icon_point"></span>Give</div> -->
         </div>
 
-	</div>
+    </div>
 </div>

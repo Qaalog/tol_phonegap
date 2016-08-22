@@ -1,0 +1,20 @@
+<div class="points-wrap" data-repeat="feedItem" data-type="points-wrap">
+  <!--  <div class="you-gave"
+      data-binding="getYouGave(feedItem)"
+      data-show="{% feedItem['my_points'] && !feedItem['my_points'] == 0 %}">
+      {%scope.getYouGave(feedItem)%}
+    </div>
+    <div class="give"
+         data-touch="givePoints(feedItem)"
+         data-binding
+         data-show="{% (scope.product.id != feedItem.from_product_id && !feedItem.my_points && scope.product.id != feedItem.to_product_id) %}">
+      <span class="t-icon_point"></span>Give
+    </div>-->
+  <div class="post-img-wrap" 
+       style="height: 15em"
+       data-image-loader="img/tol_loader_gray_128.gif" 
+       data-touch="showPostDetails(feedItem)">
+    <img class="img main_image" 
+         data-src="{% scope.imgResizedPrefix + feedItem.media_url + scope.imgResizedSuffix %}">
+  </div>
+</div>

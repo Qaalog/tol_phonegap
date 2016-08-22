@@ -1,4 +1,4 @@
-qaalog.service('menu',[function(){
+tol.service('menu',[function(){
     var $menu = this;
     var currentParams;
     
