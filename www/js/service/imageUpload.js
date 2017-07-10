@@ -190,20 +190,34 @@ tol.service('imageUpload',['userService','dialog', 'network',function(userServic
       onTake();
       parseTimerId = setTimeout(function() {
         var url = /(http.?:\/\/.+\.[^\s]+)/i.exec(message)[1];
-        network.getOutside(url, {}, function(result, response) {
+        //Check youtube url
+        var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        var url_youtube = false;
+        if(match && match[2] && match[2].length == 11){//valid youtube url
+          url_youtube = 'https://youtu.be/'+match[2]+'?app=desktop';
+        }
+
+        network.getOutside(url_youtube?url_youtube:url, {}, function(result, response) {
           
           if (result) {
             var ogImage = /<meta[^>]+property="og:image[^>]*"/i.exec(response);
             var ogDescriptionSrc = /<meta[^>]+"description[^>]*"/i.exec(response);
             var host = /(http.?:\/\/)/i.exec(url)[1];
             var link = url.replace(/http.?:\/\//i,'').replace(/\/.*/g,'');
-            if (ogDescriptionSrc) {
+
+            if (ogDescriptionSrc  && !url_youtube) {
               
               var ogDescription = /description".+"([^"]+)/i.exec(ogDescriptionSrc);
               
               if (!ogDescription) {
                 ogDescription = /"([^"]+)".+description/i.exec(ogDescriptionSrc);
-              } 
+              }
+
+              if (!ogDescription) {
+                ogDescription = /"(.+)"/i.exec(ogDescriptionSrc)
+              }
+
 
               if (ogDescription) {
                 ogDescription = htmlDecode(ogDescription[1]);
@@ -219,8 +233,11 @@ tol.service('imageUpload',['userService','dialog', 'network',function(userServic
 
             var imgSrc = false;
             
-            if (!ogImage) {
-              var imgs = response.match(/<img[^>]+src="[^>]*"/ig);
+            if (!ogImage || ! /(http.?:\/\/[^"]+)/.test(ogImage[0])) {
+              var imgs = response.match(/<img[^>]+src=["'][^>]*["']/ig);
+              if (!imgs){
+                  imgs = response.match(/<img[^>]+src=["'\n\r][^>]+["']/ig);
+              }
               if (!imgs) {
                 callback(false);
                 return false;
@@ -230,10 +247,18 @@ tol.service('imageUpload',['userService','dialog', 'network',function(userServic
                 if (/(http.?:\/\/[^"]+)/i.test(imgs[i])) {
                   ogImage = [imgs[i]];
                 } else {
-                  var src = /src="([^"]+)/i.exec(imgs[i]);
+                  var src = /src=["']([^"']+)["']/i.exec(imgs[i]);
                   if (src) {
                     imgSrc = host + link + '/' + src[1];
                   }
+                }
+                if(!imgSrc){
+                    if(/src=[\r\n]\s*["']([^"]+)["']/i.test(imgs[i])){
+                        var src = /src=[\r\n]\s*["']([^"]+)["']/i.exec(imgs[i])
+                        if(src){
+                            imgSrc = host + src[1].replace('//','');
+                        }
+                    }
                 }
                 if (/\.jpg|\.png/i.test(imgs[i])) {
                   break;

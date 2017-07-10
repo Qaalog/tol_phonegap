@@ -1,0 +1,33 @@
+<div class="quote-wrap linked" data-repeat="feedItem" data-type="external-vote-wrap">
+    <span class="t-icon_quote quote-icon"></span>
+    <div class="feed-box comment" data-show="{%feedItem.parent_post.post_type_id == feedService.VOTE_POST%}" data-touch="showPostDetails(feedItem)">
+        <div class="user-posted this-user">
+            <div class="image-wrap">
+                <div class="img-middle-wrap">
+                    <div class="img-inner-wrap custom">
+                        <img class="img" src="img/icon_vote.svg">
+                    </div>
+                </div>
+            </div>
+            <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
+                <div class="feed-title">
+                    <div class="user-name">Customer reviewed {%feedItem.parent_post.attachments[0].data.vote_object?('<br><b>'+feedItem.parent_post.attachments[0].data.vote_object+'</b>'):''%}</div>
+                </div>
+                <div class="time-published">{%scope.getPostAge(feedItem.parent_post)%} - {%scope.hotelName%}</div>
+            </div>
+        </div>
+        <div class="post-box">
+            <div class="post-title title-points">
+                {%scope.getHtml(feedItem.parent_post.message,false,true)%}
+                <div class="comment-points vote">{%feedItem.parent_post.attachments[0].data.rate%}</div>
+            </div>
+            <div class="post-img-wrap"
+                 style="height: 15em"
+                 data-image-loader="img/tol_loader_gray_128.gif"
+                 data-touch="showPostDetails(feedItem)">
+                <img class="img main_image"
+                     data-src="{% scope.imgResizedPrefix + feedItem.parent_post.media_url + scope.imgResizedSuffix %}">
+            </div>
+        </div>
+    </div>
+</div>

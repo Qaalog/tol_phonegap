@@ -1,5 +1,5 @@
-tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','userService','$httpParamSerializer','$filter', 'device',
-  function($http, page,config,$q,$timeout,$rootScope, userService,$httpParamSerializer,$filter, device) {
+tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','userService','$httpParamSerializer','$filter', 'device','dialog',
+  function($http, page,config,$q,$timeout,$rootScope, userService,$httpParamSerializer,$filter, device,dialog) {
   var $network = this;
   $network.servisePathPHP = config.servicePath;
   if (navigator.userAgent.toLocaleLowerCase().indexOf('windows') > -1 
@@ -398,8 +398,9 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
             }
           });
   };
-  
-  $network.logout = function() {
+
+  $network.logout = function(hideLogin) {
+    hidelogin = hideLogin || false;
     localStorage.removeItem(config.AUTH_KEY);
 
     var deviceType = null;
@@ -409,7 +410,7 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
       var data = { device_id: device.getUUID()
                  , device_type: deviceType
                  , product_id: userService.getAuthProduct().id
-                 , registration_id: '1'
+                 , registration_id: null
                  };
 
       $network.post('user/registerDevice',data);
@@ -419,8 +420,9 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
     userService.clear();
     
     $network.pagerReset();
-    
-    page.show('login',{hard: true});
+    if(!hideLogin){
+        page.show('login',{hard: true});
+    }
     page.navigatorClear();
     try {
       cordova.plugins.notification.badge.clear();
@@ -491,4 +493,99 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
     var date = new Date().getTime();
     return $filter('date')(date, 'yyyy-MM-dd HH:mm:ss');
   };
+
+  $network.forceVersion = false;
+  $network.checkAppVersion = function (callback) {
+      function ltrim(str,search){
+          while(str.charAt(0) === search)
+              str = str.substr(1);
+          return str;
+      }
+      callback = callback || function(){};
+      var appVersion = app.version.split('.').join('');
+      appVersion = ltrim(appVersion,'0');
+      $network.get('/info', {appId: config.appId}, function (result, response) {
+          if (result) {
+              console.log(response);
+              if(response.app &&  response.app.presets && response.app.presets.parameter
+                 && response.app.presets.parameter.force_upg_version && response.app.presets.parameter.force_upg_version.value){
+                  $network.forceVersion = response.app.presets.parameter.force_upg_version.value;
+                  var forceVersion = $network.forceVersion.split('.').join('');
+                  forceVersion = ltrim(forceVersion,'0');
+                  callback(forceVersion*1 <= appVersion*1);
+              } else {
+                  callback(true);
+              }
+          } else {
+              callback(true);
+          }
+      }, true);
+  };
+
+  $network.doLogin = function(login, start,fromLoginButton,scope) {
+          var AUTH_KEY = config.AUTH_KEY;
+          scope = scope || false;
+          start = start || false;
+          fromLoginButton = fromLoginButton || false;
+          $network.setUserKey(login);
+          $network.get('logout/',{},function(){
+              $network.get('user',{},function(result,response,status) {
+                  if (result && response.length === 1) {
+
+                      var password = atob(login).split(':')[1];
+
+                      userService.setPassword(password);
+                      userService.setUserId(response[0].id);
+                      userService.setUser(response[0]);
+                      userService.setUserCode(response[0].username);
+
+//          if (window.Localytics) {
+//            Localytics.setCustomerEmail(response[0].username);
+//            Localytics.setCustomerFullName(response[0].username);
+//            Localytics.setCustomerId(response[0].id);
+//            Localytics.upload();
+//            console.log('Localytics set user data');
+//          }
+
+                      if (response[0]['password_reset']*1 !== 1) {
+                          response[0].firstLogin = fromLoginButton;
+                          if(!userService.checkPrivacyTerms()){
+                              page.show('termsPrivacy',response[0]);
+                          } else {
+                              page.show('facebookLink',response[0]);
+                          }
+                      } else {
+                          localStorage.removeItem(AUTH_KEY);
+                          page.show('changePassword',response[0]);
+                          setTimeout(function(){
+                              page.navigatorClear();
+                              page.navigatorPush(function() {
+                                  page.show('login',{hard: true});
+                                  page.navigatorClear();
+                              });
+                          },300);
+                      }
+                      //   page.show('catalog',{});
+
+                  } else {
+                      page.hideLoader();
+                      if(scope) scope.auth.password = '';
+                      if (!start) {
+
+                          if (status == 401) {
+                              dialog.create(dialog.INFO,'Login failed','Incorrect username or password.','OK').show();
+                              if(scope) scope.auth.password = '';
+                          } else {
+                              page.showNoConnection(function() {
+                                  $network.doLogin(login, start);
+                                  page.hideNoConnection();
+                              }, 99);
+                          }
+
+                      }
+                  }
+              }, true);
+          });
+      };
+
 }]);

@@ -1,39 +1,4 @@
-<div class="recognition-wrap reco-search">
-    <!--        <div class="intro text-center" ng-show="recognizeList.length < 1">Tap <strong>Add</strong> to select people for recognition</div>-->
-    <div class="reco-middle" id="chart-search-reco-scroll" ng-hide="recognizeList.length < 1">
-        <div class="reco-inner" id="chart-search-reco-inner">
-            <div class="reco-list">
-                <div class="chart recognized stripped">
-                    <div class="image-wrap"></div>
-                    <div class="stripes">
-                        <div class="line"></div>
-                        <div class="line bottom"></div>
-                    </div>
-                </div>
-                <div class="recognized chart-search-recognized" ng-repeat="recoProduct in recognizeList">
-                    <div class="image-wrap">
-                        <div class="img-middle-wrap">
-                            <div class="img-inner-wrap" ng-fast-touch="showProfile(recoProduct)">
-                                <img ng-src="{{(recoProduct.image_url || recoProduct.from_product_image) ? imgPrefix + (recoProduct.image_url || recoProduct.from_product_image) + imgSuffix : 'img/default-staff.png'}}">
-                            </div>
-                        </div>
-                        <span class="remove t-icon_close" ng-fast-touch="removeFromRecognizeList($index)"></span>
-                    </div>
-                    <div class="text" ng-bind-html="splitName(recoProduct)" ng-fast-touch="showProfile(recoProduct)"></div>
-                </div>                
-            </div>
-        </div>
-    </div>
-    <div class="reco-btn"
-         ng-fast-touch="recognize()"
-         ng-hide="recognizeList.length < 1">
-        <div class="inner">
-            <span class="t-icon_point"></span>
-            Recognize
-        </div>
-    </div>
-</div>
-<div class="container search-container" ng-class="{'reco-added':recognizeList.length>0}">
-    <div class="chart-box" id="chart_box_wrap">
-    </div>
+<div class="container">
+  <div class="chart-box" id="chart_box_wrap">
+  </div>
 </div>

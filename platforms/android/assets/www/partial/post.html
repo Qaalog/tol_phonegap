@@ -1,133 +1,48 @@
 <div class="container">
-    <div class="post-wrap">
-        <div class="write-post-header">
-            <div class="image-wrap" ng-fast-touch="showPictureInLightBox(userAvatar)">
-                <div class="img-middle-wrap">
-                    <div class="img-inner-wrap">
-                        <img class="img"
-                             ng-src="{{(userAvatar) ? imgPrefix + userAvatar + imgSuffix : 'img/default-staff.png'}}">
-                    </div>
-                </div>
-            </div>
-            <div class="write-post">
-                <textarea class="write-post-text"
-                  id="post_textarea"
-                  placeholder="What's on your mind?"
-                  ng-change="validatePost(); parseMessage(postBody.message)"
+  <div class="post-wrap">
+    <div class="write-post-header">
+      <div class="image-wrap" ng-fast-touch="showPictureInLightBox(userAvatar)">
+        <div class="img-middle-wrap">
+          <div class="img-inner-wrap">
+            <img class="img" 
+                 ng-src="{{(userAvatar) ? imgPrefix + userAvatar + imgSuffix : 'img/default-staff.png'}}">
+          </div>
+        </div>
+      </div>
+      <div class="write-post">
+        <textarea class="write-post-text" 
+                  id="post_textarea" 
+                  placeholder="Say something about this" 
+                  ng-change="validatePost(); parseMessage(postBody.message)" 
                   ng-model="postBody.message"></textarea>
-                  <div ng-if="!isPreviewCanvasShow && !isExternalPost" class="add-photo-btn text-center">
-                    <span class="t-icon_photo"></span>
-                    Add photo
-                </div>
-            </div>
-        </div>
-        <div ng-hide="isExternalPost">
-            <div id="post_preview_wrap" class="add-photo"
-                 ng-class="{added: postBody['media_data']['content'] || isEdit || isURL}" ng-fast-touch="addPhoto()">
-                <!-- <div ng-if="!isPreviewCanvasShow" class="add-photo-btn text-center">
-                    <span class="t-icon_photo"></span>
-                    Add photo
-                </div> -->
-                <div class="rotate" ng-fast-touch="rotate()" ng-if="!params.editItem && !isURL"><span
-                        class="t-icon_arrow_rotate"></span></div>
-                <canvas ng-show="isPreviewCanvasShow" id="test_canvas"></canvas>
-                <div class="post-loader" ng-if="isPostLoaderShow"></div>
-            </div>
-            <div class="caption" ng-show="isURL">
-                <div class="caption-title">{{caption.title}}</div>
-                <a href="" class="caption-link">{{caption.link}}</a>
-            </div>
-            <div class="to-remember share" ng-hide="isEdit">
-                <div class="custom-checkbox" id="post_switcher" ng-fast-touch="toggleCheckBox($event)">
-                    <div class="switcher"></div>
-                </div>
-                <div class="to-remember-label" id="share_to_fb_label">Share on Facebook</div>
-            </div>
-            <div class="to-remember share">
-                <div class="custom-checkbox" id="other_can_share_switcher" ng-fast-touch="toggleCheckBox($event)">
-                    <div class="switcher"></div>
-                </div>
-                <div class="to-remember-label" id="others_can_share">Others can share my post</div>
-            </div>
-        </div>
-        <div ng-show="isExternalPost">
-            <!--TripAdvisor POST-->
-            <div class="feed-box comment" ng-if="params.editItem.parent_post && params.editItem.parent_post.auto_post_name =='TripAdvisor'">
-                <div class="user-posted this-user">
-                    <div class="image-wrap">
-                        <div class="img-middle-wrap">
-                            <div class="img-inner-wrap">
-                                <img class="img" src="img/icon_tripadvisor.svg">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="user-title">
-                        <div class="feed-title">
-                            New TripAdvisor comment
-                        </div>
-                        <div class="time-published">{{getPostAge(params.editItem.parent_post)}} - {{hotelName}}</div>
-                    </div>
-                    <!--    <div class="user-menu t-icon_menu"></div>-->
-                </div>
-                <div class="post-box">
-                    <div class="post-title">
-                        {{params.editItem.parent_post.message}}
-                        <div class="stars">
-                            <div class="star t-icon_star2 {{(params.editItem.parent_post.attachments[0].data.stars*1 > 0) ? 'tapped' : ''}}"></div>
-                            <div class="star t-icon_star2 {{(params.editItem.parent_post.attachments[0].data.stars*1 > 1) ? 'tapped' : ''}}"></div>
-                            <div class="star t-icon_star2 {{(params.editItem.parent_post.attachments[0].data.stars*1 > 2) ? 'tapped' : ''}}"></div>
-                            <div class="star t-icon_star2 {{(params.editItem.parent_post.attachments[0].data.stars*1 > 3) ? 'tapped' : ''}}"></div>
-                            <div class="star t-icon_star2 {{(params.editItem.parent_post.attachments[0].data.stars*1 > 4) ? 'tapped' : ''}}"></div>
-                        </div>
-                    </div>
-                    <div class="comment-text" ng-bind-html="tripAdvisorHtml(params.editItem.parent_post.attachments[0].data.text)"></div>
-                    <div class="author">
-                        <div class="name">{{params.editItem.parent_post.attachments[0].data.userName}}</div>
-                        <div class="place">{{params.editItem.parent_post.editItem.parent_post.attachments[0].data.userLocation}}</div>
-                    </div>
-                    <div class="post-info"></div>
-                </div>
-            </div>
-            <!--TripAdvisor POST END-->
-            <!--BookingCom POST-->
-            <div class="feed-box comment" ng-if="params.editItem.parent_post && params.editItem.parent_post.auto_post_name =='BookingCom'">
-                <div class="user-posted this-user">
-                    <div class="image-wrap">
-                        <div class="img-middle-wrap">
-                            <div class="img-inner-wrap">
-                                <img class="img" src="img/icon_booking.svg">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="user-title">
-                        <div class="feed-title">
-                            New Booking.com comment
-                        </div>
-                        <div class="time-published">{{getPostAge(params.editItem.parent_post)}} - {{hotelName}}</div>
-                    </div>
-                </div>
-                <div class="post-box">
-                    <div class="post-title title-points">
-                        {{params.editItem.parent_post.message}}
-                        <div class="comment-points">{{params.editItem.parent_post.attachments[0].data.stars}}</div>
-                    </div>
-                    <div class="comment-text">
-                        <div class="comment-part" ng-show="params.editItem.parent_post.attachments[0].data.text_pos">
-                            <span class="icon plus">+</span> {{params.editItem.parent_post.attachments[0].data.text_pos}}
-                        </div>
-                        <div class="comment-part" ng-show="params.editItem.parent_post.attachments[0].data.text_neg">
-                            <span class="icon minus"></span> {{params.editItem.parent_post.attachments[0].data.text_neg}}
-                        </div>
-                    </div>
-                    <div class="author">
-                        <div class="name">{{params.editItem.parent_post.attachments[0].data.userName}}</div>
-                        <div class="place">{{params.editItem.parent_post.attachments[0].data.userLocation}}, {{formatDate(params.editItem.parent_post.datetime_published)}}</div>
-                    </div>
-                    <div class="post-info"></div>
-                </div>
-            </div>
-            <!--BookingCom POST END-->
-
-        </div>
+      </div>      
     </div>
+    <div id="post_preview_wrap" class="add-photo" ng-class="{added: postBody['media_data']['content'] || isEdit || isURL}" ng-fast-touch="addPhoto()">
+      <div ng-if="!isPreviewCanvasShow" class="add-photo-btn text-center">
+        <span class="t-icon_photo"></span>
+        Add photo
+      </div>
+      <div class="rotate" ng-fast-touch="rotate()" ng-if="!params.editItem && !isURL"><span class="t-icon_arrow_rotate"></span></div>
+      <canvas ng-show="isPreviewCanvasShow" id="test_canvas"></canvas>
+      <div class="post-loader" ng-if="isPostLoaderShow"></div>      
+    </div>
+    <div class="caption" ng-show="isURL">
+      <div class="caption-title">{{caption.title}}</div>
+      <a href="" class="caption-link">{{caption.link}}</a>
+    </div>
+    <div class="to-remember share" ng-hide="isEdit">      
+      <div class="custom-checkbox" id="post_switcher" ng-fast-touch="toggleCheckBox($event)">
+        <div class="switcher"></div>
+      </div>
+      <div class="to-remember-label" id="share_to_fb_label">Share on Facebook</div>
+    </div>
+
+    <div class="to-remember share">      
+      <div class="custom-checkbox" id="other_can_share_switcher" ng-fast-touch="toggleCheckBox($event)">
+        <div class="switcher"></div>
+      </div>
+      <div class="to-remember-label" id="others_can_share">Others can share my post</div>
+    </div>
+
+  </div>
 </div>

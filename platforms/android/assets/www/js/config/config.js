@@ -31,13 +31,11 @@ tol.service('config',[function(){
   
   $config.startPage = 'login';
   $config.defaultTitle = 'TeamOutLoud';
-  $config.SPRINT = 6;
+  $config.SPRINT = 4;
   $config.galleryLength = 1;
   $config.AUTH_KEY = btoa('auth');
-  $config.DEFAULT_TIMEOUT = 60000;
-  $config.REMOVE_VALUE_PODIUMS = true;
-  $config.ADD_TO_RECENT_SEARCH_SELECTED = true;//Add to recent search list if the search result was addedd
-
+  $config.DEFAULT_TIMEOUT = 40000;
+  
   /* API Key */
   $config.appKey = '37e1d26dd7a0206da9aab83b6e4b4672'; //Azure
   
@@ -49,15 +47,10 @@ tol.service('config',[function(){
 //                      };
 
   /* Prod analytics */                   
-/*
   $config.analytics = { trackCode: 'UA-71877820-3'
 
                       };
-*/
-  $config.analytics = { trackCode: 'UA-80060720-1'
-
-                      };
-
+  
   
   $config.googlePlayUrl = 'https://play.google.com/store/apps/details?id=com.leverage.qaalog';
   $config.appStoreUrl = 'https://itunes.apple.com/app/id928036482';

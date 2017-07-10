@@ -33,7 +33,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
     }
-}
+   }
 
 // Allow plugins to declare Maven dependencies via build-extras.gradle.
 repositories {
@@ -88,7 +88,6 @@ ext {
 // PLUGIN GRADLE EXTENSIONS START
 apply from: "cordova-plugin-badge/prod-badge.gradle"
 apply from: "phonegap-plugin-push/prod-push.gradle"
-apply from: "cordova-plugin-crosswalk-webview/prod-xwalk.gradle"
 // PLUGIN GRADLE EXTENSIONS END
 
 def hasBuildExtras = file('build-extras.gradle').exists()
@@ -163,6 +162,7 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+
     defaultConfig {
         versionCode cdvVersionCode ?: Integer.parseInt("" + privateHelpers.extractIntFromManifest("versionCode") + "0")
         applicationId privateHelpers.extractStringFromManifest("package")
@@ -171,11 +171,14 @@ android {
             minSdkVersion cdvMinSdkVersion
         }
     }
+
     lintOptions {
-        abortOnError false;
+      abortOnError false;
     }
+
     compileSdkVersion cdvCompileSdkVersion
     buildToolsVersion cdvBuildToolsVersion
+
     if (Boolean.valueOf(cdvBuildMultipleApks)) {
         productFlavors {
             armv7 {
@@ -197,27 +200,28 @@ android {
             }
         }
     } else if (!cdvVersionCode) {
-        def minSdkVersion = cdvMinSdkVersion ?: privateHelpers.extractIntFromManifest("minSdkVersion")
-        // Vary versionCode by the two most common API levels:
-        // 14 is ICS, which is the lowest API level for many apps.
-        // 20 is Lollipop, which is the lowest API level for the updatable system webview.
-        if (minSdkVersion >= 20) {
-            defaultConfig.versionCode += 9
-        } else if (minSdkVersion >= 14) {
-            defaultConfig.versionCode += 8
-        }
+      def minSdkVersion = cdvMinSdkVersion ?: privateHelpers.extractIntFromManifest("minSdkVersion")
+      // Vary versionCode by the two most common API levels:
+      // 14 is ICS, which is the lowest API level for many apps.
+      // 20 is Lollipop, which is the lowest API level for the updatable system webview.
+      if (minSdkVersion >= 20) {
+        defaultConfig.versionCode += 9
+      } else if (minSdkVersion >= 14) {
+        defaultConfig.versionCode += 8
+      }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_6
         targetCompatibility JavaVersion.VERSION_1_6
     }
+
     if (cdvReleaseSigningPropertiesFile) {
         signingConfigs {
             release {
                 // These must be set or Gradle will complain (even if they are overridden).
                 keyAlias = ""
-                keyPassword = "__unset"
-                // And these must be set to non-empty in order to have the signing step added to the task graph.
+                keyPassword = "__unset" // And these must be set to non-empty in order to have the signing step added to the task graph.
                 storeFile = null
                 storePassword = "__unset"
             }
@@ -232,26 +236,17 @@ android {
     if (cdvDebugSigningPropertiesFile) {
         addSigningProps(cdvDebugSigningPropertiesFile, signingConfigs.debug)
     }
-    productFlavors {
-        armv7 {
-            versionCode 2070012
-        }
-        x86 {
-            versionCode 2070014
-        }
-    }
 }
 
 dependencies {
-    compile fileTree(include: '*.jar', dir: 'libs')
+    compile fileTree(dir: 'libs', include: '*.jar')
     // SUB-PROJECT DEPENDENCIES START
     debugCompile project(path: "CordovaLib", configuration: "debug")
     releaseCompile project(path: "CordovaLib", configuration: "release")
+    compile "com.android.support:support-v13:23+"
+    compile "com.google.android.gms:play-services-gcm:+"
+    compile "com.google.android.gms:play-services-analytics:+"
     // SUB-PROJECT DEPENDENCIES END
-    compile 'com.google.android.gms:play-services-analytics:+'
-    compile 'com.android.support:support-v13:24.0.0'
-    compile 'com.google.android.gms:play-services-gcm:9.0.2'
-    compile 'com.google.android.gms:play-services-analytics:+'
 }
 
 configurations.all {

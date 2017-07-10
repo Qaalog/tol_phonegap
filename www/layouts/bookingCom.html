@@ -2,14 +2,15 @@
     <div class="user-posted this-user" data-touch="showPostDetails(feedItem)">
         <div class="image-wrap">
             <div class="img-middle-wrap">
-                <div class="img-inner-wrap">
+                <div class="img-inner-wrap custom">
+                    <!--<img class="img" data-src="{% (scope.selectedCatalog.image_url) ?  scope.imgPrefix + (scope.selectedCatalog.image_url) + scope.imgSuffix : 'img/icon_booking.svg' %}">-->
                     <img class="img" src="img/icon_booking.svg">
                 </div>
             </div>
         </div>
         <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
             <div class="feed-title">
-                <div class="user-name">New Booking.com comment</div>
+                <div class="user-name">{%feedItem.attachments[0].data.from?scope.getHtml(feedItem.attachments[0].data.from,false,true):(feedItem.attachments[0].data.rule_message?scope.getHtml(feedItem.attachments[0].data.rule_message,false,true):'New Booking.com comment')%}</div>
             </div>
             <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
         </div>
@@ -23,10 +24,10 @@
         </div>
         <div class="comment-text">
             <div class="comment-part" data-show="{%feedItem.attachments[0].data.text_pos%}"><span
-                    class="icon plus">+</span> {%feedItem.attachments[0].data.text_pos%}
+                    class="icon plus">+</span> {%scope.getHtml(feedItem.attachments[0].data.text_pos,false,true,feedItem)%}
             </div>
             <div class="comment-part" data-show="{%feedItem.attachments[0].data.text_neg%}"><span
-                    class="icon minus"></span> {%feedItem.attachments[0].data.text_neg%}
+                    class="icon minus"></span> {%scope.getHtml(feedItem.attachments[0].data.text_neg,false,true,feedItem)%}
             </div>
         </div>
         <div class="author">

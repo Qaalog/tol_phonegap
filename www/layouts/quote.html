@@ -17,7 +17,7 @@
         <div data-class-binding="borderedUserTitle(feedItem,'quote-outer')" class="{%scope.borderedUserTitle(feedItem,'quote-outer')%}">
             <!--External Quote Title-->
             <div class="feed-title"
-                 data-show="{%['quote-url-wrap','quote-wrap','external-tripadvisor-wrap','external-booking-wrap'].indexOf(scope.getQuoteType(feedItem))!==-1%}">
+                 data-show="{%['quote-url-wrap','quote-wrap','external-tripadvisor-wrap','external-booking-wrap','external-custom-post-wrap','external-vote-wrap'].indexOf(scope.getQuoteType(feedItem))!==-1%}">
                 <span class="user-name" data-touch="showProfile(feedItem.from_product_id)">
                     <b>{% feedItem.from_product_name %}</b> says:<br>
                 </span>
@@ -52,7 +52,7 @@
             <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
         </div>
         <div class="user-menu t-icon_menu"
-             data-show="{%scope.product.id*1 === feedItem.from_product_id*1%}"
+             data-show="{%(scope.product.id*1 === feedItem.from_product_id*1) || scope.canEditAllPosts%}"
              data-touch="userMenuShow(feedItem)">
         </div>
     </div>

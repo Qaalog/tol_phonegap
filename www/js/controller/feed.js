@@ -17,6 +17,7 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
         $scope.imgResizedPrefix = network.servisePathPHP + 'GetResizedImage?i=';
         $scope.imgResizedSuffix = '&w=' + Math.round(innerWidth - device.emToPx(2));
 
+
         $scope.$on('savedDataChanged', function (event, value) {
             $scope.savedData = value;
         });
@@ -37,6 +38,7 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
         page.onShow(settings, function (params) {
             $scope.isMindVisible = true;
             $scope.authProductId = userService.getAuthProduct().id;
+            $scope.canEditAllPosts = userService.checkCanEditAllPosts(userService.getAuthProduct().characteristics);
             /*
              if (window.Babel) {
              window.Babel.init($scope.imgPrefix, $scope.imgSuffix, $scope);
@@ -56,6 +58,7 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
             $scope.product = userService.getAuthProduct();
             $scope.userProductId = userService.getProductId();
             $scope.hotelName = userService.getHotelName();
+            $scope.selectedCatalog = userService.getCatalogSelected();
             //document.querySelector('.header').style.display = 'none';
             //document.querySelector('.footer-menu').style.display = 'none';
 
@@ -140,6 +143,10 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
                 };
                 $rootScope.$broadcast('recognizeListChanged', selectedFeedItem.recognizeList)
             }
+            if(postType == 'recognition' && selectedFeedItem.points_characteristic_deleted && selectedFeedItem.points_characteristic_deleted ==1){
+                return false; //disallow to reinforce post with deleted characteristic
+            }
+
             dialog.togglePointsMenu(true, postType);
 
         };
@@ -148,6 +155,15 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
             selectedFeedItem = feedItem;
             var postType = 'normal';
             dialog.toggleExternalMenu(true, postType);
+        }
+
+        $scope.quoteExternalGeneric = function (feedItem) {
+            selectedFeedItem = feedItem;
+            if($scope.checkCustomPost(selectedFeedItem) && selectedFeedItem.to_product_id ){
+                $scope.toggleGivePoints(selectedFeedItem,$scope.givePoints)
+            } else {
+                $scope.quoteExternal(selectedFeedItem);
+            }
         }
 
         dialog.addActionListener(settings.name, function (action) {
@@ -196,9 +212,23 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
                     selectedFeedItem.fromRecognizeButoon = true;
                     selectedFeedItem.recognizeList = [];
                     selectedFeedItem.savedData = {};
-                    $rootScope.$broadcast('recognizeListChanged', selectedFeedItem.recognizeList)
-                    $rootScope.$broadcast('savedDataChanged', selectedFeedItem.savedData);
-                    page.show('givePoints', selectedFeedItem);
+                    if($scope.checkCustomPost(selectedFeedItem) && selectedFeedItem.to_product_id){
+                        /*$scope.getProductById(selectedFeedItem.to_product_id, function (response) {
+                            if (response) {
+                                response.isAdded = true;
+                                response.productId = response.id;
+                                selectedFeedItem.recognizeList = [response];
+                                $rootScope.$broadcast('recognizeListChanged', [response])
+                                $rootScope.$broadcast('savedDataChanged', {});
+                                page.show('givePoints', selectedFeedItem);
+                            }
+                        });*/
+                        $scope.toggleGivePoints(selectedFeedItem,$scope.givePoints);
+                    } else {
+                        $rootScope.$broadcast('recognizeListChanged', selectedFeedItem.recognizeList)
+                        $rootScope.$broadcast('savedDataChanged', selectedFeedItem.savedData);
+                        page.show('givePoints', selectedFeedItem);
+                    }
                     break;
             }
         });
@@ -233,6 +263,7 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
         $scope.unrecognizeItem = feed.unrecognizeItem;
         $scope.borderedUserTitle = feed.borderedUserTitle;   
         $scope.getPostType = feed.getPostType;
+        $scope.checkCustomPost = feed.checkCustomPost;
         $scope.showProfile = function (productId) {
             page.show('profile', {productId: productId});
         };
@@ -257,7 +288,7 @@ tol.controller('feed', ['$scope', 'page', 'network', 'feed', 'userService', 'dev
         };
 
         $scope.getFeed = function (id, needUpdate) {
-            repeat = repeat || new ElRepeat(document.querySelector('#common_feed'));//Init of Valera's library
+            repeat = repeat || new ElRepeat(document.querySelector('#common_feed'));//Valera's library Init
             window.repeat1 = repeat;
             var data = {
                 'my_product_id': id

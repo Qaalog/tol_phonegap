@@ -10,30 +10,29 @@ tol.controller('login',['$scope','config','page','network','device','userService
                  };         
         
   page.onShow(settings,function(params) {
-    if (device.isIOS() && window.StatusBar) {
-      StatusBar.hide();
-    }
-    if (params.hard) {
-      $scope.auth = {};
-    }
-    
-    $scope.rememberMe = true; 
-    page.setCheckBox('remember_me',$scope.rememberMe);
-    
-    if (!params.isBack && !params.logout) {
-      var oldAuth = localStorage.getItem(AUTH_KEY);
-      if (oldAuth && oldAuth !== null) {
-        var encodedAuth = atob(oldAuth).split(':');
-        $scope.auth.login = encodedAuth[0];
-        $scope.auth.password = encodedAuth[1];
-//        $scope.rememberMe = true; 
+      if (device.isIOS() && window.StatusBar) {
+        StatusBar.hide();
+      }
+      if (params.hard) {
+        $scope.auth = {};
+      }
+
+      $scope.rememberMe = true;
+      page.setCheckBox('remember_me', $scope.rememberMe);
+
+      if (!params.isBack && !params.logout) {
+        var oldAuth = localStorage.getItem(AUTH_KEY);
+        if (oldAuth && oldAuth !== null) {
+          var encodedAuth = atob(oldAuth).split(':');
+          $scope.auth.login = encodedAuth[0];
+          $scope.auth.password = encodedAuth[1];
+//        $scope.rememberMe = true;
 //        page.setCheckBox('remember_me',$scope.rememberMe);
-        $scope.doLogin(oldAuth, params.start);
-        return false;
-      } 
-    }
-    page.hideLoader();
-    
+          $scope.doLogin(oldAuth, params.start,false,$scope);
+          return false;
+        }
+      }
+      page.hideLoader();
   });
   
   $scope.toggleCheckBox = function(event) {
@@ -42,62 +41,7 @@ tol.controller('login',['$scope','config','page','network','device','userService
   
   
   
-  $scope.doLogin = function(login, start) {
-    
-    network.setUserKey(login);
-    network.get('logout/',{},function(){
-      network.get('user',{},function(result,response,status) {
-        if (result && response.length === 1) {
-
-          var password = atob(login).split(':')[1];
-
-          userService.setPassword(password);
-          userService.setUserId(response[0].id);
-          userService.setUser(response[0]);
-          userService.setUserCode(response[0].username);
-          
-//          if (window.Localytics) {
-//            Localytics.setCustomerEmail(response[0].username);
-//            Localytics.setCustomerFullName(response[0].username);
-//            Localytics.setCustomerId(response[0].id);
-//            Localytics.upload();
-//            console.log('Localytics set user data');
-//          }
-
-          if (response[0]['password_reset']*1 !== 1) {
-            page.show('facebookLink',response[0]);
-          } else {
-            localStorage.removeItem(AUTH_KEY);
-            page.show('changePassword',response[0]);
-            setTimeout(function(){
-              page.navigatorClear();
-              page.navigatorPush(function() {
-                page.show('login',{hard: true});
-                page.navigatorClear();
-              });
-            },300);
-          }
-       //   page.show('catalog',{});
-
-        } else {
-          page.hideLoader();
-          $scope.auth.password = '';
-          if (!start) {
-
-            if (status == 401) {
-              loginError();
-            } else {
-              page.showNoConnection(function() {
-                $scope.doLogin(login, start);
-                page.hideNoConnection();
-              }, 20);
-            }
-
-          }
-        }
-      }, true);
-    }); 
-  };
+  $scope.doLogin = network.doLogin;
   
   $scope.login = function(auth) {
     
@@ -145,8 +89,7 @@ tol.controller('login',['$scope','config','page','network','device','userService
       localStorage.removeItem(AUTH_KEY);
       
     }
-    
-    $scope.doLogin(codedAuth);
+    $scope.doLogin(codedAuth,false,true,$scope);
    // console.log('login', codedAuth, auth);
   };
   

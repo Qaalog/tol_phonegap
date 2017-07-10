@@ -141,8 +141,7 @@ module.exports.metadata =
     "cordova-plugin-statusbar": "2.1.3",
     "ionic-plugin-keyboard": "2.2.0",
     "phonegap-plugin-push": "1.6.3",
-    "com.cmackay.plugins.googleanalytics": "0.1.22",
-    "cordova-plugin-crosswalk-webview": "1.8.0"
+    "com.cmackay.plugins.googleanalytics": "0.1.22"
 };
 // BOTTOM OF METADATA
 });

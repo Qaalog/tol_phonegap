@@ -25,6 +25,9 @@
   </div>
   </div>
   <div class="give-points-box">
+    <div class="what-is-this-wrap" ng-fast-touch="showWhatIsThis()">
+      <span class="what-is-this"></span>
+    </div>
     <div class="points-block" style="display: block;" ng-show="recognizeList"><div class="text-center on">{{recognizeList.length>1?' are ':' is '}}</div></div>
     <div class="user-posted" ng-hide="recognizeList">
 	    <div class="image-wrap" ng-fast-touch="showPictureInLightBox(params.from_product_image || params.image_url)">
@@ -45,7 +48,7 @@
         <div class="inner">
           <span class="t-icon_point"></span>
           <div class="points-name">{{categoryConfig[categoryMark]['point_values'][0].name}}</div>
-          <div class="points-number">3 points</div>
+          <div class="points-number">{{categoryConfig[categoryMark]['point_values'][0].points*1>1?categoryConfig[categoryMark]['point_values'][0].points + ' points':categoryConfig[categoryMark]['point_values'][0].points + ' point' }}</div>
         </div>	  		
 	  	</div>
 	  	<div class="points-col col-2" ng-fast-touch="setMark(1)" ng-class="{active: (mark === 1), disabled : !pointSelected}">
@@ -53,7 +56,7 @@
           <span class="t-icon_point"></span>
           <span class="t-icon_point"></span>
           <div class="points-name">{{categoryConfig[categoryMark]['point_values'][1].name}}</div>
-          <div class="points-number">4 points</div>
+          <div class="points-number">{{categoryConfig[categoryMark]['point_values'][1].points*1>1?categoryConfig[categoryMark]['point_values'][1].points + ' points':categoryConfig[categoryMark]['point_values'][1].points + ' point' }}</div>
         </div>	  		
 	  	</div>
 	  	<div class="points-col col-3" ng-fast-touch="setMark(2)" ng-class="{active: (mark === 2), disabled : !pointSelected}">
@@ -62,23 +65,29 @@
           <span class="t-icon_point"></span>
           <span class="t-icon_point"></span>
           <div class="points-name">{{categoryConfig[categoryMark]['point_values'][2].name}}</div>
-          <div class="points-number">5 points</div>
+          <div class="points-number">{{categoryConfig[categoryMark]['point_values'][2].points*1>1?categoryConfig[categoryMark]['point_values'][2].points + ' points':categoryConfig[categoryMark]['point_values'][2].points + ' point' }}</div>
         </div>
 	  	</div>
 	  	<div class="points-col col-4" ng-fast-touch="setMark(3)" ng-class="{active: (mark === 3), disabled : !pointSelected}">
+            <div class="inner">
 	  		<span class="t-icon_point"></span>
 	  		<span class="t-icon_point"></span>
 	  		<span class="t-icon_point"></span>
 	  		<span class="t-icon_point"></span>
-	  		<div class="points-name">{{categoryConfig[categoryMark]['point_values'][3].name}}</div>
+            <div class="points-name">{{categoryConfig[categoryMark]['point_values'][3].name}}</div>
+            <div class="points-number">{{categoryConfig[categoryMark]['point_values'][3].points*1>1?categoryConfig[categoryMark]['point_values'][3].points + ' points':categoryConfig[categoryMark]['point_values'][3].points + ' point' }}</div>
+            </div>
 	  	</div>
 	  	<div class="points-col col-5" ng-fast-touch="setMark(4)" ng-class="{active: (mark === 4), disabled : !pointSelected}">
+            <div class="inner">
 	  		<span class="t-icon_point"></span>
 	  		<span class="t-icon_point"></span>
 	  		<span class="t-icon_point"></span>
 	  		<span class="t-icon_point"></span>
 	  		<span class="t-icon_point"></span>
-	  		<div class="points-name">{{categoryConfig[categoryMark]['point_values'][4].name}}</div>
+            <div class="points-name">{{categoryConfig[categoryMark]['point_values'][4].name}}</div>
+            <div class="points-number">{{categoryConfig[categoryMark]['point_values'][4].points*1>1?categoryConfig[categoryMark]['point_values'][4].points + ' points':categoryConfig[categoryMark]['point_values'][4].points + ' point' }}</div>
+            </div>
 	  	</div>
 	  	<div class="text-center on">at</div>
 	  </div>
@@ -111,7 +120,7 @@
              ng-fast-touch="setCategory(4)" 
              ng-hide="categoryCount < 5"
              ng-class="{active: (category === 4), disabled : !categorySelected}">
-          <span class="cat-name"><span class="t-icon_category_4 cat-icon"></span>{{categoryConfig[4].long_name}}</span>
+          <span class="cat-name"><span class="q-icon_category_5 cat-icon"></span>{{categoryConfig[4].long_name}}</span>
         </div>
 	  </div>
       <div class="to-remember share create" ng-show="params.pointsForPost">
@@ -152,7 +161,7 @@
 	</div>	
 
 <!-- Post Output Start -->
-  <div class="feed-box posted" ng-if="isQuotePost && !isQuotePostUrl && !isQuotePostExternal">
+  <div class="feed-box posted" ng-if="isQuotePost && !isQuotePostUrl && !isQuotePostExternal && !checkCustomPost(params)">
       <div class="user-posted this-user">
         <div class="image-wrap">
           <div class="img-middle-wrap">
@@ -227,7 +236,7 @@
             </div>
             <div class="user-title">
                 <div class="feed-title">
-                    <div class="user-name">New TripAdvisor comment</div>
+                    <div class="user-name">{{params.attachments[0].data.rule_message?params.attachments[0].data.rule_message:'New TripAdvisor comment'}}</div>
                 </div>
                 <div class="time-published">{{getPostAge(params)}} - {{hotelName}}</div>
             </div>
@@ -248,7 +257,6 @@
             <div class="author">
                 <div class="name">{{params.attachments[0].data.userName}}</div>
                 <div class="place">{{params.attachments[0].data.userLocation}}</div>
-
             </div>
             <div class="post-info"></div>
         </div>
@@ -266,7 +274,7 @@
             </div>
             <div class="user-title">
                 <div class="feed-title">
-                    <div class="user-name">New Booking.com comment</div>
+                    <div class="user-name">{{params.attachments[0].data.rule_message?params.attachments[0].data.rule_message:'New Booking.com comment'}}</div>
                 </div>
                 <div class="time-published">{{getPostAge(params)}} - {{hotelName}}</div>
             </div>
@@ -291,6 +299,64 @@
                 </div>
             </div>
             <div class="post-info"></div>
+        </div>
+    </div>
+    <!-- Post Output End -->
+    <!-- Custom Post Output Start -->
+        <div class="feed-box comment" ng-if="checkCustomPost(params)">
+            <div class="user-posted this-user">
+                <div class="image-wrap">
+                    <div class="img-middle-wrap">
+                        <div class="img-inner-wrap custom">
+                            <img class="img" ng-src="{{(selectedCatalog.image_url) ?  imgPrefix + selectedCatalog.image_url + imgSuffix : 'img/icon_custom.svg'}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="user-title">
+                    <div class="feed-title">
+                        <div class="user-name">{{params.attachments[0].data.from?getHtml(params.attachments[0].data.from):hotelName}}</div>
+                    </div>
+                    <div class="time-published">{{getPostAge(params)}} - {{hotelName}}</div>
+                </div>
+                <!--    <div class="user-menu t-icon_menu"></div>-->
+            </div>
+            <div class="post-box">
+                <h2 class="post-title" ng-bind-html="params.message?getHtml(params.message,false,true,params):'New Custom Post'"></h2>
+                <div class="post-img-wrap"
+                     style="height: 15em"
+                     data-image-loader="img/tol_loader_gray_128.gif"
+                     data-touch="showPostDetails(params)">
+                    <div class="custom-post-phrase"ng-bind-html="params.attachments[0].data.phrase?getHtml(params.attachments[0].data.phrase,false,true):''"></div>
+                    <img class="img main_image"
+                         ng-src="{{imgResizedPrefix + params.media_url + imgResizedSuffix}}">
+                </div>
+            </div>
+        </div>
+    <!-- Post Output End -->
+    <!-- Vote Post Output Start -->
+    <div class="feed-box comment" ng-if="params.post_type_id == feedService.VOTE_POST">
+        <div class="user-posted this-user">
+            <div class="image-wrap">
+                <div class="img-middle-wrap">
+                    <div class="img-inner-wrap custom">
+                        <img class="img" src="img/icon_vote.svg">
+                    </div>
+                </div>
+            </div>
+            <div class="user-title">
+                <div class="feed-title">
+                    <div class="user-name">Customer reviewed <br><b>{{params.attachments[0].data.vote_object?(params.attachments[0].data.vote_object):''}}</b></div>
+                </div>
+                <div class="time-published">{{getPostAge(params)}} - {{hotelName}}</div>
+            </div>
+        </div>
+        <div class="post-box">
+                <div class="post-title title-points" ng-bind-html="getHtml(params.message,false,true)">
+                    <div class="comment-points vote">{{params.attachments[0].data.rate}}</div>
+                </div>
+                <div class="post-img-wrap">
+                    <img class="img main_image" ng-src="{{imgResizedPrefix + params.media_url + imgResizedSuffix}}">
+                </div>
         </div>
     </div>
     <!-- Post Output End -->

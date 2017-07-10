@@ -32,8 +32,6 @@ var app = {
              , 'quote'
              , 'quoteWrap'
              , 'quoteUrlWrap'
-             , 'extBookingWrap'
-             , 'extTripAdvisorWrap'
              ],
     languages: ['en','pt'],
     language: false,
@@ -166,13 +164,7 @@ var app = {
       }
       return false;  
     },
-    isBigScreen: function() {
-      var hgt;
-      if ((hgt = window.screen.height * window.devicePixelRatio)>1333){
-        return true;
-      }
-      return false;
-    },
+    
     requestFrame: (function() {
       return ('requestAnimationFrame' in window) ? 'requestAnimationFrame' : 'webkitRequestAnimationFrame';
     })(),

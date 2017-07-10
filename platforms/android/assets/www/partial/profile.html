@@ -1,13 +1,13 @@
 <div class="container profile-container" id="profile_container">
   <div class="tab-wrap" ng-show="isPostsShow">
     <div class="bottom_loader" id="profile_top_loader" style="display:none"></div>
-  	<div class="feed-wrap" id="profile_feed" ng-class="(params.productId != userProductId)?'profile-posts-has-recobutton':''">
+  	<div class="feed-wrap" id="profile_feed">   
       
 	  </div>
     <div class="bottom_loader" id="profile_loader" style="display:none"></div>
   </div>  
   <div class="tab-wrap" ng-show="isPointsShow">
-  	<div class="points-box" ng-class="(params.productId != userProductId)?'profile-has-recobutton':''">
+  	<div class="points-box">
   		<div class="points-header" ng-show="currentPoint.long_name">
   			<div class="arrow-prev arrow" ng-fast-touch="changePoint('prev')" ng-show="showPrevArrow">
               <span class="t-icon_arrow_left"></span>
@@ -29,8 +29,8 @@
   				<div class="table-col first">Period</div>
   				<div class="table-col text-center">Level</div>
   				<div class="table-col text-center">Points</div>
-			</div>
-
+  			</div>
+        
         <div class="table-wrap has-subtable"
              ng-class="{'opened': point.isMonthOpened}"
              ng-fast-touch="(!isEmptyObject(point.points_per_month)) ? point.isMonthOpened = !point.isMonthOpened : false">
@@ -112,18 +112,18 @@
           </div>
             
         </div>
-<!--        <div class="text-center"
+        <div class="text-center"
              ng-hide="::userProductId == productId" 
              ng-fast-touch="givePoints({from_product_id: productId, 'from_product_name': product.name, 'from_product_image': product.image_url, point: currentPoint})">
           <div class="give-points give"><span class="t-icon_point"></span>Give points</div>
-        </div>-->
+        </div>
   		</div>
       
            
   	</div>
   </div>
   <div class="tab-wrap" ng-show="isBioShow">
-    <div class="bio-box" ng-class="(params.productId != userProductId)?'profile-has-recobutton':''">
+    <div class="bio-box">
 <!--      <div class="info-row" ng-if="telephone.value">
         <span class="t-icon_phone icon"></span><a class="phone" href="tel:{{telephone.value}}">{{telephone.value}}</a>
       </div>

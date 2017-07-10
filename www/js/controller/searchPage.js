@@ -250,29 +250,29 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
 
     page.toggleNoResults(false);
     
-    $scope.products = readFromLocalstorage(recentName);
-    
-    if ($scope.products.length < 1) {
-      page.toggleNoResults(true,'No result found.','.search-title');
-      return false;
-    }
-    
-    for (var i = 0, l = $scope.products.length; i < l; i++) {
-      var product = $scope.products[i];
-      if (product['updated_date'] + 10*60*1000 < new Date().getTime()) {
-        onProductExpire(product);
-      }
-      for (var n = 0, nn = $scope.recognizeList.length; n < nn; n++) {
-        console.log($scope.recognizeList[n].id*1, product.id*1);
-        if ($scope.recognizeList[n].id*1 === product.id*1) {
-          $scope.products[i] = $scope.recognizeList[n];
+    checkStorageDataActuality(readFromLocalstorage(recentName),function(result,data){
+        $scope.products = data;
+        writeToLocalstorage(recentName,data);
+        if ($scope.products.length < 1) {
+            page.toggleNoResults(true,'No result found.','.search-title');
+            return false;
         }
-      }
-    }
-    
-    executeLocalstorageQueue(recentName);
-    var searchInput = document.getElementById('search-input');
-    
+
+        for (var i = 0, l = $scope.products.length; i < l; i++) {
+            var product = $scope.products[i];
+            if (product['updated_date'] + 10*60*1000 < new Date().getTime()) {
+                onProductExpire(product);
+            }
+            for (var n = 0, nn = $scope.recognizeList.length; n < nn; n++) {
+                console.log($scope.recognizeList[n].id*1, product.id*1);
+                if ($scope.recognizeList[n].id*1 === product.id*1) {
+                    $scope.products[i] = $scope.recognizeList[n];
+                }
+            }
+        }
+        executeLocalstorageQueue(recentName);
+        //var searchInput = document.getElementById('search-input');
+    });
   }
   
   function writeToLocalstorage(name, data) {
@@ -306,7 +306,37 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
     
     return data;
   }
-  
+
+  function checkStorageDataActuality(data,callback) {
+      callback = callback || function(){};
+      var resultData = [];
+      if (data.length) {
+          var params = {
+              'ids[]': []
+          };
+          for (var i = 0; i < data.length; i++) {
+              params['ids[]'].unshift(data[i].id);
+          }
+          network.get('product/', params, function (result, response) {
+              if (result) {
+                  for(var j = 0;j<response.length;j++){
+                      for(var k = 0;k<data.length;k++){
+                          if(data[k].id == response[j].id){
+                             var tmp =  prepareProductDataForRecent(response[j]);
+                             tmp['updated_date'] = new Date().getTime();
+                             resultData.unshift(tmp);
+                             break;
+                          }
+                      }
+                  }
+                  callback(true,resultData);
+              } else {
+                  callback(false,data);
+              }
+          });
+      }
+  }
+
   var localstorageQueue = [];
   function writeToLocalstorageQueue(product) {
     localstorageQueue.push(product);

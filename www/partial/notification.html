@@ -16,8 +16,7 @@
                 </span>
 			</div>
 			<div class="user-title">
-				<div class="feed-title">
-					<span class="user-name">{{notification.by_product_name}}</span> {{notification.notification_message}}</div>
+				<div class="feed-title" ng-bind-html="prepareMessage(notification)"></div>
 				<div class="time-published">{{getPostAge(notification)}} - {{hotelName}}</div>
 			</div>
 		</div>

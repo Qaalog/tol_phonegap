@@ -1,14 +1,12 @@
 tol.controller('profile',['$scope','page','network','facebook','config','feed','$sce','$timeout','dialog','userService','device','$filter',
-  'analytics','imageUpload', 'pager','$rootScope',
-  function($scope, page, network,facebook,config,feed,$sce,$timeout,dialog,userService,device,$filter, analytics,imageUpload,pager,$rootScope){
+  'analytics','imageUpload', 'pager',
+  function($scope, page, network,facebook,config,feed,$sce,$timeout,dialog,userService,device,$filter, analytics,imageUpload,pager){
     
   var currentTab, pointsTables = [];  
   var settings = { name: 'profile'
                  , search: true
                  , chart: true
                  , tabs:  true
-                 , smallBack: true
-                 , smallSearch: true
                  , profileHeader: true
                  };       
   $scope.productId;
@@ -57,7 +55,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
       network.pagerReset('profile');
       lastProductId = $scope.productId;
       savedPoint = 0;
-      page.setProfileTab('bio');
+      page.setProfileTab('points');
     }
     
     $scope.getProduct();
@@ -111,6 +109,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
         console.log(response);
         $scope.chars = response.characteristics;
         $scope.telephone = false;
+        
         for (var i = $scope.chars.length-1; i >= 0; i--) {
           var char = $scope.chars[i];
           
@@ -148,7 +147,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
         
         page.hideLoader();
         currentTab = $scope.params.tab || currentTab;
-        if (!currentTab) page.setProfileTab('bio'); else page.setProfileTab(currentTab);
+        if (!currentTab) page.setProfileTab('points'); else page.setProfileTab(currentTab);
       }
     },false,true);
   };
@@ -370,8 +369,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
   /*----- -----*/
   
   $scope.givePoints = function(feedItem) {
-    //page.show('givePoints',feedItem);
-    return false;
+    page.show('givePoints',feedItem);
   };
   
   $scope.getPostAge = page.getPostAge;
@@ -385,33 +383,20 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
   $scope.showPictureInLightBox = feed.showPictureInLightBox;
   $scope.getStatusDescription = feed.getStatusDescription;
   $scope.getOtherCount = feed.getOtherCount;
-  $scope.getOtherCountHtml = feed.getOtherCountHtml
   $scope.isProductOneOfProductList = feed.isProductOneOfProductList;
   $scope.formatDate = feed.formatDate;
   $scope.getSharePermission = feed.getSharePermission;
   $scope.getYouGave = feed.getYouGave;
   $scope.preparePoints = feed.preparePoints;
   $scope.goToLink = feed.goToLink;
-  $scope.getQuoteType = feed.getQuoteType;
-  $scope.setLikeFeedItem = feed.setLikeFeedItem;
-  $scope.prepareLikes = feed.prepareLikes;
-  $scope.getTappedByMe = feed.getTappedByMe;
-  $scope.getMarksCountByType = feed.getMarksCountByType;
-  $scope.feedService = feed;
-  $scope.getExternalQuoteName = feed.getExternalQuoteName;
-  $scope.giversFilter = feed.giversFilter;
-  $scope.toggleGivePoints = feed.toggleGivePoints;
-  $scope.unrecognizeItem = feed.unrecognizeItem;
-  $scope.borderedUserTitle = feed.borderedUserTitle;
-  $scope.getPostType = feed.getPostType;
-  $scope.showPostDetails = feed.showPostDetails;
-  $scope.showProfile = function (productId) {
-    page.show('profile', {productId: productId});
+  
+  $scope.showPostDetails = function(feedItem) {
+    page.show('postDetails', {postId: feedItem.id});
   };
-
+  
   $scope.getMyPosts = function() {
     repeat = repeat || new ElRepeat(document.querySelector('#profile_feed'));
-
+    
     var data = { 'for_product_id': $scope.productId
                , 'my_product_id': userService.getProductId()
                , 'feedId': 'profile_feed'
@@ -421,13 +406,14 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
                , 'context': 'profile'
                , 'needUpdate': $scope.params.needUpdate
                };
-
+    
     feed.getFeed(repeat, data, function(feedItems) {
-
+                         
       $scope.posts = feedItems;
       page.hideLoader();
-
+      
     });
+    
   };
   
 //  $scope.$on('post_deleting',function(event,item){
@@ -459,7 +445,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
 //                         , 'Logout profile button click'
 //                         , 1
 //                         ]);
-    $rootScope.$broadcast('clearSavedDataEvent')
+    
     network.logout();
   };
   

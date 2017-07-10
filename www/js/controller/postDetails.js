@@ -89,6 +89,7 @@ tol.controller('postDetails', ['$scope', 'page', 'userService', 'feed', 'network
         };
         page.onShow(settings, function (params) {
             $scope.hotelName = userService.getHotelName();
+            $scope.selectedCatalog = userService.getCatalogSelected();
             $scope.product = userService.getAuthProduct();
             $scope.authProductId = $scope.product.id;
             repeat = repeat || new ElRepeat(document.querySelector('#post-detail-wrap'));
@@ -131,6 +132,7 @@ tol.controller('postDetails', ['$scope', 'page', 'userService', 'feed', 'network
         $scope.borderedUserTitle = feed.borderedUserTitle;
         $scope.getPostType = feed.getPostType;
         $scope.getProductById = feed.getProductById;
+        $scope.checkCustomPost = feed.checkCustomPost;
         $scope.showProfile = function(productId) {
             page.show('profile',{productId: productId});
         };
@@ -282,6 +284,10 @@ tol.controller('postDetails', ['$scope', 'page', 'userService', 'feed', 'network
                     , points: feedItem.points
                 };
                 $rootScope.$broadcast('recognizeListChanged', selectedFeedItem.recognizeList)
+            }
+
+            if(postType == 'recognition' && selectedFeedItem.points_characteristic_deleted && selectedFeedItem.points_characteristic_deleted ==1){
+                return false; //disallow to reinforce post with deleted characteristic
             }
 
             dialog.togglePointsMenu(true, postType);

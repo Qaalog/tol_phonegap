@@ -1,19 +1,7 @@
-<div class="feed-on-u-mind" ng-show="isMindVisible" ng-fast-touch="mindShowMenu()">
-  <div class="profile-user">
-    <div class="image-wrap">
-      <div class="img-middle-wrap">
-        <div class="img-inner-wrap">
-          <img class="img" ng-src="{{(mindProduct.image_url) ? imgPrefix + mindProduct.image_url + imgSuffix : 'img/default-staff.png'}}">
-        </div>
-      </div>
-    </div>
-    <div class="profile-title">
-      <span class="user-name">What's on your mind?</span>
-    </div>
-  </div>
-</div>
 <div class="container" id="feed_container">
   <div class="bottom_loader" id="top_loader" style="display:none"></div>
-  <div class="feed-wrap news" id="common_feed" ng-non-bindable></div>
+  <div class="feed-wrap" id="common_feed" ng-non-bindable>
+    
+  </div>
   <div class="bottom_loader" id="feed_loader" style="display:none"></div>
 </div>

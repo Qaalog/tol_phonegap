@@ -105,15 +105,6 @@ tol.service('page',['config',function(config){
     var callback = $page.pages[pageId] || function(){};
     $page.currentPage = pageId;
     $page.currentParams = params;
-    if($page.currentPage == 'profile'){
-      $page.pageParams[pageId].smallBack = true;
-      $page.pageParams[pageId].smallSearch = true;
-      if(params.fromTabChange || (params.callPage=='profile' && params.isBack)){
-        $page.pageParams[pageId].smallBack = false;
-        $page.pageParams[pageId].smallSearch = false;
-      }
-      delete params.fromTabChange;
-    }
     $page.applyParams($page.pageParams[pageId],isBack);
     callback(params);
   };

@@ -17,6 +17,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     $scope.searchModel = {};
     $scope.shareMenuShowedEvent = {};
     $scope.hideDeleteButton = false;
+    $scope.hideRegenerateThumbButton = true;
     //$scope.imgPrefix = network.servisePathPHP + '/GetCroppedImage?i=';
     $scope.imgPrefix = network.servisePathPHP + '/GetResizedImage?i=';
     $scope.imgSuffix = '&h=256&w=256';
@@ -32,6 +33,10 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     });
     $scope.$on('shareMenuShowedEvent',function(event,value){
       $scope.shareMenuShowedEvent = value;
+    });
+
+    $scope.$on('fbLinkedChanged',function(event,value){
+      $scope.isFBLinked = value;
     });
 
     $scope.$on('recognizeButtonClickNeeded',function(event,value){
@@ -88,7 +93,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
           loader.style.bottom = bottom+'px';
         } catch(e) {}
       }
-      if(['catalog','facebookLink'].indexOf(page.currentPage)!==-1){
+      if(['catalog','facebookLink','termsPrivacy'].indexOf(page.currentPage)!==-1){
         $scope.isLoaderVisiable = false;
         $scope.isFeedLoaderVisible = true;
       } else {
@@ -280,10 +285,15 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
       $scope.activePage = {};
       $scope.activePage[pageId] = true;
       $scope.currentPage = pageId;
-      
-      if (analytics.isEnabled)
-        analytics.trackView($scope.currentPage);
-      
+      $scope.isFBLinked = ( localStorage.getItem('fbAccessToken'+userService.getUser().id) ) ? true : false;
+      $scope.userHasPhoto = userService.getAuthProduct().image_url;
+      if (analytics.isEnabled){
+        analytics.trackCustomMetric(analytics.POST_MADE, 0, function () {
+          analytics.trackCustomMetric(analytics.POINTS_GIVEN, 0, function () {
+            analytics.trackView($scope.currentPage);
+          });
+        });
+      }
       page.setActiveTabView(pageId);
       page.toggleVersionVisiable(false);      
       imageUpload.setAllowEdit(true);//Image Allow EDit
@@ -310,7 +320,6 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
         var classSelector = (!params.searchChart) ? '.search-product' : '.search_chart';
         app.animate(document.querySelector(classSelector),250);
       }
-      
       $scope.profileHeaderShow = params.profileHeader;
       $scope.rankingHeaderShow = params.rankingHeader;
       page.setTabsVisiable(params.tabs);
@@ -368,6 +377,8 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
         if (result) {
           console.log(response);
           userService.setAvatar(response.image_url);
+          $scope.showUserPhotoNeededMarker = !userService.getAuthProduct().image_url;
+          $scope.userHasPhoto = userService.getAuthProduct().image_url;
           network.pagerReset();
           img.src = $scope.imgPrefix + response.image_url + $scope.imgSuffix;
           img.onerror = function() {
@@ -394,6 +405,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
       imageUpload.setOnSucces(function(imageData) {
 //        var img = document.getElementById('avatar_img');
 //        img.src = "data:image/jpeg;base64," + imageData;
+
         var data = { media_data: { content: imageData
                                  , mime_type: 'image/jpeg'
                                  }
@@ -420,6 +432,10 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     ];
     
     page.addProfileTab = function(tabTitle) {
+
+      $scope.showUserPhotoNeededMarker = !userService.getAuthProduct().image_url;
+      $scope.showFBlinkNeededMarker = !$scope.isFBLinked;
+
       for (var i = $scope.profileTabs.length-1; i >= 0; i-- ) {
         if ($scope.profileTabs[i].title === tabTitle) {
           return false;
@@ -429,6 +445,10 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     };
     
     page.removeProfileTab = function(tabTitle){
+      if(tabTitle == 'config'){
+        $scope.showUserPhotoNeededMarker = false;
+        $scope.showFBlinkNeededMarker = false;
+      }
       for (var i = $scope.profileTabs.length-1; i >= 0; i-- ) {
         if ($scope.profileTabs[i].title === tabTitle) {
           $scope.profileTabs.splice(i,1);
@@ -565,7 +585,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     
     page.setProfileTab = function(tab) {
       $scope.product = userService.getProduct();
-      
+
       for (var i in $scope.profileTabs) {
         if (tab === $scope.profileTabs[i].title) {
           $scope.profileTabs[i].isActive = true;
@@ -837,6 +857,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
           facebook.toggleShareMenu(false);
           page.setTabsVisiable(true);
           localStorage.removeItem('do_not_link'+userService.getUser().id);
+          shareItem.firstLogin = true;
           page.showForResult('facebookLink',shareItem,function(result){
             if (result) {
               share();
@@ -854,7 +875,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     page.requestFBAvatar = function(callback){
       callback = callback || function(){};
       if (facebook.isActive()) { 
-        dialog.create(dialog.QUESTION,'Use Facebook picture?','Do you want to user your Facebook profile<br>\
+        dialog.create(dialog.QUESTION,'Use Facebook picture?','Do you want to use your Facebook profile<br>\
           picture on TeamOutLoud?','Yes','No',function(answer){
           if (answer) {
             facebook.getBase64Avatar(function(base,mimeType){
@@ -926,6 +947,15 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     dialog.toggleUserMenu = function(value,hideDeleteButton) {
       hideDeleteButton = hideDeleteButton || false;
       $scope.hideDeleteButton = hideDeleteButton;
+      $scope.hideRegenerateThumbButton = true;
+      if(userService.checkCanEditAllPosts(userService.getAuthProduct().characteristics) && value){
+          var itemType = feed.getPostType(feed.selectedFeedItem);
+          //Regenerate thumbs available only for recognition and not external auto
+          if(itemType.indexOf('external')===-1 && itemType.indexOf('quote')===-1
+              && ((itemType == 'normal' && feed.selectedFeedItem.point_givers!=0) || itemType == 'other-auto-post')){
+              $scope.hideRegenerateThumbButton = false;
+          }
+      }
       if (value) page.navigatorPush(function(){
         $timeout(function() {
           $scope.closeUserMenu(false,true);
@@ -1278,14 +1308,39 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     };
     
     $scope.getPostAge = page.getPostAge;//
-       
+    page.setHeaderVisiable(false);
     document.addEventListener('pages_ready',function(){
-      if (window.analytics) analytics.init();
-      page.show(config.startPage,{start: true},false);
+      network.checkAppVersion(function(result){
+        if(result) {
+          page.setHeaderVisiable(true);
+          if (window.analytics) analytics.init();
+          page.showLoader();
+          page.show(config.startPage,{start: true},false);
+        } else {
+          page.hideLoader();
+          dialog.create(dialog.INFO, 'New version available',config.newVersionText.replace('[$force_version$]',network.forceVersion), 'UPGRADE',false,
+              function (answer) {
+                if (answer) {
+                  if(app.isDesktop){
+                    window.location = 'https://play.google.com/store/apps/details?id='+config.storeAppId;
+                  } else if(app.isIOS()) {
+                    window.open('itms-apps://itunes.com/apps/' + config.appName, '_system');
+                    var event = document.createEvent('Event');
+                    event.initEvent('pages_ready', true, true);
+                    document.dispatchEvent(event);
+                  } else {
+                    window.open('market://details?id='+config.storeAppId,'_system');
+                    navigator.app.exitApp();
+                  }
+                } else {
+                  page.navigatorClear();
+                  if(!app.isDesktop && !app.isIOS()) navigator.app.exitApp();
+                }
+              }
+          ).show();
+        }
+      });
     });
-    page.showLoader();
-    
-    
 }]);
 
 

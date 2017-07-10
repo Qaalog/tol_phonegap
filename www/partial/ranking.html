@@ -76,6 +76,9 @@
 	<div ng-class="{'is-admin': isAdmin}">
 		<div class="points-box ranking-background-bordered"  ng-repeat="currentRanking in ranking track by $index" ng-class="{first:$index==0}">
 			<div class="points-header">
+				<div class="what-is-this-wrap" ng-fast-touch="showWhatIsThis(currentRanking)">
+					<span class="what-is-this"></span>
+				</div>
 				<h2 class="points-title">{{currentRanking.long_name}}</h2>
 			</div>
 			<div class="ranking-stand">

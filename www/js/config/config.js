@@ -1,9 +1,6 @@
 var tol = angular.module('qaalog',[]);
 tol.service('config',[function(){
   var $config = this;
-  
-  
-  
   //$config.IS_DEBUG = false;
   
   if (window.AppVersion) {
@@ -19,6 +16,7 @@ tol.service('config',[function(){
     }
   }
   //http://tolws-dev.azurewebsites.net/info
+  //$config.IS_DEBUG = false;
   if ($config.IS_DEBUG) {
     /* DEV*/
     $config.appId = 'com.tol.dev';
@@ -28,7 +26,8 @@ tol.service('config',[function(){
     $config.appId = 'leverage.qaalog.cryst1.cryst';
     $config.servicePath = 'http://tolws.azurewebsites.net/';
   }
-  
+  $config.storeAppId = 'com.tol.prod';
+  $config.appName = 'teamoutloud';
   $config.startPage = 'login';
   $config.defaultTitle = 'TeamOutLoud';
   $config.SPRINT = 6;
@@ -37,6 +36,8 @@ tol.service('config',[function(){
   $config.DEFAULT_TIMEOUT = 60000;
   $config.REMOVE_VALUE_PODIUMS = true;
   $config.ADD_TO_RECENT_SEARCH_SELECTED = true;//Add to recent search list if the search result was addedd
+
+  $config.newVersionText = 'New v.[$force_version$] available <br/> with great new features!<br/> You need to upgrade before using TeamOutLoud.';
 
   /* API Key */
   $config.appKey = '37e1d26dd7a0206da9aab83b6e4b4672'; //Azure
@@ -49,14 +50,16 @@ tol.service('config',[function(){
 //                      };
 
   /* Prod analytics */                   
-/*
+
   $config.analytics = { trackCode: 'UA-71877820-3'
 
                       };
-*/
+
+/*
   $config.analytics = { trackCode: 'UA-80060720-1'
 
                       };
+*/
 
   
   $config.googlePlayUrl = 'https://play.google.com/store/apps/details?id=com.leverage.qaalog';

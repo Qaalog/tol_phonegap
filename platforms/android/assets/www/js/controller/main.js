@@ -1,46 +1,23 @@
 tol.controller('main',['$rootScope','$scope','page','searchService','network','config','$timeout','pager',
-  'menu','device','facebook','dialog','$sce','header','feed','userService','imageUpload', 'lightbox', 'analytics','pagerItera','notification','utils',
+  'menu','device','facebook','dialog','$sce','header','feed','userService','imageUpload', 'lightbox', 'analytics','pagerItera','notification',
   function($rootScope,$scope,page,searchService,network,config,$timeout,pager,menu,
     device,facebook,dialog,$sce,header,feed,userService,imageUpload,lightbox,analytics, 
-    pagerItera,notification,utils){
+    pagerItera,notification){
     
     $scope.isIOS = device.isIOS;
-    $scope.isBigScreen = app.isBigScreen;
     $scope.app = app;
-    $scope.main = {};
+    
     $scope.activePage = {};
     $scope.currentPage = config.startPage;
     
     $scope.isLoaderVisiable = false;
-    $scope.isFeedLoaderVisible = false;
     $scope.activeView = {};
     $scope.searchModel = {};
-    $scope.shareMenuShowedEvent = {};
-    $scope.hideDeleteButton = false;
+    
     //$scope.imgPrefix = network.servisePathPHP + '/GetCroppedImage?i=';
     $scope.imgPrefix = network.servisePathPHP + '/GetResizedImage?i=';
     $scope.imgSuffix = '&h=256&w=256';
-
-    $scope.$on('savedDataChanged',function(event,value){
-      $scope.main.savedData = value;
-    });
-    $scope.$on('recognizeListChanged',function(event,value){
-      $scope.main.recognizeList = value;
-    });
-    $scope.$on('clearSavedDataEvent',function(event){
-      $scope.clearSavedData();
-    });
-    $scope.$on('shareMenuShowedEvent',function(event,value){
-      $scope.shareMenuShowedEvent = value;
-    });
-
-    $scope.$on('recognizeButtonClickNeeded',function(event,value){
-      $scope.recognizeButtonClick('recobutton');
-    });
-    $scope.clearSavedData = function(){
-      $scope.main.recognizeList = [];
-      $scope.main.savedData = {};
-    };
+    
     if (navigator.connection) {
       $scope.connection = navigator.connection;
       $scope.$watch('connection.type',function(value) {
@@ -67,7 +44,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     
     var loaderTimerId;
     page.showLoader = function(topSelector,bottomSelector) {
-      $rootScope.$broadcast('setMindVisible',false);
+      
       if (loaderTimerId) clearTimeout(loaderTimerId);
       
       var loader = document.getElementById('loader');
@@ -88,31 +65,19 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
           loader.style.bottom = bottom+'px';
         } catch(e) {}
       }
-      if(['catalog','facebookLink'].indexOf(page.currentPage)!==-1){
-        $scope.isLoaderVisiable = false;
-        $scope.isFeedLoaderVisible = true;
-      } else {
-        $scope.isLoaderVisiable = true;
-        $scope.isFeedLoaderVisible = false;
-      }
-
+      
+      $scope.isLoaderVisiable = true;
       
       loaderTimerId = setTimeout(function() {
         $timeout(function() {
-          if (!$scope.isLoaderVisiable && !$scope.isFeedLoaderVisible) return false;
+          if (!$scope.isLoaderVisiable) return false;
           network.stopAll();
           
           dialog.create(dialog.INFO,'Oooops!',
                 'Something went wrong...<br>Let\'s reload!','OK','', function() {
                   network.repeatLastRequest(function(result) {
                     if (!result) {
-                      if(page.currentPage =='catalog'){
-                        $scope.isLoaderVisiable = false;
-                        $scope.isFeedLoaderVisible = true;
-                      } else {
-                        $scope.isLoaderVisiable = true;
-                        $scope.isFeedLoaderVisible = false;
-                      }
+                      $scope.isLoaderVisiable = true;
                       dialog.create(dialog.INFO,'Gosh!',
                         'Looks like the problem is serious.<br>Please try again later','OK','', function() {
                           page.hideLoader();
@@ -128,11 +93,9 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     };
     
     page.hideLoader = function(){
-      $rootScope.$broadcast('setMindVisible',true);
       document.getElementById('loader').style.top = '';
       document.getElementById('loader').style.bottom = '';
       $scope.isLoaderVisiable = false;
-      $scope.isFeedLoaderVisible = false;
     };
     
     $scope.hideLoader = page.hideLoader;
@@ -162,46 +125,26 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
 
     /*--------- NAVIGATION --------*/
     $scope.onCancel = function() {
-      $scope.blurTextAreas();
-      //$scope.clearSavedData();
-      var delay = 100;
-      if (device.isIOS())  {
-        // "over ckick" on iOS prevent.
-        delay = 300;
-        //if (['searchPage','givePoints','postDetails'].indexOf(page.currentPage) !==-1) delay = 300;
-      }
-      if(userService.getAuthProduct()){
-        $timeout(function() {
-          page.show('feed', {});
-        },delay);
-      } else {
-        $timeout(function() {
-          page.show('login',{logout:true})
-        },delay);
-      }
+      page.show('feed', {});
       page.navigatorClear();
-
     };
     
     $scope.onBack = function() {
       console.log('GO BACK');
-      $scope.blurTextAreas();
+      document.getElementById('post_textarea').blur();
+      document.getElementById('givePoints_textarea').blur();
       if (!network.getConnection()){
         return false;
       }
       return page.goBack();
     };
 
-    $scope.blurTextAreas = function(){
-      document.getElementById('post_textarea').blur();
-      document.getElementById('givePoints_textarea').blur();
-    };
 
     page.goBack = function(stopAllDeny) {
       document.getElementById('search-input').blur();
       
       if (!stopAllDeny) network.stopAll();
-      if(page.currentPage === 'feed') return false;//native android backbutton exit from app
+
       var oldPage = page.navigatorPop();
       if (oldPage) {
         
@@ -210,12 +153,8 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
           return true;
         }
         
-        var delay = 100;
-        if (device.isIOS())  {
-          // this code prevent "over ckick" on iOS.
-          delay = 300;
-          //if (page.currentPage === 'searchPage') delay = 300;
-        }
+        var delay = 0;
+        if (device.isIOS()) delay = 100;
         $timeout(function() {
           page.show(oldPage.name,oldPage.params,true);
         },delay);
@@ -286,7 +225,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
       
       page.setActiveTabView(pageId);
       page.toggleVersionVisiable(false);      
-      imageUpload.setAllowEdit(true);//Image Allow EDit
+      imageUpload.setAllowEdit(false);
       params.callPage = page.currentPage;
       page.runOnShow(pageId,params,isBack);
     };
@@ -340,16 +279,12 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
       page.applyParams(settings);
     };
     
-    page.toggleNoResults = function (isShow, text, bgColor,removeTop) {
-      removeTop = removeTop || false;
+    page.toggleNoResults = function (isShow, text, bgColor) {
+      
       $timeout(function() {
         var wrap = document.getElementById('no_result_wrap');
         wrap.style.backgroundColor = '';
-        if(removeTop) {
-          wrap.style.top = '0em'
-        } else {
-          wrap.style.top = '';
-        }
+
         $scope.isNoResultShow = isShow;
         $scope.noResultText = text || 'No result.';
         if (bgColor) {
@@ -412,10 +347,9 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     
     /*---------- TABS --------*/
     $scope.profileTabs = [
-      {title: 'bio'},
       {title: 'posts'},
-      /*{title: 'points'},*/
-
+      {title: 'points'},
+      {title: 'bio'},
       {title: 'config'}
     ];
     
@@ -439,7 +373,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     
     page.setTabsVisiable = function(value, force){
       if (value) {
-        var footerHeight = (app.emToPx(app.isBigScreen()?6.25:6.25) + 1);
+        var footerHeight = (app.emToPx(6.25) + 1);
         if (force) {
           app.wrapper.style.height = (innerHeight - footerHeight) + 'px';
         } else {
@@ -517,7 +451,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
 
     
     page.onTabChange = function(pageName) {
-      page.show(pageName,{fromTabChange:true});
+      page.show(pageName,{});
     };
       
     page.setActiveTabView = function(view) {
@@ -547,7 +481,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
           return false;
         }
       }
-
+      
       page.toggleNoResults(false);
       page.hideNoConnection();
       pager.stop();
@@ -585,21 +519,18 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     };
     
     
-    var currDate = new Date();
-    $scope.rankingTabs = [ {id:'prev_month',title: utils.getShrotMonthName((currDate.getMonth()-1>=0?currDate.getMonth()-1:11))}
-                         , {id:'this_month',title: utils.getShrotMonthName(currDate.getMonth())}
-                         , {id:'prev_year',title: currDate.getFullYear()-1+''}
-                         , {id:'this_year',title: currDate.getFullYear()+''}
+    $scope.rankingTabs = [ {title: 'this month'}
+                         , {title: 'year to date'}
                          ];
     
     $scope.onRankingTabTouch = function(tab) {  
-      page.setRankingTab(tab);
+      page.setRankingTab(tab.title);
     };
     
     page.setRankingTab = function(tab) {
       
       for (var i in $scope.rankingTabs) {
-        if (tab.id === $scope.rankingTabs[i].id) {
+        if (tab === $scope.rankingTabs[i].title) {
           $scope.rankingTabs[i].isActive = true;
           continue;
         } 
@@ -616,23 +547,23 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     };
     
     $scope.postNow = function() {
-      $scope.blurTextAreas();
-      //page.showLoader();
+      document.getElementById('post_textarea').blur();
+      page.showLoader();
       header.post();
     };
     
     $scope.save = function() {
-      $scope.blurTextAreas();
+      document.getElementById('post_textarea').blur();
       header.save();
     };
     
     $scope.onDoIt = function() {
-      $scope.blurTextAreas();
+      document.getElementById('givePoints_textarea').blur();
       header.doIt();
     };
     
     $scope.goToChart = function() {
-      var data = {recognizeList:$scope.main.recognizeList,savedData:$scope.main.savedData};
+      var data = {};
       if (page.currentPage === 'searchPage') {
         data.saveList = true;
       }
@@ -744,7 +675,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
           
           var ctx = canvas.getContext('2d');
           
-          if (img && img.width < img.height) {
+          if (img.width < img.height) {
             canvasWrap.style.width = '30%';
             canvasWrap.style.float = 'left';
             canvasWrap.style.marginRight = '0.5em';
@@ -755,7 +686,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
               canvas.height = img.height;
               ctx.drawImage(img,0, 0, img.width, img.height);
             }, 300);
-          } else if(img){
+          } else {
             canvasWrap.style.width = '';
             canvasWrap.style.float = '';
             canvasWrap.style.marginRight = '';
@@ -811,9 +742,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
         facebook.api('POST','me/feed',data,function(result, response){
           page.hideLoader();
           console.log('send',result, response);
-          //feed.setLikeFeedItem(shareItem,feed.LIKE_TYPE_FACEBOOK,$scope.shareMenuShowedEvent);
           if (result) {
-            feed.setLikeFeedItem(shareItem,feed.LIKE_TYPE_FACEBOOK,$scope.shareMenuShowedEvent);
             $timeout(function(){
               dialog.create(dialog.INFO, 'Thanks!', 'Your post was successfully<br/>published in Facebook', 'OK', null).show();
             });
@@ -872,7 +801,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
         }).show();
       }
     };
-
+    
     /*------- DIALOGS -------*/
     dialog.create = function(type, title, message, positiveBtn, negativeBtn, callback) {
       callback = callback || function(){};
@@ -923,9 +852,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
              };
     };
      
-    dialog.toggleUserMenu = function(value,hideDeleteButton) {
-      hideDeleteButton = hideDeleteButton || false;
-      $scope.hideDeleteButton = hideDeleteButton;
+    dialog.toggleUserMenu = function(value) {
       if (value) page.navigatorPush(function(){
         $timeout(function() {
           $scope.closeUserMenu(false,true);
@@ -937,51 +864,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
       
       $scope.isUserMenuShow = value;
     };
-    dialog.toggleMindMenu = function(value) {
-      if (value) page.navigatorPush(function(){
-        $timeout(function() {
-          $scope.closeMindMenu(false,true);
-          console.log('back');
-        });
-
-      });
-      if (!value) page.navigatorPop();
-
-      $scope.isMindMenuShow = value;
-    };
-    dialog.addActionListener('all',function(action) {
-      switch (action) {
-        case 'create_post':
-          dialog.toggleMindMenu(false);
-          page.navigatorPush();
-          $scope.changeView('post')
-          break;
-
-        case 'create_recognition':
-          dialog.toggleMindMenu(false);
-          page.navigatorPush();
-          $scope.recognizeButtonClick('mindmenu');
-          break;
-      }
-    });
     
-    $scope.recognizeButtonClick = function(from){
-      var backPage = { name: 'feed'
-        , params: {}
-      };
-      if(from == 'profile'){
-        $scope.product.isAdded = true;
-        $scope.product.productId = $scope.product.id;
-        $scope.main.recognizeList = [$scope.product];
-        $scope.main.savedData = {};
-        $rootScope.$broadcast('recognizeListChanged',$scope.main.recognizeList);
-        page.show('givePoints',{backPage: backPage, recognizeList:$scope.main.recognizeList,savedData:{}})
-      } else {
-        $rootScope.$broadcast('recognizeListChanged',$scope.main.recognizeList);
-        page.show('givePoints',{recognizeList: $scope.main.recognizeList||[], backPage: backPage, savedData: $scope.main.savedData || {},fromRecognizeButton:(from=='recobutton'),fromMindMenu:(from=='mindmenu')});
-      }
-    };
-
     dialog.togglePhotoMenu = function(value) {
       if (value) page.navigatorPush(function(){
         $timeout(function() {
@@ -1001,11 +884,6 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
     $scope.closeUserMenu = function(event,force) {
       if (force || event.target.className.indexOf('popup-message') >= 0) {
         dialog.toggleUserMenu(false);
-      }
-    };
-    $scope.closeMindMenu = function(event,force) {
-      if (force || event.target.className.indexOf('popup-message') >= 0) {
-        dialog.toggleMindMenu(false);
       }
     };
     $scope.closePhotoMenu = function(event,force) {
@@ -1033,27 +911,7 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
         dialog.togglePointsMenu(false);
       }
     };
-
-    dialog.toggleExternalMenu = function(value, postType){
-      if (value) {
-        page.navigatorPush(function(){
-          $timeout(function() {
-            $scope.closeExternalMenu(false,true);
-          });
-        });
-        $scope.menuPostType = postType;
-      }
-      if (!value) page.navigatorPop();
-
-      $scope.isExternalMenuShow = value;
-    };
-
-     $scope.closeExternalMenu = function(event,force) {
-      if (force || event.target.className.indexOf('popup-message') >= 0) {
-        dialog.toggleExternalMenu(false);
-      }
-    };
-
+    
     
     $scope.toast = { isExist: false
                    , isHidden: true
@@ -1092,12 +950,10 @@ tol.controller('main',['$rootScope','$scope','page','searchService','network','c
 //        console.log('preventScroll set');
 //        body.addEventListener('touchmove', preventScroll);
 //      }
-      var data = {saveList:false,savedData:$scope.main.savedData,recognizeList:$scope.main.recognizeList};
-/*
+      var data = {};
       if (page.currentPage === 'chart') {
         data.saveList = true;
       }
-*/
       if (page.currentPage !== 'searchPage') {
         page.show('searchPage',data);
       }

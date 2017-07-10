@@ -38,7 +38,7 @@ function ElRepeat(wrapper) {
                    , 'image-loader'
                    , 'src'
                    ];
-  
+  var AUTO_POSTS = ['CUSTOMPOST','BIRTHDAY','ANNIVERSARY','JOINED','LEFT','PHRASE'];
 
   
   
@@ -126,17 +126,34 @@ function ElRepeat(wrapper) {
     
     for (var i = 0, l = links.length; i < l; i++) {
       //var link = links[i];
+      if(links[i].post_type_id*1 === feedService.URL_POST_WITH_PUSH)  links[i].post_type_id =  feedService.URL_POST;
+      if(links[i].post_type_id*1 === feedService.NORMAL_POST_WITH_PUSH)  links[i].post_type_id =  feedService.NORMAL_POST;
+
       compileString = ElRepeatIniter.getLayout('normal');
       
       if (links[i].post_type_id*1 === feedService.MULTI_RECOGNITION_POST) {
         compileString = ElRepeatIniter.getLayout('multi-recognition');
       }
       
-      if (links[i].auto_post_name === 'TripAdvisor') {
+      if (links[i].auto_post_name && links[i].auto_post_name === 'TripAdvisor') {
         compileString = ElRepeatIniter.getLayout('trip-adviser');
       }
-      if (links[i].auto_post_name === 'BookingCom') {
+      if (links[i].auto_post_name && links[i].auto_post_name === 'BookingCom') {
         compileString = ElRepeatIniter.getLayout('booking-com');
+      }
+      if (links[i].post_type_id*1 < 0 && links[i].attachment_count && links[i].attachment_count*1>0 && links[i].attachments && links[i].attachments[0]
+          && links[i].attachments[0].data && links[i].attachments[0].data.post_name
+          && (AUTO_POSTS.indexOf(links[i].attachments[0].data.post_name.toUpperCase())!==-1)){
+        compileString = ElRepeatIniter.getLayout('custom-post');
+      }
+      if (links[i].post_type_id*1 < 0 && links[i].attachment_count && links[i].attachment_count*1>0 && links[i].attachments && links[i].attachments[0]
+          && links[i].attachments[0].data && links[i].attachments[0].data.post_type
+          && links[i].attachments[0].data.post_type.toUpperCase() =='CUSTOMPOST'){
+        compileString = ElRepeatIniter.getLayout('custom-post');
+      }
+      if (links[i].post_type_id*1 === feedService.VOTE_POST) {
+        //if (links[i].attachment_count*1 < 1) continue;
+        compileString = ElRepeatIniter.getLayout('vote-post');
       }
       if (links[i].post_type_id*1 === feedService.URL_POST) {
         //if (links[i].attachment_count*1 < 1) continue;
@@ -490,56 +507,6 @@ function ElRepeat(wrapper) {
   this.update = update;
   
 };
-
-(function ElRepeatIniter(window, list) {
-  
-  var items = [], layouts = {}, itemsCount = list.length, counter = 0, linkNames = {};
-  
-  function init(itemName) {
-    var http = new XMLHttpRequest();
-    http.open('GET', 'layouts/'+itemName+'.html', true);
-    http.onreadystatechange = function() {
-      if (http.readyState === 4) {
-        items.push(http.responseText);
-        itemsLoaded();
-      }
-    };
-    http.send();
-  }
-  
-  function itemsLoaded() {
-    counter++;
-    if (itemsCount === counter) {
-      for (var i = 0, ii = items.length; i < ii; i++) {
-        var type = /data-type="([^"]+)/.exec(items[i])[1];
-        var linkName = /data-repeat="([^"]+)/.exec(items[i])[1];
-        layouts[type] = items[i];
-        linkNames[type] = linkName;
-      }
-    } else {
-      init(list[counter]);
-    }
-    
-  }
-  
-  init(list[0]);
-  window.ElRepeatIniter = {
-    get: function() {
-      console.log('layouts',layouts);
-    },
-    
-    getLayout: function(type) {
-      return layouts[type];
-    },
-    
-    getLinkName: function(type) {
-      return linkNames[type];
-    },
-    globalId: 1
-  };
-  
-})(window, app.layouts);
-
 
 
 /**

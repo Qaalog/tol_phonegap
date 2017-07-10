@@ -85,7 +85,7 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','u
   page.onRequestResult(settings,function(params,onResult) {
     $scope.onResult = onResult;
   });
-
+    
   $scope.linkNow = function() {
     
     if (!config.IS_DEBUG && config.SPRINT < 3) {
@@ -119,16 +119,12 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','u
    clearToken();
    if(!$scope.params.username) {
      if ($scope.params.requestResult) {
-       if(typeof $scope.onResult == 'function') {
-         $scope.onResult(false);
-       } else {
-         page.goBack();
-       }
+       $scope.onResult(false);
        return false;
      }
      page.goBack();
      return false;
-   };
+   }; 
    page.show('catalog',$scope.params);
    
 //    openFB.logout(function(info){

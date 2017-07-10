@@ -1,4 +1,4 @@
-tol.service('header',['$rootScope',function($rootScope){
+tol.service('header',[function(){
     
   var $header = this;
   
@@ -8,9 +8,8 @@ tol.service('header',['$rootScope',function($rootScope){
   $header.cancel = function(){};
   $header.post = function(){};
   $header.save = function(){};
-  $header.doIt = function(){
-    $rootScope.$broadcast('doItEvent');
-  };
+  $header.doIt = function(){};
+  
   $header.toggleSave = function(){};
   $header.togglePost = function(){};
   $header.switchPost = function(){};

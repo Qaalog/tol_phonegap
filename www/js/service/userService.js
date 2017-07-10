@@ -3,6 +3,7 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
     
   var $user = this;
   $user.isAdmin = false;
+  $user.canEditAllPosts = false;
   //var productId, userCode, product, avatar, hotelName, userId = false, user, catalogDB = false, hotelId;
   
   var storage = { productId: false
@@ -14,6 +15,7 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
                 , userId: false
                 , user: false
                 , catalogDB: false
+                , catalogSelected:false
                 , hotelId: false
                 , password: false
                 , orgLevels: {}
@@ -32,7 +34,7 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
   $user.getProductId = function() {
     return storage.productId;
   };
-  
+
   $user.setUserCode = function(code) {
     storage.userCode = code;
   };
@@ -77,6 +79,7 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
   
   $user.setAvatar = function(url){
     storage.avatar = url;
+    storage.authProduct.image_url = url;
   };
   
   $user.getAvatar = function() {
@@ -114,7 +117,15 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
   $user.getPassword = function() {
     return storage.password;
   };
-  
+
+  $user.setCatalogSelected = function(catalog) {
+    storage.catalogSelected = catalog;
+  };
+
+  $user.getCatalogSelected = function() {
+    return storage.catalogSelected;
+  };
+
   $user.checkForAdmin = function(characteristics) {
     for (var i = 0, l = characteristics.length; i < l; i++) {
       var char = characteristics[i];
@@ -129,7 +140,31 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
     }
     return false;
   };
-  
+
+  $user.checkCanEditAllPosts = function(characteristics) {
+    for (var i = 0, l = characteristics.length; i < l; i++) {
+      var char = characteristics[i];
+
+      if (char.short_name === 'role') {
+        if (!!char.long_name && char.long_name.toLowerCase() === 'admin' && char.value*1 === 1) {
+          $user.canEditAllPosts = true;
+          return true;
+        }
+      }
+
+    }
+    return false;
+  };
+
+  $user.checkPrivacyTerms = function(currentPrivacyId){
+    if(currentUser = $user.getUser()){
+       if(typeof currentUser.terms_privacy_accepted !='undefined'){
+         return currentUser.terms_privacy_accepted;
+       }
+    }
+    return true;
+  }
+
   $user.normalizeOrgLevels = function(characteristics) {
     for (var i = 0, l = characteristics.length; i < l; i++) {
       var char = characteristics[i];

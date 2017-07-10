@@ -1,0 +1,30 @@
+<div class="quote-wrap linked" data-repeat="feedItem" data-type="external-custom-post-wrap">
+    <span class="t-icon_quote quote-icon"></span>
+    <div class="feed-box comment" data-touch="showPostDetails(feedItem)">
+        <div class="user-posted this-user">
+            <div class="image-wrap">
+                <div class="img-middle-wrap">
+                    <div class="img-inner-wrap custom">
+                        <img class="img" data-src="{% (scope.selectedCatalog.image_url) ?  scope.imgPrefix + (scope.selectedCatalog.image_url) + scope.imgSuffix : 'img/icon_custom.svg' %}">
+                    </div>
+                </div>
+            </div>
+            <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
+                <div class="feed-title">
+                    <div class="user-name">{%feedItem.parent_post.attachments[0].data.from?scope.getHtml(feedItem.parent_post.attachments[0].data.from,false,true,feedItem.parent_post):scope.hotelName%}</div>
+                </div>
+                <div class="time-published">{%scope.getPostAge(feedItem.parent_post)%} - {%scope.hotelName%}</div>
+            </div>
+        </div>
+        <div class="post-box">
+            <h2 class="post-title">{%feedItem.parent_post.message?scope.getHtml(feedItem.parent_post.message,false,true,feedItem.parent_post):''%}</h2>
+            <div class="post-img-wrap"
+                 style="height: 15em"
+                 data-image-loader="img/tol_loader_gray_128.gif">
+                <div class="custom-post-phrase">{%feedItem.parent_post.attachments[0].data.phrase?scope.getHtml(feedItem.parent_post.attachments[0].data.phrase,false,true):''%}</div>
+                <img class="img main_image"
+                     data-src="{% scope.imgResizedPrefix + feedItem.parent_post.media_url + scope.imgResizedSuffix %}">
+            </div>
+        </div>
+    </div>
+</div>

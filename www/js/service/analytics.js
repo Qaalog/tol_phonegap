@@ -64,11 +64,12 @@ tol.service('analytics',['config','userService',function(config, userService){
     window.analytics.sendException(error, false);
   };
   
-  $analytics.trackCustomDimension = function(key, value) {
+  $analytics.trackCustomDimension = function(key, value,success,error) {
     if (!$analytics.isEnabled) {
       return false;
     }
-    
+    success = success || function(){};
+    error = error || function(){};
     console.log('analytics trackCustomDimension', key, value);
 //    window.analytics.addCustomDimension(key, value, 
 //    
@@ -80,16 +81,18 @@ tol.service('analytics',['config','userService',function(config, userService){
 //      console.log('addCustomDimension fail: ', e);
 //    });
     
-    window.analytics.customDimension(key, value);
+    window.analytics.customDimension(key, value,success,error);
     
   };
   
-  $analytics.trackCustomMetric = function(key, value) {
+  $analytics.trackCustomMetric = function(key, value, success,error) {
     if (!$analytics.isEnabled) {
       return false;
     }
+    success = success || function(){};
+    error = error || function(){};
     console.log('Custom metric', key, value);
-    window.analytics.customMetric(key, value);
+    window.analytics.customMetric(key, value,success,error);
   };
   
   $analytics.trackView = function(pageName) {
@@ -102,17 +105,18 @@ tol.service('analytics',['config','userService',function(config, userService){
     window.analytics.sendAppView(pageName);
   };
   
-  $analytics.trackEvent = function(params, isDelayed) {
+  $analytics.trackEvent = function(params, isDelayed,success,error) {
     if (!$analytics.isEnabled) {
       return false;
     }
-    
+    success = success || function(){};
+    error = error || function(){};
     params = params || [];
     params.unshift(userService.getUserId());
     
     if (!isDelayed) {
       //window.analytics.trackEvent.apply({},params);
-      window.analytics.sendEvent(params[0].toString(), params[1].toString(), params[2].toString());
+      window.analytics.sendEvent(params[0].toString(), params[1].toString(), params[2].toString(),0,success,error);
       test.apply({},params);
       return true;
     }
@@ -140,16 +144,17 @@ tol.service('analytics',['config','userService',function(config, userService){
     console.log('Analistic test',a,b,c,d);
   }
   
-  $analytics.trackTiming = function(variable, label, time) {
+  $analytics.trackTiming = function(variable, label, time,success, error) {
     
     if (!$analytics.isEnabled) {
       return false;
     }
-    
+    success = success || function(){};
+    error = error || function(){};
     console.log(userService.getUserId().toString());
     
     //window.analytics.trackTiming.apply({},params);
-    window.analytics.sendTiming(userService.getUserId().toString(), variable, label, time);
+    window.analytics.sendTiming(userService.getUserId().toString(), variable, label, time,success, error);
   };
   
   var timeTags = {};
@@ -157,14 +162,16 @@ tol.service('analytics',['config','userService',function(config, userService){
     timeTags[tag] = new Date().getTime();
   };
   
-  $analytics.timeEnd = function(tag) {
+  $analytics.timeEnd = function(tag, success,error) {
     if (!timeTags[tag]) return false;
     
     var time = new Date().getTime() - timeTags[tag];
+    success = success || function(){};
+    error = error || function(){};
   
     console.info(tag, (time/1000)+'s');
 
-    $analytics.trackTiming(tag, tag, time);
+    $analytics.trackTiming(tag, tag, time,success,error);
     delete timeTags[tag];
   };
 }]);

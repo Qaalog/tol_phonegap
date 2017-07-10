@@ -87,9 +87,9 @@ tol.controller('catalog', ['$rootScope','$scope','network', 'page', 'config', 'd
             if (response.length < 1) {
               console.log('response',response);
               if (!isUpdate) {
-                //network.post('user/'+$scope.user['id'],{catalog_id: null},function(result, response){
+                network.post('user/'+$scope.user['id'],{catalog_id: null},function(result, response){
                   page.show('catalog',$scope.data,true);
-                //});
+                });
               }
               dialog.create(dialog.QUESTION,'Access is denied','You are not created as a user on this hotel.<br>Please notify your HR manager.<br>Do you want logout?',
               'YES','NO',function(answer){
@@ -133,7 +133,7 @@ tol.controller('catalog', ['$rootScope','$scope','network', 'page', 'config', 'd
         } else {
           //if (response.code == 501) {
             page.hideLoader();
-            //network.post('user/'+$scope.user['id'],{catalog_id: null},function(result, response){});
+            network.post('user/'+$scope.user['id'],{catalog_id: null},function(result, response){});
             dialog.create(dialog.QUESTION,'Access is denied','You are not created as a user on this hotel.<br>Please notify your HR manager.<br>Do you want logout?',
               'YES','NO',function(answer){
                 if (answer) network.logout();

@@ -28,6 +28,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
     console.log('profile params',params);
     app.protectHeader();
     $scope.authProductId = userService.getAuthProduct().id;
+    $scope.canEditAllPosts = userService.checkCanEditAllPosts(userService.getAuthProduct().characteristics);
     $scope.getFBName = facebook.getName;
     
     if (params.productId === null) {
@@ -42,7 +43,6 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
     $scope.params = params;
     $scope.isFBLinked = ( localStorage.getItem('fbAccessToken'+userService.getUser().id) ) ? true : false;
     $scope.userProductId = userService.getProductId();
-    
     if (params.productId && params.productId*1 !== $scope.userProductId) {
       page.removeProfileTab('config');
       if (fileSelector) fileSelector.disabled = true;
@@ -62,6 +62,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
     
     $scope.getProduct();
     $scope.hotelName = userService.getHotelName();
+    $scope.selectedCatalog = userService.getCatalogSelected();
     params.productId = params.productId || $scope.userProductId;
     page.setProfileProductId(params.productId*1);
   });
@@ -244,7 +245,6 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
     return (Object.keys(obj).length > 0) ? false : true;
   };
   
-  
   function normalizePointsPerYear(pointsPerYear) {
     console.log('pointsPerYear', pointsPerYear);
   }
@@ -405,6 +405,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
   $scope.borderedUserTitle = feed.borderedUserTitle;
   $scope.getPostType = feed.getPostType;
   $scope.showPostDetails = feed.showPostDetails;
+  $scope.checkCustomPost = feed.checkCustomPost;
   $scope.showProfile = function (productId) {
     page.show('profile', {productId: productId});
   };
@@ -480,6 +481,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
       console.log('login',response.authResponse.accessToken);
       $timeout(function(){
         $scope.isFBLinked = true;
+        $rootScope.$broadcast('fbLinkedChanged',$scope.isFBLinked);
       });
       $scope.longLife(function(){
         dialog.create(dialog.INFO,'Connected!','You have linked your Facebook<br>account successfully.','OK', '', function(){
@@ -505,9 +507,9 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
       if (result) {
         var parsedResponse = /access_token=(.*)&expires=(.*)/.exec(response);
         localStorage.removeItem('do_not_link'+userService.getUser().id);
-        localStorage.setItem('fbAccessToken',parsedResponse[1]);
-        localStorage.setItem('fbAccessToken'+userService.getUser().id,parsedResponse[1]);
-        localStorage.setItem('fbTokenExpire'+userService.getUser().id, new Date().getTime() + (parsedResponse[2]*1000) );
+          localStorage.setItem('fbAccessToken',response.access_token);
+          localStorage.setItem('fbAccessToken'+userService.getUser().id,response.access_token);
+          localStorage.setItem('fbTokenExpire'+userService.getUser().id, new Date().getTime() + (response.expires_in*1000) );
         facebook.loadName(function(result, response) {
           callback();
         });
@@ -525,6 +527,7 @@ tol.controller('profile',['$scope','page','network','facebook','config','feed','
             console.log('logout',info);
           });
           $scope.isFBLinked = false;
+          $rootScope.$broadcast('fbLinkedChanged',$scope.isFBLinked);
         }
     }).show();
   };

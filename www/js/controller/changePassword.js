@@ -66,9 +66,20 @@ tol.controller('changePassword',['$scope','page','header','network','dialog','co
                      , 'password_reset': null
                      };
           network.post('user/'+userService.getUserId(),data,function(result, response){
-            page.hideLoader();
+            var AUTH_KEY = config.AUTH_KEY;
+            var codedAuth = btoa(userService.getUserCode()+':'+$scope.passwords.new);
+            var oldAuth = localStorage.getItem(AUTH_KEY);
             network.logout();
-            dialog.create(dialog.INFO,'INFO','Password changed<br>Your new password is now set','OK').show();
+            setTimeout(function(){
+              if (oldAuth && oldAuth !== codedAuth) {
+                localStorage.setItem(AUTH_KEY,codedAuth);
+              } else {
+                localStorage.removeItem(AUTH_KEY);
+              }
+            },500);
+            network.doLogin(codedAuth,false);
+            dialog.create(dialog.INFO,'Password Changed','Your new password is now active on all devices - you might be asked to login again.','OK','').show();
+            page.hideLoader();
           });
         } else {
           page.hideLoader();

@@ -3,7 +3,7 @@
 <html ng-strict-di>
 <head>
     <meta http-equiv="Content-Security-Policy"
-          content="default-src *; img-src * data:; media-src * blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+          content="default-src * data: cdvfile: gap:; img-src * data:; media-src * blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="viewport" content="initial-scale=1.0001, minimum-scale=1.0001, maximum-scale=1.0001, user-scalable=no"/>
@@ -52,6 +52,7 @@
     <script type="text/javascript" src="js/controller/postDetails.js"></script>
     <script type="text/javascript" src="js/controller/notification.js"></script>
     <script type="text/javascript" src="js/controller/cut.js"></script>
+    <script type="text/javascript" src="js/controller/termsPrivacy.js"></script>
 
 
     <!-- Directives -->
@@ -60,6 +61,7 @@
     <script type="text/javascript" src="js/directive/ngRender.js"></script>
     <script type="text/javascript" src="js/directive/ngCntHeight.js"></script>
     <script type="text/javascript" src="js/directive/ngImageLoader.js"></script>
+    <script type="text/javascript" src="js/directive/ngIframeLoader.js"></script>
 
     <!-- Services -->
     <script type="text/javascript" src="js/service/analytics.js"></script>
@@ -139,6 +141,7 @@
                 <div class="image-wrap" id="avatar_wrap" ng-fast-touch="changeAvatar(product)">
                     <div class="img-middle-wrap">
                         <div class="img-inner-wrap">
+                            <i ng-show="showUserPhotoNeededMarker" class="icon-notify"></i>
                             <img class="img"
                                  id="avatar_img"
                                  ng-src="{{(product.image_url) ? imgPrefix + product.image_url + imgSuffix : 'img/default-staff.png'}}">
@@ -207,6 +210,7 @@
 </div>
 
 <div ng-section="partial/login.html" ctrl-name="login" ng-show="activePage['login']" class="page_section"></div>
+<div ng-section="partial/termsPrivacy.html" ctrl-name="termsPrivacy" ng-show="activePage['termsPrivacy']" class="page_section"></div>
 <div ng-section="partial/facebookLink.html" ctrl-name="facebookLink" ng-show="activePage['facebookLink']"
      class="page_section"></div>
 <!-- Statusbar -->
@@ -237,7 +241,6 @@
     <div ng-section="partial/notification.html" ctrl-name="notification" ng-show="activePage['notification']"
          class="page_section"></div>
     <div ng-section="partial/cut.html" ctrl-name="cut" ng-show="activePage['cut']" class="page_section"></div>
-
 </div>
 
 <!-- No Results -->
@@ -304,7 +307,9 @@
 <div class="popup-message fixed-screen" ng-class="{show: isInfoShow}">
     <div class="white-box text-center">
         <h1 class="white-box-title">{{dialog.title}}</h1>
-        <div class="white-box-desc" ng-bind-html="dialog.message"></div>
+        <div class="white-box-desc">
+            <div class="white-box-content" ng-bind-html="dialog.message"></div>
+        </div>
         <button ng-fast-touch="positiveBtnTouch()" class="light-btn text-center">{{dialog.positiveBtn}}</button>
     </div>
 </div>
@@ -358,6 +363,9 @@
     <div class="white-box">
         <button class="light-btn edit-btn text-center" ng-fast-touch="dialogAction('edit_post')">
             <span class="t-icon_edit inner-btn">Edit your post</span>
+        </button>
+        <button class="light-btn delete-btn text-center"  ng-hide="hideRegenerateThumbButton" ng-fast-touch="dialogAction('regenerate_thumb')">
+            <span class="t-icon_refresh inner-btn">Reload image</span>
         </button>
         <button class="light-btn delete-btn text-center" ng-hide="hideDeleteButton" ng-fast-touch="dialogAction('delete_post')">
             <span class="t-icon_delete inner-btn">Delete your post</span>
@@ -452,7 +460,7 @@
 </div>
 <!-- Toast -->
 <div class="toast-message text-center white-box-desc" ng-class="{hide: toast.isHidden}" ng-if="toast.isExist"
-     style="display: none">
+     style="display: none" ng-cloak>
     <span class="toast-text">{{toast.text}}</span>
 </div>
 
@@ -482,7 +490,7 @@
          ng-class="{'active':activeView['givePoints']}"
          ng-fast-touch="recognizeButtonClick('recobutton')">
          <div class="inner">
-           <span class="menu-icon t-icon_point"><i ng-show="main.recognizeList.length>0" class="icon-notify"></i></span>
+            <span class="menu-icon t-icon_point"><div ng-show="main.recognizeList.length>0" class="icon-notify"></div></span>
             <div class="item-text">Recognize</div>
          </div>        
     </div>
@@ -495,8 +503,8 @@
     <div class="menu-item"
          ng-class="{'active':activeView['profile'] && (profileProductId == userProductId)}"
          ng-fast-touch="changeView('profile')">
-        <span class="menu-icon t-icon_profile"></span>
-        <div class="item-text">Profile</div>
+            <span class="menu-icon t-icon_profile"><div ng-show="!userHasPhoto" class="icon-notify"></div></span>
+            <div class="item-text">Profile</div>
     </div>
 </footer>
 </body>

@@ -1,6 +1,6 @@
 tol.controller('post',['$scope','$timeout','page','network','facebook','device','header','dialog','userService','imageUpload','lightbox','pager',
-  'analytics','feed','$sce',
-  function($scope,$timeout,page,network,facebook,device,header,dialog,userService,imageUpload,lightbox,pager,analytics,feed,$sce){
+  'analytics','feed',
+  function($scope,$timeout,page,network,facebook,device,header,dialog,userService,imageUpload,lightbox,pager,analytics,feed){
   
   var postNow;
   
@@ -37,21 +37,10 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
   //$scope.imgPrefix = network.servisePathPHP + '/GetCroppedImage?i=';
   $scope.imgPrefix = network.servisePathPHP + '/GetResizedImage?i=';
   $scope.imgSuffix = '&h=256&w=256';
-  $scope.isExternalPost = false;
-  $scope.hotelName = userService.getHotelName();
-  $scope.formatDate = feed.formatDate;
-  $scope.tripAdvisorHtml = function(textToHTML){
-    return $sce.trustAsHtml(textToHTML);
-  };
-
+  
+  
   cleanPostBody();
-  $scope.$watch('postBody.message',function(newVal,oldVal){
-    newVal = newVal.replace(/<.*>/gim,'');
-    newVal = newVal.replace(/^/gim,'<br>');
-    newVal = newVal.replace(/<br>/,'');
-
-    if(newVal.length>250) $scope.postBody.message = oldVal;
-  });
+  
   $scope.rotate = function() {
     anglePointer++;
     if (anglePointer > 3) anglePointer = 0;
@@ -64,7 +53,6 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
         img = new Image();
         img.src = 'data:image/jpeg;base64,'+imageData;
         loaded();
-        //TODO here we can resize image to needed sizes
         img.onload = function() {
           $timeout(function() {
             imageUpload.rotate(previewCanvas, img, '#post_preview_wrap', 0);
@@ -90,11 +78,9 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
       header.togglePost(true);
       header.toggleSave(true);
       return true;
-    } else {
-      header.togglePost(false);
-      header.toggleSave(false);
-      return false;
     }
+    header.togglePost(false);
+    header.toggleSave(false);
   };
   
   
@@ -105,10 +91,6 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
                  };  
   
   page.onShow(settings,function(params) {
-    $scope.isExternalPost = false;
-    if(params.editItem && typeof params.editItem.parent_post != 'undefined' && ['BookingCom','TripAdvisor'].indexOf(params.editItem.parent_post.auto_post_name)!==-1){
-      $scope.isExternalPost = true;
-    }
     imageUpload.setOnSucces(onSuccess);
     imageUpload.setOnFail(onFail);
     $scope.isURL = false;
@@ -116,9 +98,7 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
     $scope.isPostLoaderShow = false;
     page.setCheckBox('post_switcher',false);
     page.setCheckBox('other_can_share_switcher',false);
-    $scope.postToFB = (page.getSwitchState('post_switcher'))? 1 : 0;
     previewCanvas = document.getElementById('test_canvas');
-    $scope.otherCanShare = (page.getSwitchState('other_can_share_switcher')) ? 1 : 0;
     
     header.togglePost(false);
     header.save = postNow;
@@ -140,21 +120,19 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
       var img = params.editItem.$$element.querySelector('.main_image');
 
       $timeout(function(){
-        if(img){
-          imageUpload.rotate(previewCanvas, img, '#post_preview_wrap', 0);
-          $scope.isPreviewCanvasShow = true;
-        }
+        imageUpload.rotate(previewCanvas, img, '#post_preview_wrap', 0);
+        $scope.isPreviewCanvasShow = true;
         $scope.isPostLoaderShow = false;
-
       });
       
-      $scope.postBody.message = params.editItem.message?params.editItem.message.replace(/<br>/gim,''):'';
+      $scope.postBody.message = params.editItem.message.replace(/<br>/gim,'');;
       header.switchPost(header.SAVE);
       $scope.validatePost();
       var fileInput = document.getElementById('file_selector_input');
       if (fileInput) {
         fileInput.remove();
       }
+      
       return false;
     }
     
@@ -258,7 +236,8 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
     document.getElementById('post_textarea').blur();
     if (navigator.camera && !$scope.params.editItem) dialog.togglePhotoMenu(true);
   };
-
+  
+  
   var doPostToFb = function(params) {
     network.put('post',params,function(result, response){
       if (result) {
@@ -266,50 +245,22 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
         var data = { message: params.message
                    , link: response.media_url
                    };
-        var createdItem = response;
         facebook.api('POST','me/feed',data,function(result, response){
-          if(result){
-            console.log('send',result, response);
-            cleanPostBody();
-
-            //TODO add after sprint 6
-            if(createdItem && createdItem.id){
-              var data = {
-                'id': createdItem.id
-                , 'product_id': userService.getProductId()
-                , 'mark_id': feed.LIKE_TYPE_FACEBOOK
-              };
-              network.post('post/addMark/', data, function (result, response) {
-                if (result) {
-                  if (typeof response.marks !== 'undefined') {
-                    createdItem.marks = response.marks;
-                  } else {
-                    delete createdItem.marks;
-                  }
-                  createdItem.mark_count = response.mark_count * 1;
-                }
-              });
-            }
-            network.pagerReset();
-            page.show(app.mainPage,{needUpdate: true});
-            dialog.create(dialog.INFO, 'Thanks!', 'Your post was successfully<br/>published in Facebook', 'OK', null).show();
-          } else {
-            network.pagerReset();
-            page.show(app.mainPage,{needUpdate: true});
-            //dialog.create(dialog.INFO, 'Thanks!', 'Your post was successfully<br/>published in Facebook', 'OK', null).show();
-          }
+          console.log('send',result, response);
+          cleanPostBody();
+          page.show(app.mainPage,{needUpdate: true});
+          dialog.create(dialog.INFO, 'Thanks!', 'Your post was successfully<br/>published in Facebook', 'OK', null).show();
         });
       }
     });
   };
   
   postNow = function() {
-    if($scope.validatePost()){
-      page.showLoader();
-      console.log('post now');
-
+    page.showLoader();
+    console.log('post now');
+    
       console.log('timer');
-
+      
       if ($scope.postBody['media_data']) {
         if (angles[anglePointer] === 90) {
           $scope.postBody['media_data'].rotate = -90;
@@ -328,20 +279,16 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
 
       if ($scope.params.editItem) {
         var postData = { message: $scope.postBody.message
-          , can_share: $scope.otherCanShare
-          , status_id: feed.EDITED_POST
-          , update_reason: '<strong data-touch=showProfile('+userService.getAuthProduct().id+')>' +userService.getAuthProduct().name + '</strong>' +' edited post message'
-        };
+                       , can_share: $scope.otherCanShare
+                       , status_id: feed.EDITED_POST
+                       , update_reason: userService.getAuthProduct().name + ' edited post message'
+                       };
         var item = $scope.params.editItem;
         network.post('post/'+item.id,postData,function(result, response){
           if (result) {
             console.log(response);
             cleanPostBody();
-            page.show($scope.params.callPage,($scope.params.callPage == 'postDetails'?{postId:item.id}:{}));
-            if($scope.params.callPage == 'postDetails'){
-              page.navigatorPop();
-              page.navigatorPop();
-            }
+            page.show($scope.params.callPage,{});
             network.pagerUpdate();
           }
           page.hideLoader();
@@ -350,7 +297,7 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
         return false;
       }
 
-
+      
       if (!$scope.postBody.message || (!$scope.postBody['media_data'].content && !$scope.postBody.media_url)) {
         page.hideLoader();
         return false;
@@ -380,7 +327,7 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
       console.log($scope.postBody);
 
       postToFeed($scope.postBody);
-    }
+    
   };
   
   function postToFeed(params) {

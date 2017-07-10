@@ -9,7 +9,7 @@ tol.service('utils', ['network', '$sce',
 
         $utils.getPrevMonthRange = function(date){
             var firstDay = '01';
-            var lastDay = $utils.getMonthLastDay(date);
+            var lastDay = $utils.getMonthLastDay(new Date(date.getFullYear(),date.getMonth(), 0));
             if(date.getMonth()==0){
                 return {dateFrom:date.getFullYear()-1+'-12-'+firstDay,
                     dateTo:date.getFullYear()-1+'-12-'+lastDay};
@@ -67,6 +67,8 @@ tol.service('utils', ['network', '$sce',
             }
         };
 
-
+        $utils.undef = function(item){
+            return typeof item == 'undefined';
+        }
 
     }]);

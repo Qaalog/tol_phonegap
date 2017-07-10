@@ -49,6 +49,12 @@
                 </div>
                 <div class="to-remember-label" id="others_can_share">Others can share my post</div>
             </div>
+            <div class="to-remember share" ng-hide="hideSendNotification || isEdit">
+                <div class="custom-checkbox" id="send_notification_switcher" ng-fast-touch="toggleCheckBox($event)">
+                    <div class="switcher"></div>
+                </div>
+                <div class="to-remember-label" id="send_notification">Send Notifications</div>
+            </div>
         </div>
         <div ng-show="isExternalPost">
             <!--TripAdvisor POST-->
@@ -63,7 +69,7 @@
                     </div>
                     <div class="user-title">
                         <div class="feed-title">
-                            New TripAdvisor comment
+                            {{params.editItem.parent_post.attachments[0].data.rule_message?params.editItem.parent_post.attachments[0].data.rule_message.message:'New TripAdvisor comment'}}
                         </div>
                         <div class="time-published">{{getPostAge(params.editItem.parent_post)}} - {{hotelName}}</div>
                     </div>
@@ -101,7 +107,7 @@
                     </div>
                     <div class="user-title">
                         <div class="feed-title">
-                            New Booking.com comment
+                            {{params.editItem.parent_post.attachments[0].data.rule_message?params.editItem.parent_post.attachments[0].data.rule_message:'New Booking.com comment'}}
                         </div>
                         <div class="time-published">{{getPostAge(params.editItem.parent_post)}} - {{hotelName}}</div>
                     </div>

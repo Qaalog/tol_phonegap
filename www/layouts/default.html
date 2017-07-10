@@ -65,7 +65,7 @@
           <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
         </div>
         <div class="user-menu t-icon_menu" 
-             data-show="{%scope.product.id*1 === feedItem.from_product_id*1%}" 
+             data-show="{%(scope.product.id*1 === feedItem.from_product_id*1) || scope.canEditAllPosts%}"
              data-touch="userMenuShow(feedItem)"></div>
       </div>
       <div class="post-box">

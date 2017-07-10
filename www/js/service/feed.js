@@ -1,5 +1,5 @@
-tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userService', '$rootScope', 'pager', 'lightbox', 'pagerItera', '$filter',
-    function (network, $sce, page, dialog, facebook, userService, $rootScope, pager, lightbox, pagerItera, $filter) {
+tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userService', '$rootScope', 'pager', 'lightbox', 'pagerItera', '$filter','$http','config','device',
+    function (network, $sce, page, dialog, facebook, userService, $rootScope, pager, lightbox, pagerItera, $filter,$http,config,device) {
 
         var $feed = this;
         $feed.postDetailUpdateStart = function () {
@@ -16,6 +16,9 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
         $feed.REINFORCE_POST = 4;
         $feed.URL_POST = 5;
         $feed.MULTI_RECOGNITION_POST = 6;
+        $feed.NORMAL_POST_WITH_PUSH = 8;//For Oleg to show this posts in notification feed
+        $feed.URL_POST_WITH_PUSH = 9;//For Oleg to show this posts in notification feed
+        $feed.VOTE_POST = 7;
 
         $feed.EDITED_POST = 1;
         $feed.GIVED_POINTS = 2;
@@ -26,10 +29,10 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
 
         $feed.MESSAGE_LENGTH_TO_SHOW = 3;
         $feed.EXTERNAL_MESSAGE_LENGTH_TO_SHOW = 10;
-
+        $feed.EXTERNAL_BOOKING_LENGTH_TO_SHOW = 4;
         $feed.MESAGE_STRING_LENGTH = 40;
         $feed.LIKES_CAN_BE_REMOVED = [$feed.LIKE_TYPE_NORMAL/*,$feed.LIKE_TYPE_FACEBOOK*/];
-
+        $feed.AUTO_POSTS = ['CUSTOMPOST','BIRTHDAY','ANNIVERSARY','JOINED','LEFT','PHRASE'];
         /* END CONST*/
 
         $feed.selectedFeedItem;
@@ -74,21 +77,51 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
 
         };
 
-        $feed.getHtml = function (text,sliceDisabled,isExternal) {
+        $feed.getHtml = function (text,sliceDisabled,isExternal,feedItem) {
             if (!text) return '';
+            var bookingPosPresent = false;//Booking Positive feedback
+            var bookingNegPresent = false;//Booking Negative feedback
             sliceDisabled = (sliceDisabled || false);
             isExternal = (isExternal || false);
+            feedItem = feedItem || false;
             var messageLength = isExternal?$feed.EXTERNAL_MESSAGE_LENGTH_TO_SHOW:$feed.MESSAGE_LENGTH_TO_SHOW;
+            if(feedItem && (typeof feedItem.auto_post_name !=='undefined')  && feedItem.auto_post_name == 'BookingCom'){
+                messageLength = $feed.EXTERNAL_BOOKING_LENGTH_TO_SHOW;
+                bookingPosPresent = (typeof feedItem.attachments[0].data.text_pos !== 'undefined') && feedItem.attachments[0].data.text_pos;
+                bookingNegPresent = (typeof feedItem.attachments[0].data.text_neg !== 'undefined') && feedItem.attachments[0].data.text_neg;
+            }
+
             if (page.currentPage == 'postDetails') sliceDisabled = true;
             var strippedText = false;
             if(text.length> messageLength*$feed.MESAGE_STRING_LENGTH+12 && !sliceDisabled){
                 var brCount = (text.match(/<br>/g) || []).length;
-
-                strippedText = text.slice(0,($feed.MESAGE_STRING_LENGTH*messageLength+12)-text.length)+'...'+'<div class="show-full">Full post</div>';
+                strippedText = text.slice(0,($feed.MESAGE_STRING_LENGTH*messageLength+12)-text.length)+'...';
+                if(bookingPosPresent && bookingNegPresent){
+                    if(text == feedItem.attachments[0].data.text_neg) strippedText += '<div class="show-full">Full post</div>';
+                    if(text == feedItem.attachments[0].data.text_pos) feedItem['posWasStripped'] = true;
+                } else if(bookingPosPresent){
+                    if(text == feedItem.attachments[0].data.text_pos) strippedText += '<div class="show-full">Full post</div>';
+                } else if(bookingNegPresent){
+                    if(text == feedItem.attachments[0].data.text_neg) strippedText += '<div class="show-full">Full post</div>';
+                } else {
+                    strippedText += '<div class="show-full">Full post</div>';
+                }
             }
             if(strippedText){
-              return $sce.trustAsHtml(strippedText);
+                text = strippedText;
             }
+            text = text.split('\\"').join('&quot;');
+            text = text.split("\\\\'").join('&lsquo;');
+            text = text.split('\\\\').join('\\');
+            if(bookingPosPresent && bookingNegPresent && text == feedItem.attachments[0].data.text_neg && feedItem['posWasStripped']){
+                feedItem['posWasStripped'] = 'undefined';
+                text += '<div class="show-full">...Full post</div>'
+            }
+            if(feedItem.post_type_id*1<0  && typeof feedItem.to_product_id != 'undefined' && feedItem.to_product_id && feedItem.to_product_name){
+                text = text.split('##user##').join('<strong data-touch=showProfile(' + feedItem.to_product_id + ')>' + feedItem.to_product_name.trim() + '</strong>');
+            }
+            text = text.split('##user##').join('');
+            text = text.split('##').join('</br>');
             return $sce.trustAsHtml(text);
         };
         $feed.deleteFeedItem = function (item) {
@@ -112,6 +145,9 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
                             deleted: 'X'
 
                         };
+                        if(userService.canEditAllPosts && item.from_product_id!==userService.getProductId()){
+                            data.cascade=1;
+                        }
                         network.post('post/' + item.id, data, function (result, response) {
                             if (result) {
                                 //$rootScope.$broadcast('post_deleted');
@@ -157,6 +193,23 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
             }
         };
 
+        $feed.regenerateThumbnail = function(item){
+
+            dialog.create(dialog.QUESTION, 'Regenerate image?', 'The image will be regenerated<br>Are you sure?', 'YES', 'NO',
+                function (answer) {
+                    if (answer) {
+                        var itemType = $feed.getPostType(item);
+                        var method = 'post/updatePointsPostImage';
+                        if(itemType == 'other-auto-post'){
+                            method = 'post/updateAutoPostImage';
+                        }
+                        network.post(method, {post_id: item.id}, function (result) {
+                            page.show('feed', {});
+                            network.pagerUpdate();
+                        });
+                    }
+                }).show();
+        };
 
         dialog.addActionListener('all', function (action) {
             switch (action) {
@@ -169,6 +222,11 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
                 case 'delete_post':
                     dialog.toggleUserMenu(false);
                     $feed.deleteFeedItem($feed.selectedFeedItem);
+                    break;
+
+                case 'regenerate_thumb':
+                    dialog.toggleUserMenu(false);
+                    $feed.regenerateThumbnail($feed.selectedFeedItem);
                     break;
             }
         });
@@ -184,7 +242,7 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
         };
 
         $feed.userMenuShow = function (feedItem) {
-            if (feedItem.from_product_id * 1 !== userService.getProductId()) {
+            if (feedItem.from_product_id * 1 !== userService.getProductId() && !userService.checkCanEditAllPosts(userService.getAuthProduct().characteristics)) {
                 return false;
             }
 //    feedItem.index = index;
@@ -419,12 +477,28 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
             }
             return result;
         };
-        
+        $feed.checkCustomPost = function(feedItem) {
+            var result = false;
+            if (feedItem) result = (feedItem.post_type_id*1 < 0 && feedItem.attachment_count && feedItem.attachment_count*1>0
+                && feedItem.attachments[0] && feedItem.attachments[0].data && feedItem.attachments[0].data.post_type
+                && feedItem.attachments[0].data.post_type.toUpperCase() == 'CUSTOMPOST') || (feedItem.post_type_id*1 < 0
+                && feedItem.attachment_count && feedItem.attachment_count*1>0 && feedItem.attachments && feedItem.attachments[0]
+                && feedItem.attachments[0].data && feedItem.attachments[0].data.post_name
+                && $feed.AUTO_POSTS.indexOf(feedItem.attachments[0].data.post_name.toUpperCase())!==-1);
+            return result;
+        }
+
         $feed.getQuoteType = function (feedItem) {
             var result = 'quote-wrap';
             if (feedItem.parent_post) {
                 if (feedItem.parent_post.auto_post_name) {
+                    if($feed.checkCustomPost(feedItem.parent_post)){//Custom Post
+                        return 'external-custom-post-wrap';
+                    }
                     switch (feedItem.parent_post.auto_post_name) {
+                        case 'Custom':
+                            result = 'external-custom-post-wrap';
+                            break;
                         case 'TripAdvisor':
                             result = 'external-tripadvisor-wrap';
                             break;
@@ -437,9 +511,14 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
 */
                     }
                 }
-                if (feedItem.parent_post.post_type_id && feedItem.parent_post.post_type_id == $feed.URL_POST && feedItem.attachment_count * 1 > 0) {
+                if(feedItem.parent_post.post_type_id == $feed.VOTE_POST){
+                    return 'external-vote-wrap';
+                }
+                if (feedItem.parent_post.post_type_id && (feedItem.parent_post.post_type_id == $feed.URL_POST || feedItem.parent_post.post_type_id == $feed.URL_POST_WITH_PUSH)&& feedItem.attachment_count * 1 > 0) {
                     result = 'quote-url-wrap';
                 }
+
+
             }
             return result;
         };
@@ -461,6 +540,31 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
 
         $feed.showPictureInLightBox = function (href) {
             lightbox.showPicture(href);
+/*
+ //TODO imageZoom needs the page from Julia with inpage css
+            var imgContainer = window.open('partial/cut.html','_blank','location=no,enableViewportScale=true');// zoom image
+            function processImage() {
+                var httpData = { 'method': 'get'
+                    , 'url': 'js/lib/imageZoom.js'
+                };
+                $http(httpData).success(function(result, status, headers) {
+                    imgContainer.executeScript(
+                        { code:result},function(){
+                            imgContainer.executeScript({code:"inject()"},function(values){
+                                console.log(values);
+                            });
+                        }
+                    );
+                });
+            };
+            function winClose(event) {
+                imgContainer.removeEventListener('loadstop', processImage);
+                clearInterval(testInterval);
+                imgContainer.removeEventListener('exit', winClose);
+            };
+            imgContainer.addEventListener( "loadstop", processImage);
+            imgContainer.addEventListener( "exit", winClose);
+*/
         };
 
         $feed.showPostDetails = function (feedItem) {
@@ -469,9 +573,18 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
             } else {
                 if(feedItem.media_url || (feedItem.parent_post && feedItem.parent_post.media_url)){
                   if(feedItem.post_type_id==$feed.QUOTE_POST){
-                      $feed.showPictureInLightBox(feedItem.parent_post.media_url);
+                      if(feedItem.parent_post.post_type_id && feedItem.parent_post.post_type_id==$feed.URL_POST){
+                          $feed.goToLink(feedItem.parent_post.attachments[0].data.href);
+                      } /*else {
+                          $feed.showPictureInLightBox(feedItem.parent_post.media_url);
+                      }*/
+
                   } else {
-                      $feed.showPictureInLightBox(feedItem.media_url);
+                      if(feedItem.post_type_id && feedItem.post_type_id==$feed.URL_POST) {
+                          $feed.goToLink(feedItem.attachments[0].data.href);
+                      } /*else {
+                          $feed.showPictureInLightBox(feedItem.media_url);
+                      }*/
                   }
                 }
             }
@@ -655,7 +768,7 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
         };
 
         $feed.giversFilter = function (feedItem) {
-            currUser = [userService.getAuthProduct()];
+            //currUser = [userService.getAuthProduct()];
             if (feedItem.point_givers * 1 > 0) {
                 return (feedItem.my_points * 1 > 0/* && feedItem.from_product_id!=userService.getAuthProduct().id*/);
             }
@@ -688,6 +801,10 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
 
         $feed.itemCanBeDeleted = function(item,callback){
             //$feed.showMenuLoader(item);
+            if(userService.canEditAllPosts) {
+                callback(true);
+                return;
+            }//The user with Admin Role can delete all posts
             network.get('post/' + item.id, {my_product_id: userService.getProductId()}, function (result, response) {
                 //$feed.hideMenuLoader(item);
                 if (result) {
@@ -797,6 +914,10 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
                                 var data = {
                                     deleted: 'X'
                                 };
+
+                                if(userService.canEditAllPosts && feedItem.from_product_id!==userService.getProductId()){
+                                    data.cascade=1;
+                                }
                                 network.post('post/' + feedItem.id, data, function (result, response) {
                                     if (result) {
                                         //dialog.toggleToastMessage(true,'You have successfully deleted the post');
@@ -831,6 +952,37 @@ tol.service('feed', ['network', '$sce', 'page', 'dialog', 'facebook', 'userServi
                             $feed.showPostDetails(feedItem);
                         }
                     });
+                }
+            });
+        };
+
+        $feed.getCatalog = function(callback){
+            callback = callback || function(){};
+            var params =  { 'app_id':  config.appId
+                , 'device_id': device.getUUID() || 'pc11'
+                , language:       navigator.language
+            };
+
+            network.get('entity_catalog/',params, function(result, response) {
+                if (result) {
+                    if (response.length === 0) {
+                        page.hideLoader();
+                        dialog.create(dialog.INFO, 'INFO', 'Your hotel list is empty. Please change username<br>or contact your administrator', 'OK').show();
+                    }
+                    var user = userService.getUser();
+                    if (user) {
+                        for (var i in response) {
+                            if (response[i].id * 1 === user.catalog_id * 1) {
+                                callback(response[i]);
+                                return;
+                            }
+                        }
+                        callback(false);
+                        return;
+                    }
+
+                } else {
+                    callback(false);
                 }
             });
         };

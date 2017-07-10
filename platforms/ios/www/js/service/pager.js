@@ -382,7 +382,6 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
   };
   
   function gotoBack() {
-    page.showLoader();
     repeater.clearAll();
     $pager.stop();
     setTimeout(function(){
@@ -412,10 +411,8 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
       backButton.innerHTML = 'Back to the top';
     }
     setTimeout(function(){
-      if (backButton && backButton.style){
-        backButton.style.opacity = '1';
-      }
-    },1000);
+      backButton.style.opacity = '1';
+    },300);
   }
   
   function hideBackButton() {
@@ -439,7 +436,7 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
       topLoader.style.display = '';
       setTimeout(function(){
         container.style.transition = animate;
-        container.style[transform] = 'translate3d(0,0,0)';
+        container.style[transform] = 'translate3d(0,3em,0)';
       },100);
     } else {
       container.style[transform] = 'translate3d(0,'+device.emToPx(8)+'px,0)';
@@ -471,13 +468,8 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
         var newItem = updateBuffer[n];
         if (item[linkName].id === newItem.id && item[linkName].points*1 !== newItem.points*1) {
           var element = item[0];
-/*
           newItem.points = newItem.points || 0;
           element.querySelector('.points strong').innerHTML = newItem.points + ( (newItem.points != 1) ? ' points' : ' point' );
-*/
-          newItem.points = newItem.points || 0;
-          newItem.point_givers = newItem.point_givers || '';
-          element.querySelector('.points strong').innerHTML = newItem.point_givers;
           break;
         }
       }

@@ -1,5 +1,5 @@
-tol.controller('ranking', ['$scope', 'config', 'page', 'network', 'userService', '$sce', 'feed','utils',
-    function ($scope, config, page, network, userService, $sce, feed,utils) {
+tol.controller('ranking', ['$scope', 'config', 'page', 'network', 'userService', '$sce', 'feed','utils','dialog',
+    function ($scope, config, page, network, userService, $sce, feed,utils,dialog) {
 
 
         $scope.imgPrefix = network.servisePathPHP + '/GetResizedImage?i=';
@@ -22,6 +22,7 @@ tol.controller('ranking', ['$scope', 'config', 'page', 'network', 'userService',
 
         $scope.showPictureInLightBox = feed.showPictureInLightBox;
         $scope.hideValuePodiums = config.REMOVE_VALUE_PODIUMS;
+
         $scope.splitName = function (fullName) {
             if(!!fullName) {
                 var clearedFullName = fullName.replace(/\s\s+/g, ' ');
@@ -63,26 +64,34 @@ tol.controller('ranking', ['$scope', 'config', 'page', 'network', 'userService',
                 data.to_date = range.dateTo;
             }
             network.post('points_given/getLeaders', data, function (result, response) {
-                page.hideLoader();
                 if (result) {
                     console.log(response);
                     $scope.ranking = response.characteristics;
+                    feed.getCatalog(function(selectedCatalog){
+                        page.hideLoader();
+                        var showValuePodiums = false;
+                        if (selectedCatalog) {
+                            if (selectedCatalog.parameters && selectedCatalog.parameters.category_values !=0) {
+                                showValuePodiums = true;
+                            }
+                        }
 
-                    for (var i = $scope.ranking.length - 1; i >= 0; i--) {
-                        if (config.REMOVE_VALUE_PODIUMS && $scope.ranking[i].id !== 0) {
-                            $scope.ranking.splice(i, 1);
-                            continue;
+                        for (var i = $scope.ranking.length - 1; i >= 0; i--) {
+                            if (!showValuePodiums && $scope.ranking[i].id !== 0) {
+                                $scope.ranking.splice(i, 1);
+                                continue;
+                            }
+                            if ($scope.ranking[i].places.length < 1) {
+                                $scope.ranking.splice(i, 1);
+                            }
                         }
-                        if ($scope.ranking[i].places.length < 1) {
-                            $scope.ranking.splice(i, 1);
+                        $scope.ranking.reverse();
+                        if ($scope.ranking.length < 2) {
+                            page.toggleNoResults(true, 'There is no data for this '+requestMode+'.', '#eaeaea',true);
+                            return false;
                         }
-                    }
-                    if (config.REMOVE_VALUE_PODIUMS) $scope.ranking.reverse();
-                    if ($scope.ranking.length < 2) {
-                        page.toggleNoResults(true, 'There is no data for this '+requestMode+'.', '#eaeaea',true);
-                        return false;
-                    }
-                    $scope.changeRanking(rankingPoint);
+                        $scope.changeRanking(rankingPoint);
+                    });
                 }
             });
         };
@@ -185,5 +194,14 @@ tol.controller('ranking', ['$scope', 'config', 'page', 'network', 'userService',
             page.show('profile', {productId: product.id});
         };
 
+        $scope.showWhatIsThis = function(currentRanking){
+            console.log(currentRanking);
+            if(currentRanking.rate_description){
+                dialog.create(dialog.INFO,currentRanking.long_name,currentRanking.rate_description,'OK','').show();
+            } else if(currentRanking.description){
+                dialog.create(dialog.INFO,currentRanking.long_name,currentRanking.description,'OK','').show();
+            }
+
+        };
 
     }]);

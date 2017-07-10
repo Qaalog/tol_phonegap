@@ -22,7 +22,7 @@
           <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
         </div>
         <div class="user-menu t-icon_menu" 
-             data-show="{%scope.product.id*1 === feedItem.from_product_id*1%}" 
+             data-show="{%(scope.product.id*1 === feedItem.from_product_id*1) || scope.canEditAllPosts%}"
              data-touch="userMenuShow(feedItem)"></div>
       </div>
       <div class="post-box" data-touch="showPostDetails(feedItem)">
@@ -46,7 +46,7 @@
                               <span class="t-icon_point"></span>Give
                             </div>
               -->
-            <img data-src="{% scope.imgResizedPrefix + feedItem.media_url + scope.imgResizedSuffix%}" alt="" class="img main_image" data-touch="showPostDetails(feedItem)">
+            <img data-src="{% scope.imgResizedPrefix + encodeURIComponent(feedItem.media_url) + scope.imgResizedSuffix%}" alt="" class="img main_image" data-touch="showPostDetails(feedItem)">
             </div>
             <div class="image-link" data-touch="goToLink(feedItem.attachments[0].data.href)"><a href="javascript:;" class="link">{%feedItem.attachments[0].data.link%}</a></div>
           </div>

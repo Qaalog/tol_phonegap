@@ -19,7 +19,7 @@ tol.controller('menu',['$scope','page','menu','device','$timeout','network','fac
       for (var i = 59648; i < 60138; i++) {
         var hex = i.toString(16);
         var div = document.createElement('div');
-        div.innerHTML = 'icon: <span class="q-icon">&#x'+hex+';</span>  hex: '+hex;
+        div.innerHTML = 'icon: <span class="t-icon">&#x'+hex+';</span>  hex: '+hex;
         parent.appendChild(div);
       }
       parent.style.display = '';

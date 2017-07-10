@@ -1,6 +1,5 @@
-
-tol.controller('searchPage',['$scope','config','page','network','searchService','userService','dialog','$timeout','lightbox','$sce','$rootScope','$filter',
-  function($scope,config,page,network,searchService,userService,dialog,$timeout,lightbox,$sce,$rootScope,$filter){
+tol.controller('searchPage',['$scope','config','page','network','searchService','userService','dialog','$timeout','lightbox','$sce',
+  function($scope,config,page,network,searchService,userService,dialog,$timeout,lightbox,$sce){
     
   $scope.recognizeList = [];
   var recentName = '';
@@ -24,8 +23,7 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
         console.log(e);
       }
     }
-
-    $scope.addAllVisible = true;
+    
     if (!params.saveList && !params.isBack) {
       $scope.recognizeList = [];
       $scope.savedData = params.savedData;
@@ -40,14 +38,11 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
         countRecoWrapWidth();
       });
     }
-
-    $scope.recognizeListDep = [];
-
     $scope.searchStarted = false;
     $scope.currentProductId = userService.getAuthProduct().id;
     recentName = 'recent_' + userService.getProductId() + '_' + userService.getHotelId();
     //db = openDatabase('recent_search_db_2', '1.0', 'Recent Search', 2 * 1024 * 1024);
-    $scope.departmentName = '';
+    
     if (params['characteristic_id']) {
 
       var data = { 'characteristic_id[]': params['characteristic_id']
@@ -55,7 +50,6 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
                  };
       $scope.charSearch(data);
       $scope.searchStarted = true;
-      $scope.departmentName  =  params['characteristic_value'][0];
       page.changePageSettings({ back: true
                               , title: params['characteristic_value'][0]
                               });
@@ -73,7 +67,6 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
     }
     
     page.hideLoader();
-    page.toggleNoResults(false);
     loadRecent();
   });
   
@@ -88,23 +81,17 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
       page.hideLoader();
       if (result) {
         console.log(response);
-        $scope.departmentEmployeesCount = response.length;
         $scope.products = response;
         for (var i = 0, l = response.length; i < l; i++) {
           response[i]['productId'] = response[i].id;
           for (var n = 0, nn = $scope.recognizeList.length; n < nn; n++) {
             if ($scope.recognizeList[n].id*1 === response[i].id*1) {
               response[i] = $scope.recognizeList[n];
-              $scope.recognizeListDep.push($scope.recognizeList[n]);
-              $scope.addAllVisible = false;
             }
           }
         }
-        $timeout(function() {
-          countRecoWrapWidth();
-        },0,true);
         if (response.length < 1) {
-          page.toggleNoResults(true,'No results found.');
+          page.toggleNoResults(true,'No result found.');
           $scope.products = [];
         }
       }     
@@ -127,19 +114,9 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
       page.hideLoader();
     });
   };
+  
 
-  $scope.$on('clearSavedDataEvent',function(event){
-    $scope.recognizeList = [];
-    $scope.savedData = {};
-  });
-
-  $scope.$watchCollection('recognizeList', function(newval,oldval) {
-    $rootScope.$broadcast('recognizeListChanged',newval);
-  });
-  $scope.$watchCollection('savedData', function(newval,oldval) {
-    $rootScope.$broadcast('savedDataChanged',newval);
-  });
-
+  
   function onProductExpire(product) {
     network.get('product/'+product.id,{},function(result, response){
       if (result) {
@@ -161,7 +138,7 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
     network.get('product/',{filter: value},function(result,response){
       if (result) {
         if (response.length < 1) {
-          page.toggleNoResults(true,'No results found.');
+          page.toggleNoResults(true,'No result found.');
           $scope.products = [];
           return false;
         }
@@ -193,9 +170,23 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
   
   $scope.showProfile = function(product) {
     console.log('GO',product);
-    var id = product['from_product_id'] || product.id;
     document.getElementById('search-input').blur();
-    saveRecent(prepareProductDataForRecent(product));
+    var id = product['from_product_id'] || product.id;
+    
+    var data = { 'id': product.id
+               , 'name': product.name
+               , 'header_name': product.header_name
+               , 'image_url': product.image_url
+               };
+    if (product['from_product_id']) {
+      data = { 'id': product['from_product_id']
+             , 'name': product['from_product_name']
+             , 'header_name': product['from_product_header_name']
+             , 'image_url': product['from_product_image']
+             };
+    }
+    
+    saveRecent(data);
     page.show('profile',{productId: id});
   };
   
@@ -206,22 +197,7 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
                        };
     page.show('givePoints',product);
   };
-  function prepareProductDataForRecent(product){
-    var data = { 'id': product.id
-      , 'name': product.name
-      , 'header_name': product.header_name
-      , 'image_url': product.image_url
-    };
-    if (product['from_product_id']) {
-      data = { 'id': product['from_product_id']
-        , 'name': product['from_product_name']
-        , 'header_name': product['from_product_header_name']
-        , 'image_url': product['from_product_image']
-      };
-    }
-    return data;
-  };
-
+  
   function saveRecent(product) {
     product['updated_date'] = new Date().getTime();
     product.productId = product.id;
@@ -357,103 +333,46 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
   
   $scope.addToRecognizeList = function(product) {
     if (product.isAdded) return false;
-    if($scope.recognizeList.length>0){
-      var wrap = document.getElementById('search-reco-inner');
-      var wrapWidth = wrap.getBoundingClientRect().width;
-      wrap.style.width = (wrapWidth + app.emToPx(60)) + 'px';
-    }
+
+    var wrap = document.getElementById('search-reco-inner');
+    var wrapWidth = wrap.getBoundingClientRect().width;
+    wrap.style.width = (wrapWidth + app.emToPx(15)) + 'px';
     product.isAdded = true;
-    $scope.recognizeList.unshift(product);
-    if($scope.departmentName){
-      $scope.fillRecoDep();
-    }
-    $timeout(function(){
-        countRecoWrapWidth();
-    },0,true);
-    console.log($scope.recognizeList);
-    if($scope.searchStarted && config.ADD_TO_RECENT_SEARCH_SELECTED){
-      saveRecent(prepareProductDataForRecent(product));
-    }
     
+    $scope.recognizeList.unshift(product);
+    console.log($scope.recognizeList);
   };
+  
   $scope.removeFromRecognizeList = function(index) {
-    if(index !== false){
-      var foundedObj;
-      var wasFound = false;
-      var productsLength = $scope.products.length;
-      console.log(foundedObj);
-      delete $scope.recognizeList[index].isAdded;
-      $scope.recognizeList.splice(index,1);
-      if($scope.departmentName){
-        $scope.fillRecoDep();
-      }
-      /*
-            if(index>2){
-              var wrap = document.getElementById('search-reco-inner');
-              var wrapWidth = wrap.getBoundingClientRect().width;
-              wrap.style.width = (wrapWidth - app.emToPx(30)) + 'px';
-            }
-      */
-      $timeout(function() {
-        countRecoWrapWidth();
-      });
-    }
+    delete $scope.recognizeList[index].isAdded;
+    $scope.recognizeList.splice(index,1);
+    
+    var wrap = document.getElementById('search-reco-inner');
+    var wrapWidth = wrap.getBoundingClientRect().width;
+    wrap.style.width = (wrapWidth - app.emToPx(15)) + 'px';
+    
+    $timeout(function() {
+      countRecoWrapWidth();
+    });
   };
-
-  $scope.departmentFilter = function(tagArray,tagArrayIndex,inArray,tag,disabled) {
-    var found = $filter('listFilterByTag')(tagArray,tagArrayIndex,inArray,tag,disabled);
-    return found;
-  }
-
-  $scope.fillRecoDep = function(){
-    var recoDepTemp = [];
-    var productsLength = $scope.products.length;
-    for(var i = 0;i<productsLength;i++){
-      var filteredData = $scope.departmentFilter($scope.products,i,$scope.recognizeList,'id',false);
-      if(filteredData.data.length){
-        recoDepTemp.push($scope.recognizeList[filteredData.index]);
-      }
-    }
-    $scope.addAllVisible = !(recoDepTemp.length>0);
-    $scope.recognizeListDep = recoDepTemp;
-  }
-
-  $scope.getIndexAtRecognizeList = function(product){
-    var found = false;
-    if($scope.recognizeList.length>0){
-      for(var i=0;i<$scope.recognizeList.length;i++){
-        if($scope.recognizeList[i].id == product.id){
-          found = i;
-          break;
-        }
-      }
-    }
-    return found;
-  }
+  
   $scope.splitName = function(product) {
     var fullName = product.name || product.from_product_name;
-    fullName = fullName.replace(/\s\s+/g, ' ');
     var splitedName = fullName.split(' ');
     return $sce.trustAsHtml(splitedName[0] + '<br>' + splitedName[1]);
   };
   
   $scope.$on('searchRecognizeListRendered', function() {
-    $timeout(function(){
-      countRecoWrapWidth();
-    },0,true);
+    countRecoWrapWidth();
   });
   
   function countRecoWrapWidth() {
     var elements = document.getElementsByClassName('search-recognized');
-    var recognizedStripped = document.getElementsByClassName('searchs recognized stripped');
-    var recognizedStrippedWidth = 0;
     var wrap = document.getElementById('search-reco-inner');
     var scrollWrap = document.getElementById('search-reco-scroll');
     var width = 0;
-    if (recognizedStripped && recognizedStripped.length>0){
-      recognizedStrippedWidth = recognizedStripped[0].getBoundingClientRect().width;
-    }
-    if (elements.length < 2) {
+    
+    if (elements.length < 3) {
       wrap.style.width = innerWidth + 'px';
       return false;
     }
@@ -461,7 +380,6 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
     for (var i = 0, ii = elements.length; i < ii; i++) {
       width += elements[i].getBoundingClientRect().width;
     }
-    width+=recognizedStrippedWidth;
     if (width > innerWidth) {
       wrap.style.width = width + 'px';
     } else {
@@ -479,59 +397,7 @@ tol.controller('searchPage',['$scope','config','page','network','searchService',
     }
     return true;
   };
-
-  $scope.addAll = function(){
-    if($scope.products.length){
-      var recalculateWidthNeeded = false;
-      for(var i=0;i<$scope.products.length;i++){
-        if ($scope.products[i].isAdded) continue;
-        if ($scope.products[i].productId*1 === userService.getAuthProduct().id*1) {
-          continue;
-        }
-        if (!$scope.products[i].productId && $scope.products[i].id*1 === userService.getAuthProduct().id*1) {
-          continue;
-        }
-        if($scope.recognizeList.length>1){
-          var wrap = document.getElementById('search-reco-inner');
-          var wrapWidth = wrap.getBoundingClientRect().width;
-          wrap.style.width = (wrapWidth + app.emToPx(60)) + 'px';
-          recalculateWidthNeeded = true;
-        }
-        $scope.products[i].isAdded = true;
-        $scope.recognizeList.unshift($scope.products[i]);
-      }
-      if($scope.departmentName){
-        $scope.fillRecoDep();
-      }
-      if(recalculateWidthNeeded) {
-        $timeout(function() {
-           countRecoWrapWidth();
-        },0,true);
-      }
-    }
-  } ;
-
-  $scope.removeAll = function () {
-    $scope.addAllVisible = true;
-    var productsLength =$scope.products.length;
-    var recalculateWidthNeeded = false;
-    if( productsLength>0 && $scope.recognizeList.length>0){
-      for(var i=0;i<productsLength;i++){
-        var found = $scope.departmentFilter($scope.products,i,$scope.recognizeList,'id',false);
-        if(found.data.length>0){
-          delete $scope.products[i].isAdded;
-          $scope.recognizeList.splice(found.index,1);
-          recalculateWidthNeeded = true;
-        }
-      }
-      $scope.fillRecoDep();
-    }
-    if(recalculateWidthNeeded) {
-      $timeout(function() {
-        countRecoWrapWidth();
-      },0,true);
-    }
-  }
+    
     
 }]);
 

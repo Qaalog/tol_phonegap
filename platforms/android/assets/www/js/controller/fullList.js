@@ -1,4 +1,4 @@
-tol.controller('fullList',['$scope','page','network','userService','utils','config',function($scope, page,network,userService,utils,config){
+tol.controller('fullList',['$scope','page','network','userService',function($scope, page,network,userService){
    
   var settings = { name: 'fullList'
                  , search: true
@@ -11,110 +11,48 @@ tol.controller('fullList',['$scope','page','network','userService','utils','conf
   
   page.onShow(settings,function(params) {
     page.onRankingTabChange = onRankingTabChange;
-    page.setRankingTab(params.tab || {id:'this_month',title:'TODO tm'});
+    page.setRankingTab(params.tab || 'this month');
     $scope.params = params;
-    $scope.listIsNotEmpty = false;
   });
-
+  
+  
   $scope.getRankings = function(mode) {
-    var requestMode = 'month';
-    var range = false;
-    var currDate = new Date();
-    switch(mode){
-      case 'prev_month':
-        range = utils.getPrevMonthRange(currDate);
-        break;
-      case 'this_month':
-        range = utils.getCurrMonthRange(currDate);
-        break;
-      case 'prev_year':
-        requestMode = 'year';
-        range = utils.getPrevYearRange(currDate);
-        break;
-      case 'this_year':
-        requestMode = 'year';
-        range = utils.getCurrYearRange(currDate);
-        break;
-
-    }
-    var data = {
-      'mode': requestMode
-      , 'limit': 300
-      , 'offset': 0
-      , 'my_product_id': userService.getProductId()
-    };
-    if(range){
-      data.period = 'custom';
-      data.from_date = range.dateFrom;
-      data.to_date = range.dateTo;
-    }
+    var data = { 'mode': mode
+               , 'limit': 300
+               , 'offset': 0
+               , 'my_product_id': userService.getProductId()
+               };
     network.post('points_given/getLeaders',data,function(result, response) {
       page.hideLoader();
       if (result) {
         console.log(response);
         $scope.ranking = response.characteristics;
-        for (var i = $scope.ranking.length-1; i >= 0; i--) {
-          if (config.REMOVE_VALUE_PODIUMS && $scope.params.fromRankingTab.rate_type =='Best Giver' &&
-              ($scope.ranking[i].id !== 0 || $scope.ranking[i].rate_type !== 'Best Giver')) {
-            $scope.ranking.splice(i, 1);
-            continue;
-          }
+        
+        for (var i = $scope.ranking.length-1; i > 0; i--) {
           if ($scope.ranking[i].places.length < 1) {
             $scope.ranking.splice(i,1);
           }
         }
-        if (config.REMOVE_VALUE_PODIUMS) $scope.ranking.reverse();
-        var bestRecieverIndex = false;
-        if (config.REMOVE_VALUE_PODIUMS && $scope.params.fromRankingTab.rate_type =='Best Receiver'){
-          for (var i = $scope.ranking.length-1; i >= 0; i--) {
-            if ($scope.ranking[i].rate_type && $scope.ranking[i].rate_type == 'Best Receiver' ){
-              bestRecieverIndex = i;
-              break;
-            }
-          }
-        }
-        if (config.REMOVE_VALUE_PODIUMS && $scope.params.fromRankingTab.rate_type =='Best Giver' && $scope.ranking.length < 1){
-          $scope.listIsNotEmpty = false;
-          page.toggleNoResults(true, 'There is no data for this '+requestMode+'.', '#eaeaea',true);
+        if ($scope.ranking.length < 2) {
+          page.toggleNoResults(true, 'No result found.', '#eaeaea');
           return false;
-        } else if(config.REMOVE_VALUE_PODIUMS && $scope.params.fromRankingTab.rate_type !='Best Giver' && $scope.ranking.length < 2){
-          $scope.listIsNotEmpty = false;
-          page.toggleNoResults(true, 'There is no data for this '+requestMode+'.', '#eaeaea',true);
-          return false;
-        } else {
-          $scope.listIsNotEmpty = true;
         }
-        if(bestRecieverIndex){
-          $scope.changeRanking(bestRecieverIndex);
-        } else {
-          $scope.changeRanking($scope.params.category);
-        }
-        if(config.REMOVE_VALUE_PODIUMS && $scope.params.fromRankingTab.rate_type =='Best Giver'){
-          $scope.showPrevArrow = false;
-          $scope.showNextArrow = false;
-        }
+
+        $scope.changeRanking($scope.params.category);
       }
     });
   };
   
   function onRankingTabChange(tab) {
     page.toggleNoResults(false);
-    switch (tab.id) {
-      case 'this_month':
+    switch (tab) {
+      case 'this month':
         page.showLoader('.ranking-header','.footer-menu');
-        $scope.getRankings(tab.id);
+        $scope.getRankings('month');
         break;
-      case 'this_year':
+      case 'year to date':
         page.showLoader('.ranking-header','.footer-menu');
-        $scope.getRankings(tab.id);
-        break;
-      case 'prev_month':
-        page.showLoader('.ranking-header','.footer-menu');
-        $scope.getRankings(tab.id);
-        break;
-      case 'prev_year':
-        page.showLoader('.ranking-header','.footer-menu');
-        $scope.getRankings(tab.id);
+        $scope.getRankings('year');
         break;
     }
   };

@@ -1,5 +1,5 @@
-tol.controller('notification',['$scope', 'page', 'userService', 'feed', 'network', 'device', 'dialog','notification',
-  function($scope, page, userService, feed, network, device, dialog, notification){
+tol.controller('notification',['$scope', 'page', 'userService', 'feed', 'network', 'device', 'dialog','notification','$sce',
+  function($scope, page, userService, feed, network, device, dialog, notification,$sce){
     
   var settings = { name:  'notification'
                  , chart: true
@@ -10,6 +10,7 @@ tol.controller('notification',['$scope', 'page', 'userService', 'feed', 'network
   page.onShow(settings,function(params) {
     getNotifications();
     $scope.hotelName = userService.getHotelName();
+    $scope.selectedCatalog = userService.getCatalogSelected();
   });
   
   $scope.imgPrefix = network.servisePathPHP + 'GetResizedImage?i=';
@@ -74,9 +75,29 @@ tol.controller('notification',['$scope', 'page', 'userService', 'feed', 'network
     if (item.notification_type === 'BookingCom') {
       return 'img/icon_booking.svg';
     }
+    if ((item.notification_type && item.notification_type.toUpperCase() === 'CUSTOMPOST') || (item.auto_post_name && feed.AUTO_POSTS.indexOf(item.auto_post_name.toUpperCase())!==-1)) {
+        return $scope.selectedCatalog.image_url?$scope.imgPrefix + ($scope.selectedCatalog.image_url) + $scope.imgSuffix : 'img/icon_custom.svg';
+    }
     return (item.by_product_image) ? $scope.imgPrefix + item.by_product_image + $scope.imgSuffix : 'img/default-staff.png';
   };
 
+  $scope.prepareMessage = function(item){
+      text = item.notification_message?item.notification_message:'';
+      if(!text) return '';
+      if(item.auto_post_name && feed.AUTO_POSTS.indexOf(item.auto_post_name.toUpperCase())!==-1){
+          text = text.split('\\"').join('&quot;');
+          text = text.split("\\\\'").join('&lsquo;');
+          text = text.split('\\\\').join('\\');
+          if(item.by_product_name){
+              text = text.split('##user##').join('<span class="user-name">'+item.by_product_name+'</span>');
+          }
+          text = text.split('##user##').join('');
+          text = text.split('##').join('</br>');
+      } else {
+          text = '<span class="user-name">'+(item.by_product_name?item.by_product_name:'')+'</span>'+' '+item.notification_message;
+      }
+      return $sce.trustAsHtml(text);
+  }
 }]);
 
 

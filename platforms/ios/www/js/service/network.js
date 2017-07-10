@@ -124,7 +124,7 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
       
       case -1:
        console.log('activeRequests',activeRequests);
-       if (typeof activeRequests[path] !== 'undefined' && !activeRequests[path].canceled) {
+       if (!activeRequests[path].canceled) {
          console.log('no network');
          page.showNoConnection(function(){
            reTry(activeRequests[path].method, path, callback, params);
@@ -246,43 +246,7 @@ tol.service('network',['$http', 'page', 'config','$q','$timeout','$rootScope','u
             });
 
   };
-
-  $network.delete = function(methodName, params, callback, disableDefaultErrorHandler) {
-
-    callback = callback || function(){};
-
-    params = params || {};
-    $network.addAuth(params);
-
-    var path = $network.servisePathPHP + methodName;
-
-    activeRequests[path] = {method: 'delete', reGetTimeout: 1000};
-    setLastRequest('delete', path, callback, params);
-
-    var reqData = {'method': 'delete'
-                  , 'url': path
-                  , 'data':  params
-                  , timeout: CANCEL_TIMEOUT
-                  };
-
-    if (params.length) {
-      reqData.url = path + '?__appKey='+entityKey+'&__userKey='+userKey;
-    }
-
-    $http(reqData)
-            .success(function(result, status, headers) {
-              callback(true, result);
-            })
-            .error(function(data, status, headers, config, statusText) {
-              console.log(headers());
-              if (!disableDefaultErrorHandler) {
-                errorHandler(status, data, path, callback, params);
-                return true;
-              }
-              callback(false,data,status);
-            });
-  };
-
+  
   $network.put = function(methodName, params, callback, disableDefaultErrorHandler) {
     
     callback = callback || function(){};

@@ -54,8 +54,8 @@ tol.service('imageUpload',['userService','dialog', 'network',function(userServic
         , encodingType: Camera.EncodingType.JPEG
         , correctOrientation: true
         , allowEdit: true
-        , targetWidth: 0.3
-        , targetHeight: 0.3
+        , targetWidth: 0.5
+        , targetHeight: 0.5
         });
     } catch(e) {
       console.log(e);
@@ -70,8 +70,8 @@ tol.service('imageUpload',['userService','dialog', 'network',function(userServic
                  , encodingType: Camera.EncodingType.JPEG
                  , mediaType: Camera.MediaType.PICTURE
                  , correctOrientation: true
-                 , targetWidth: 0.3
-                 , targetHeight: 0.3
+                 , targetWidth: 0.5
+                 , targetHeight: 0.5
                  };
       if (allowEdit) {
         data.allowEdit = true;
@@ -186,17 +186,17 @@ tol.service('imageUpload',['userService','dialog', 'network',function(userServic
     
     if (parseTimerId) clearTimeout(parseTimerId);
     
-    if (/http.?:\/\/.+\..+/i.test(message)) {
+    if (/http.?:\/\/.+\..+/.test(message)) {
       onTake();
       parseTimerId = setTimeout(function() {
-        var url = /(http.?:\/\/.+\.[^\s]+)/i.exec(message)[1];
+        var url = /(http.?:\/\/.+\.[^\s]+)/.exec(message)[1];
         network.getOutside(url, {}, function(result, response) {
           
           if (result) {
             var ogImage = /<meta[^>]+property="og:image[^>]*"/i.exec(response);
             var ogDescriptionSrc = /<meta[^>]+"description[^>]*"/i.exec(response);
-            var host = /(http.?:\/\/)/i.exec(url)[1];
-            var link = url.replace(/http.?:\/\//i,'').replace(/\/.*/g,'');
+            var host = /(http.?:\/\/)/.exec(url)[1];
+            var link = url.replace(/http.?:\/\//,'').replace(/\/.*/g,'');
             if (ogDescriptionSrc) {
               
               var ogDescription = /description".+"([^"]+)/i.exec(ogDescriptionSrc);
@@ -227,7 +227,7 @@ tol.service('imageUpload',['userService','dialog', 'network',function(userServic
               }
 
               for (var i = 0, ii = imgs.length; i < ii; i++) {
-                if (/(http.?:\/\/[^"]+)/i.test(imgs[i])) {
+                if (/(http.?:\/\/[^"]+)/.test(imgs[i])) {
                   ogImage = [imgs[i]];
                 } else {
                   var src = /src="([^"]+)/i.exec(imgs[i]);

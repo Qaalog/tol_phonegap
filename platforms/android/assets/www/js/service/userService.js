@@ -52,7 +52,6 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
   
   $user.setAuthProduct = function(data) {
     storage.authProduct = data;
-    $rootScope.$broadcast('onAuthProductChanged',storage.authProduct);
   };
   
   $user.getAuthProduct = function() {
@@ -120,7 +119,7 @@ tol.service('userService',['$rootScope','page','config',function($rootScope,page
       var char = characteristics[i];
       
       if (char.short_name === 'role') {
-        if (!!char.long_name && char.long_name.toLowerCase() === 'manager' && char.value*1 === 1) {
+        if (char.long_name === 'Manager' && char.value*1 === 1) {
           $user.isAdmin = true;
           return true;
         }

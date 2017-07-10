@@ -8,7 +8,7 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
                , maxPages: 5
                , pagesToClean: 2
 */
-               , screensToTrigger: 1
+               , screensToTrigger: 1.4 //Load older posts dependency!!!!
                , updateInterval: 20     //in seconds
                };
                
@@ -56,7 +56,14 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
         page.hideLoader();
 
         intervalId = setInterval(getUpdatedFeed, config.updateInterval*1000);
-        analytics.timeEnd('Feed refresh speed');
+
+/*
+        analytics.trackCustomMetric(analytics.POINTS_GIVEN, 0,function(){
+          analytics.trackCustomMetric(analytics.POST_MADE, 0,function(){
+            analytics.timeEnd('Feed refresh speed');
+          });
+        });
+*/
       });
     } else {
       $timeout(function(){
@@ -126,6 +133,7 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
     if (device.isIOS()) {
       app.wrapper.addEventListener('scroll', iOSOnScrollHack);
     }
+    //container.removeEventListener('touchmove',calculate);
     container.addEventListener('touchmove',calculate);
     container.addEventListener('touchend',releaseLoaderLock);
   }
@@ -192,7 +200,6 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
   var timeoutId;
   
   function calculate(event) {
-
       if (scrollPos > app.wrapper.scrollTop) {//show button if new post has been posted somebody
         showBackButton();
       }
@@ -205,7 +212,7 @@ tol.service('pager',['network','userService','page','device','$timeout','analyti
 
 
       scrollPos = app.wrapper.scrollTop;
-
+      scrollHeight['feed'] = app.wrapper.scrollHeight;
       if (scrollPos >= scrollHeight[context] - (innerHeight*config.screensToTrigger) && !calculateFlag[context]) {
         calculateFlag[context] = true;
         showLoader();

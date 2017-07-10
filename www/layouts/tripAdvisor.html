@@ -9,7 +9,7 @@
         </div>
         <div data-class-binding="borderedUserTitle(feedItem)" class="{%scope.borderedUserTitle(feedItem)%}">
             <div class="feed-title">
-                <div class="user-name">New TripAdvisor comment</div>
+                <div class="user-name">{%feedItem.attachments[0].data.from?scope.getHtml(feedItem.attachments[0].data.from,false,true):(feedItem.attachments[0].data.rule_message?scope.getHtml(feedItem.attachments[0].data.rule_message):'New TripAdvisor comment')%}</div>
             </div>
             <div class="time-published">{% scope.getPostAge(feedItem)%} - {%scope.hotelName%}</div>
         </div>

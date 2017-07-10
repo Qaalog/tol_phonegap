@@ -18,12 +18,63 @@ function findParentElement(node, className) {
   return findParentElement(node.parentElement, className);
 }
 
+function ElRepeatIniter(window, list, callback) {
+    callback = callback || function(){};
+    var items = [], layouts = {}, itemsCount = list.length, counter = 0, linkNames = {};
+
+    function init(itemName) {
+        var http = new XMLHttpRequest();
+        http.open('GET', 'layouts/'+itemName+'.html', true);
+        http.onreadystatechange = function() {
+            if (http.readyState === 4) {
+                items.push(http.responseText);
+                itemsLoaded();
+            }
+        };
+        http.send();
+    }
+
+    function itemsLoaded() {
+        counter++;
+        if (itemsCount === counter) {
+            for (var i = 0, ii = items.length; i < ii; i++) {
+                var type = /data-type="([^"]+)/.exec(items[i])[1];
+                var linkName = /data-repeat="([^"]+)/.exec(items[i])[1];
+                layouts[type] = items[i];
+                linkNames[type] = linkName;
+            }
+            callback();
+        } else {
+            init(list[counter]);
+        }
+
+    }
+    init(list[0]);
+    window.ElRepeatIniter = {
+        get: function() {
+            console.log('layouts',layouts);
+        },
+
+        getLayout: function(type) {
+            return layouts[type];
+        },
+
+        getLinkName: function(type) {
+            return linkNames[type];
+        },
+        globalId: 1
+    };
+
+}
+
 var app = {
     wrapper: false,
     layouts: [ 'default'
              , 'multiRecognition'
              , 'tripAdvisor'
              , 'bookingCom'
+             , 'customPost'
+             , 'votePost'
              , 'url'
              , 'urlWrap'
              , 'pointsWrap'
@@ -34,6 +85,8 @@ var app = {
              , 'quoteUrlWrap'
              , 'extBookingWrap'
              , 'extTripAdvisorWrap'
+             , 'extCustomPostWrap'
+             , 'extVotePostWrap'
              ],
     languages: ['en','pt'],
     language: false,
@@ -62,6 +115,7 @@ var app = {
     },
     onDeviceReady: function() {
         console.log('deviceready');
+        app.isDesktop = false;
         var push = PushNotification.init({
             android: {
                 senderID: "723206060296",
@@ -92,7 +146,9 @@ var app = {
         //validateLanguages('pt');
         screen.lockOrientation('portrait');
         document.querySelector('.toast-message').style.display = ''; //  element hidden until angular will not bootstraped.
-        angular.bootstrap(document, ['qaalog']);
+        ElRepeatIniter(window, app.layouts,function(){
+            angular.bootstrap(document, ['qaalog']);
+        });
         window.open = cordova.InAppBrowser.open;
         openFB.init({appId: app.fbAppId});
         console.log(device);
@@ -327,7 +383,8 @@ if (navigator.userAgent.toLowerCase().indexOf('windows') > -1
         || navigator.userAgent.toLowerCase().indexOf('macintosh') > -1) {
   
   
-  
+  app.isDesktop = true;
+
   app.push = {//Test push 
     notification: {},
     on: function(key,fn) {
@@ -363,8 +420,9 @@ if (navigator.userAgent.toLowerCase().indexOf('windows') > -1
         var widget = XMLConfig.getElementsByTagName('widget')[0];
         app.version = widget.getAttribute('version');
         document.querySelector('.toast-message').style.display = ''; //  element hidden until angular will not bootstraped.
-        angular.bootstrap(document, ['qaalog']);
-        
+        ElRepeatIniter(window, app.layouts,function(){
+          angular.bootstrap(document, ['qaalog']);
+        });
       });
       
     });

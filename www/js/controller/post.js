@@ -116,14 +116,18 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
     $scope.isPostLoaderShow = false;
     page.setCheckBox('post_switcher',false);
     page.setCheckBox('other_can_share_switcher',false);
+    page.setCheckBox('send_notification_switcher',false);
     $scope.postToFB = (page.getSwitchState('post_switcher'))? 1 : 0;
     previewCanvas = document.getElementById('test_canvas');
     $scope.otherCanShare = (page.getSwitchState('other_can_share_switcher')) ? 1 : 0;
-    
+    $scope.sendNotification = (page.getSwitchState('send_notification_switcher')) ? 1 : 0;
     header.togglePost(false);
     header.save = postNow;
     $scope.userAvatar = userService.getAvatar();
-
+    $scope.hideSendNotification = true;
+    if(userService.checkForAdmin(userService.getAuthProduct().characteristics)){
+        $scope.hideSendNotification = false;
+    }
     page.hideLoader();
     $scope.isEdit = (params.editItem) ? true : false;
 
@@ -136,9 +140,13 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
                               , tabs:  true
                               , post: true
                               });
+
+      $scope.postBody.message = params.editItem.message?params.editItem.message.replace(/<br>/gim,''):'';
+      $scope.postBody.message = $scope.postBody.message.split('\\"').join('"');
+      $scope.postBody.message = $scope.postBody.message.split('\\\\').join('\\');
+
       console.log(params.editItem.$$element);
       var img = params.editItem.$$element.querySelector('.main_image');
-
       $timeout(function(){
         if(img){
           imageUpload.rotate(previewCanvas, img, '#post_preview_wrap', 0);
@@ -148,7 +156,6 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
 
       });
       
-      $scope.postBody.message = params.editItem.message?params.editItem.message.replace(/<br>/gim,''):'';
       header.switchPost(header.SAVE);
       $scope.validatePost();
       var fileInput = document.getElementById('file_selector_input');
@@ -233,6 +240,7 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
     page.toggleCheckBox(event);
     $scope.postToFB = page.getSwitchState('post_switcher');
     $scope.otherCanShare = (page.getSwitchState('other_can_share_switcher')) ? 1 : 0;
+    $scope.sendNotification = (page.getSwitchState('send_notification_switcher')) ? 1 : 0;
   };
   
   function cleanPostBody() {
@@ -272,7 +280,7 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
             console.log('send',result, response);
             cleanPostBody();
 
-            //TODO add after sprint 6
+            //TODO add after sprint 6 -
             if(createdItem && createdItem.id){
               var data = {
                 'id': createdItem.id
@@ -323,7 +331,15 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
       $scope.postBody.message = $scope.postBody.message.replace(/<.*>/gim,'');
       $scope.postBody.message = $scope.postBody.message.replace(/^/gim,'<br>');
       $scope.postBody.message = $scope.postBody.message.replace(/<br>/,'');
+      $scope.postBody.message = $scope.postBody.message.replace(/\\+$/,'');
+
       $scope.postBody.can_share = $scope.otherCanShare;
+      if($scope.sendNotification){
+          $scope.postBody.send_push = $scope.sendNotification;
+          $scope.postBody.post_type_id = feed.NORMAL_POST_WITH_PUSH;//To show this post in notification feed for Oleg
+      } else {
+        delete $scope.postBody.send_push;
+      }
       console.log($scope.postBody.message);
 
       if ($scope.params.editItem) {
@@ -332,6 +348,12 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
           , status_id: feed.EDITED_POST
           , update_reason: '<strong data-touch=showProfile('+userService.getAuthProduct().id+')>' +userService.getAuthProduct().name + '</strong>' +' edited post message'
         };
+        if($scope.sendNotification){
+            postData['send_push'] = $scope.sendNotification;
+            $scope.postBody.post_type_id = feed.NORMAL_POST_WITH_PUSH;//To show this post in notification feed for Oleg
+        } else {
+          delete postData['send_push'];
+        }
         var item = $scope.params.editItem;
         network.post('post/'+item.id,postData,function(result, response){
           if (result) {
@@ -362,7 +384,7 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
         openFB.getLoginStatus(function(status) {
           if (status.status !== 'connected') {
             localStorage.removeItem('do_not_link'+userService.getUser().id);
-            page.showForResult('facebookLink',{},function(result){
+            page.showForResult('facebookLink',{firstLogin:true},function(result){
               page.showLoader();
               if (result) {
                 doPostToFb(data);
@@ -389,23 +411,33 @@ tol.controller('post',['$scope','$timeout','page','network','facebook','device',
     analytics.time('Post speed');
     if ($scope.postBody.media_url) {
       params.post_type_id = feed.URL_POST;
+      if($scope.postBody.send_push ==1){
+          params.post_type_id = feed.URL_POST_WITH_PUSH;
+      }
       postType = 'URL post';
       delete params['media_data'];
     }
     network.put('post',params,function(result, response){
       if (result) {
         cleanPostBody();
-        analytics.trackCustomDimension(analytics.POST_TYPE, postType);
-        analytics.trackCustomMetric(analytics.POST_MADE, 1);
-        analytics.trackEvent([ 'DO IT button on post'
-                             , postType
-                             , 1
-                             ]);
-        
         console.log(response);
         page.show(app.mainPage);
-        
-        analytics.timeEnd('Post speed');
+        $timeout(function(){
+          analytics.trackCustomDimension(analytics.POST_TYPE, postType,function(){
+            analytics.trackCustomMetric(analytics.POST_MADE, 1,function(){
+              analytics.trackEvent([ 'DO IT button on post'
+                , postType
+                , 1
+              ],false,function(){
+                analytics.trackCustomDimension(analytics.POST_TYPE, '',function(){
+                  analytics.trackCustomMetric(analytics.POST_MADE, 0,function(){
+                    analytics.timeEnd('Post speed');
+                  });
+                });
+              });
+            });
+          });
+        },1500);
       }
     });
   }

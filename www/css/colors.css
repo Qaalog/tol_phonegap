@@ -60,11 +60,11 @@
 .first-place-col .stand {background: #d3d3d3;}
 .rotate .t-icon_arrow_rotate {background: rgba(255,255,255,0.8);}
 .login-icons .icon-facebook {background: #2626a3;}
-.number-wrap,
-.footer-menu .inner .icon-notify {background: #ef3535;}
+.number-wrap {background: #ef3535;}
 .recognized .add-wrap {background: #e2efdf;}
 .recognized .remove {background: #939393;}
 .comment .user-posted .img-inner-wrap {background: #13bc57;}
+.comment .user-posted .img-inner-wrap.custom {background: #ffffff;}
 .comment .title-points .comment-points {background: #52b055;}
 .comment-part .minus {background: #ef0839;}
 .image-lightbox {background: rgba(0,0,0,0.9);}
@@ -72,7 +72,9 @@
 
 /* Colors */
 .give,
+.doit,
 .title,
+.post-now,
 .reco-btn,
 .org-icon,
 .table-head,
@@ -88,6 +90,7 @@
 .logo-second-part,
 .place-col .place,
 .to-remember-label,
+.custom-post-phrase,
 .post-box .you-gave,
 .add-recognized .add,
 .catalog-title .arrow,
@@ -171,15 +174,11 @@
 .tab-title, 
 .config-title {color: #aaa;}
 .save,
-.doit,
 .back,
 .cancel,
-.post-now,
 .small-back {color: #c1e5be;}
-.doit.disabled,
 .save.disabled,
-.cancel.disabled,
-.post-now.disabled {color: #218e21;}
+.cancel.disabled {color: #218e21;}
 .info-row,
 .info-row a,
 .hints .white-box-desc {color: #333;}
@@ -198,6 +197,7 @@
 .info-row .phone,
 .info-row .email,
 .ranking-stand .name,
+.what-is-this,
 .recognized.add .text {color: #198e19;}
 .comment-text,
 .points-box .you-have,
@@ -287,3 +287,5 @@
   color: #50b052;
   border-color: #e6e6e6;
 }
+.doit.disabled,
+.post-now.disabled {color: #73c072;}

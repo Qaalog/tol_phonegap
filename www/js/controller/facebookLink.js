@@ -62,24 +62,28 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','u
       calculateTopMargin();
     });
     $scope.onResult = false;
-    openFB.getLoginStatus(function(status) {
-      if (status.status === 'connected') {
-        if (checkTokenExpireDate()) {
-          facebook.loadName();
-          page.show('catalog',$scope.params);
+    if(params.firstLogin){
+      openFB.getLoginStatus(function(status) {
+        if (status.status === 'connected') {
+          if (checkTokenExpireDate()) {
+            facebook.loadName();
+            page.show('catalog',$scope.params);
+          } else {
+            page.hideLoader();
+          }
         } else {
-          page.hideLoader();
-        }
-      } else {
 //        var doNotLink = localStorage.getItem('do_not_link'+userService.getUser().id);
 //        if (doNotLink) {
 //           page.show('catalog',$scope.params);
 //           return false;
 //        }
-        page.hideLoader();
-      }
-    });
-    
+          page.hideLoader();
+        }
+      });
+    } else {
+      page.show('catalog',$scope.params);
+    }
+
   });
   
   page.onRequestResult(settings,function(params,onResult) {
@@ -152,9 +156,9 @@ tol.controller('facebookLink',['$scope','page','config','$timeout','facebook','u
       if (result) {
         var parsedResponse = /access_token=(.*)&expires=(.*)/.exec(response);
         localStorage.removeItem('do_not_link'+userService.getUser().id);
-        localStorage.setItem('fbAccessToken',parsedResponse[1]);
-        localStorage.setItem('fbAccessToken'+userService.getUser().id,parsedResponse[1]);
-        localStorage.setItem('fbTokenExpire'+userService.getUser().id, new Date().getTime() + (parsedResponse[2]*1000) );
+        localStorage.setItem('fbAccessToken',response.access_token);
+        localStorage.setItem('fbAccessToken'+userService.getUser().id,response.access_token);
+        localStorage.setItem('fbTokenExpire'+userService.getUser().id, new Date().getTime() + (response.expires_in*1000) );
         callback();
         return true;
       } else {

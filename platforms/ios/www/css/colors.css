@@ -2,8 +2,8 @@
 .color-scheme {background: rgba(24,154,34,0.7);}
 .caption,
 .feed-box,
-.post-tabs,
 .chart-title,
+.cat-box.active,
 .img-inner-wrap,
 .white-box-input,
 .write-post-text,
@@ -12,18 +12,14 @@
 .linked .image-title,
 .opened .catalog-title,
 .custom-checkbox .switcher,
-.add-recognized .add.added,
 .login-icons .t-icon_link_fb,
-.feed-on-u-mind .profile-user,
-.notification-wrap .user-posted,
-.chart-row.opened > .chart-title {background: #fff;}
+.notification-wrap .user-posted {background: #fff;}
 .notification-wrap .user-posted.latest {background: #ebfceb;}
 .header,
 .statusbar {background: #50b052;}
 /*.no-results,*/
 .content-wrapper,
-.no-result-wrap,
-.feed-on-u-mind {background: #eaeaea;}
+.no-result-wrap {background: #eaeaea;}
 .catalog-title {background: #309737;}
 .popup-block,
 .popup-message,
@@ -33,15 +29,13 @@
 .white-box,
 .footer-menu,
 .profile-header,
-.ranking-header,
-.footer-menu .inner {background: #fafafa;}
+.ranking-header {background: #fafafa;}
 .post-box .you-gave {background: #1572b8;}
 .login-input {background: #a4dda4;}
 .custom-checkbox {background: #969696;}
 .custom-checkbox.checked {background: #004C02;}
 .search {background: #a7d1a2;}
-.cat-box.active,
-.points-col.active .inner,
+.tab-title.active:after,
 .share .custom-checkbox.checked {background: #4eb051;}
 .table-head {background: #2e9737;}
 .table-wrap,
@@ -49,26 +43,22 @@
 .full-list .table-wrap:nth-child(odd) {background: #f8f8f8;}
 .full-list .table-wrap,
 .table-wrap:nth-child(odd) {background: #f1f1f1;}
-/*.add-photo {background: #ddd;}*/
-/*.dropdown .dropdown .chart-title {background: #f2f2f2;}*/
+.add-photo {background: #ddd;}
+.dropdown .dropdown .chart-title {background: #f2f2f2;}
 .cat-box,
 .example-btn,
-.points-col .inner,
 .give-points-box .write-post-text:disabled {background: #f4f4f4;}
 .third-place-col .stand,
 .second-place-col .stand {background: #c9caca;}
 .first-place-col .stand {background: #d3d3d3;}
 .rotate .t-icon_arrow_rotate {background: rgba(255,255,255,0.8);}
 .login-icons .icon-facebook {background: #2626a3;}
-.number-wrap,
-.footer-menu .inner .icon-notify {background: #ef3535;}
+.number-wrap {background: #ef3535;}
 .recognized .add-wrap {background: #e2efdf;}
 .recognized .remove {background: #939393;}
 .comment .user-posted .img-inner-wrap {background: #13bc57;}
 .comment .title-points .comment-points {background: #52b055;}
 .comment-part .minus {background: #ef0839;}
-.image-lightbox {background: rgba(0,0,0,0.9);}
-.add-recognized .add {background: #2db0ea;}
 
 /* Colors */
 .give,
@@ -80,7 +70,6 @@
 .login-title,
 .fb-dont-link,
 .login-submit,
-.toast-message,
 .catalog-title,
 .number-notific,
 .forgot-pass-btn,
@@ -89,22 +78,17 @@
 .place-col .place,
 .to-remember-label,
 .post-box .you-gave,
-.add-recognized .add,
+.lightbox-wrap .close,
 .catalog-title .arrow,
-.cat-box.active .cat-icon,
-.cat-box.active .cat-name,
 .recognized .remove:before,
 .login-icons .t-icon_point,
 .login-icons .icon-facebook,
-.points-col.active .points-name,
-.points-col.active .t-icon_point,
-.points-col.active .points-number,
+.toast-message,
 .comment .title-points .comment-points {color: #fff;}
 .logo,
 .black,
 .search,
 .points-name,
-.add-photo-btn,
 .no-result-text,
 .refresh-connect,
 .add-photo-btn.active,
@@ -124,11 +108,11 @@
 .light-btn,
 .white-box-title,
 .light-btn .inner-btn:before {color: #4dae51;}
-.fb-share.tapped,
-.tab-title.shared-tab.active,
-.post-info .fb-share.tapped .t-icon_link_fb {color: #2d398a;}
+.post-info .points .t-icon_point {color: #51af51;}
+.post-info .fb-share .t-icon_link_fb {color: #2d398a;}
 .needs-to,
 .whats-new,
+.add-photo-btn,
 .full-list .job,
 .white-box-input,
 .comment .author .place,
@@ -136,10 +120,11 @@
 .recognition-wrap .intro,
 .linked-quote .image-title,
 .category .cat-description,
+.cat-box.disabled .cat-name,
 .add-photo .add-photo-label,
 .category .cat-organisation,
 .profile-user .user-position,
-.points-block .points-number,
+.points-col.disabled .points-name,
 .white-box-input::-webkit-input-placeholder,
 .write-post-text::-webkit-input-placeholder,
 .change-pass-input::-webkit-input-placeholder {color: #969696;}
@@ -150,26 +135,22 @@
 .user-menu {color: #a4a3a3;}
 .post-info,
 .user-title,
-.employee-number,
 .person-title .user-position,
-.feed-on-u-mind .profile-title,
 .quote-wrap .user-title .user-name {color: #8b8b8b;}
 .org-icon.active {color: #006800;}
 .to-next-lvl,
+.cat-box .cat-icon,
 .level .t-icon_level,
 .example-btn .inner-btn:before {color: #a0a0a0;}
 .full-list-btn,
 .tab-title.active,
-.cat-box .cat-icon,
-.points-col .t-icon_point,
 .level .t-icon_level.done,
 .add-recognized .icon-plus,
 .rotate .t-icon_arrow_rotate,
 .refresh-connect .t-icon_refresh,
 .add-photo-btn.active .t-icon_photo,
-.add-photo-btn .t-icon_photo {color: #4eb051;}
-.tab-title, 
-.config-title {color: #aaa;}
+.add-photo .add-photo-btn .t-icon_photo {color: #4eb051;}
+.tab-title, .config-title {color: #aaa;}
 .save,
 .doit,
 .back,
@@ -187,33 +168,26 @@
 .linked .link,
 .caption-link,
 .info-row .icon,
-.chart-title .icon,
 .comment-part .plus,
 .comment .star.tapped,
 .comment .author .name,
-/*.post-info .points.tapped,*/
-.chart-title .t-icon_account,
-.chart-row.opened > .chart-title {color: #52b055;}
-.show-full,
+.chart-title .t-icon_folder {color: #52b055;}
 .info-row .phone,
 .info-row .email,
+.add-recognized .add,
 .ranking-stand .name,
-.recognized.add .text {color: #198e19;}
+.recognized.add .text,
+.points-col.active .points-name {color: #198e19;}
 .comment-text,
-.points-box .you-have,
 .ranking-stand .points-number {color: #787878;}
-.points-block,
-.cat-box.disabled .cat-icon,
-.post-info .likes.disabled,
-.post-info .points.disabled,
-.post-info .fb-share.disabled,
-.points-col.disabled .t-icon_point,
-.post-info .likes.disabled .t-icon_like,
-.post-info .points.disabled .t-icon_point,
-.post-info .fb-share.disabled .t-icon_link_fb {color: #bababa;}
+.chart-title .t-icon_users {color: #c9c9c9;}
+.points-block {color: #bababa;}
 .points-block .on {color: #797979;}
-/*.add-photo-btn .t-icon_photo {color: #d3d3d3;}*/
-/*.cat-box.active .cat-icon {color: #4faf51;}*/
+.cat-box.disabled .cat-icon,
+.add-photo-btn .t-icon_photo,
+.points-col.disabled .t-icon_point {color: #d3d3d3;}
+.cat-box.active .cat-icon,
+.points-col.active .t-icon_point {color: #4faf51;}
 .write-post-text:disabled::-webkit-input-placeholder {color: #bebebe;}
 .login-input {color: #005600;}
 .error-msg {color: #f20a37;}
@@ -223,15 +197,6 @@
 .quote-wrap .quote-icon {color: #cecece;}
 .recognized .add-wrap .plus-icon {color: #add8ac;}
 .comment .star {color: #c6e2c3;}
-.has-points,
-.post-info .points.tapped,
-.tab-title.recognized-tab.active,
-.post-info .points.tapped .t-icon_point {color: #3bade3;}
-.post-info .likes.tapped,
-.tab-title.liked-tab.active {color: #c10e3d;}
-.lightbox-wrap .close {color: #b3b3b3;}
-.add-recognized .add.added {color: #2db0ea;}
-.blue {color: #1572b8!important;}
 
 /* Border Colors */
 .header {border-color: #2d872d;}
@@ -242,8 +207,7 @@
 .light-btn,
 .two-light-btns .light-btn {border-color: #c9c9c9;}
 .subtable,
-.white-box-input,
-.chart-title .t-icon_account {border-color: #eaeaea;}
+.white-box-input {border-color: #eaeaea;}
 .user-title,
 .tab-header,
 .points-wrap {border-color: #e6e6e6;}
@@ -251,20 +215,14 @@
 .person-found {border-color: #dcdcdc;}
 .post-box .you-gave:after {border-bottom-color: #1572b8;}
 .post-box .you-gave:before {border-top-color: #1572b8;}
-.tab-title.active,
 .full-list-btn {border-color: #4eb051;}
 .full-list .table-head .table-col {border-color: #97cb9b;}
-.footer-menu,
-.footer-menu .inner {border-color: #d6d6d6;}
+.footer-menu {border-color: #ebebeb;}
 .custom-checkbox {border-color: #969696;}
 .custom-checkbox.checked {border-color: #004C02;}
 .share .custom-checkbox.checked {border-color: #4eb051;}
 .whats-new {border-color: #c4c4c4;}
 .quote-wrap .feed-box {border-color: #c3c3c3;}
-.has-points-box.reco {border-color: #bababa;}
-.recognized-tab.active {border-color: #3bade3;}
-.liked-tab.active {border-color: #c10e3d;}
-.shared-tab.active {border-color: #2d398a;}
 
 /* Combinations */
 .give,
@@ -274,9 +232,6 @@
 }
 .loader {
 	background-color: #eaeaea;
-	background-image: url(../img/tol_loader_gr_wh.gif);
-}
-.feed-loader .spinner {
 	background-image: url(../img/tol_loader_gr_wh.gif);
 }
 .no-connection {

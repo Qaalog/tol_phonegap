@@ -1,0 +1,24 @@
+<div class="privacy-page fixed-screen">
+	<div class="privacy-white-box text-center">
+		<h1 id="privacyTitle" class="white-box-title">Read and accept TeamOutLoud Terms of Use and Privacy Policy before continuing</h1>
+		<div class="privacy-white-box-desc" id="privacyDesc">
+			<div class="privacy-white-box-content" ng-style="framesStyle">
+				<iframe id="termsFrame" scrolling="no" width="100%" ng-src="{{termsUrl}}" ng-style="termsFrameStyle" iframe-onload="iframeLoaded(event)"></iframe>
+				<iframe id="privacyFrame" scrolling="no" width="100%" ng-src="{{privacyUrl}}" ng-style="privacyFrameStyle" iframe-onload="iframeLoaded(event)"></iframe>
+			</div>
+		</div>
+		<button id="privacyButton" ng-fast-touch="acceptClick();" class="light-btn text-center">Accept and continue</button>
+	</div>
+</div>
+
+<!--
+<div class="privacy-page fixed-screen">
+<div class="text-center">
+	<h2>Read and accept TeamOutLoud Terms of Use</h2>
+	<h2>and Privacy Policy before continuing</h2>
+	<div class="privacy-iframe-container">
+		<div ng-bind-html="privacyContent"></div>
+	</div>
+</div>
+</div>
+-->

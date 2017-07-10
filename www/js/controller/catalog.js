@@ -104,8 +104,11 @@ tol.controller('catalog', ['$rootScope','$scope','network', 'page', 'config', 'd
             userService.setAvatar(response[0].image_url);
             userService.normalizeOrgLevels(response[0].characteristics);
             var isAdmin = userService.checkForAdmin(response[0].characteristics);
+            var canEditAllPost = userService.checkCanEditAllPosts(response[0].characteristics);
             if (isAdmin) {
-              analytics.trackCustomDimension(analytics.USER_TYPE, 'Manager');
+                analytics.trackCustomDimension(analytics.USER_TYPE, 'Manager');
+            } else if(canEditAllPost){
+                analytics.trackCustomDimension(analytics.USER_TYPE, 'Admin');
             } else {
               analytics.trackCustomDimension(analytics.USER_TYPE, 'Employee');
             }
@@ -145,9 +148,10 @@ tol.controller('catalog', ['$rootScope','$scope','network', 'page', 'config', 'd
 
     $scope.selectCatalog = function(catalog) {
       page.showLoader();
+      $rootScope.$broadcast('clearSavedDataEvent');
       userService.setHotelName(catalog.name);
       userService.setHotelId(catalog.id);
-
+      userService.setCatalogSelected(catalog);
       network.post('entity_catalog/CatalogProductExist',{'catalog_id': catalog.id, 'product_code':$scope.user.username}, 
         function(result, response) {
           
@@ -157,9 +161,14 @@ tol.controller('catalog', ['$rootScope','$scope','network', 'page', 'config', 'd
             network.pagerReset();
             network.post('user/'+$scope.user['id'],{catalog_id: catalog.id, entity_id: catalog.entity_id},function(result, response){
               if (result) {
+                userService.setUserId(response.id);
+                userService.setUser(response);
+                userService.setUserCode(response.username);
                 analytics.trackCustomDimension(analytics.CATALOG, catalog.name);
                 analytics.trackCustomDimension(analytics.ENTITY, catalog.entity_name);
-                getProductId();
+                network.get('logout',{},function(result,response){
+                  getProductId();
+                });
               }
             });
             return true;

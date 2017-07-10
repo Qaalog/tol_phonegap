@@ -4,7 +4,7 @@
     <div class="image-title">{%scope.getHtml(feedItem.attachments[0].data.title)%}</div>
     <div style="height: 15em; position: relative"
          data-image-loader="img/tol_loader_gray_128.gif">
-      <!--       <div class="you-gave"
+      <!--       <div cass="you-gave"
               data-binding="getYouGave(feedItem)"
               data-show="{ % feedItem['my_points'] && !feedItem['my_points'] == 0 % }">
               {%scope.getYouGave(feedItem)%}
@@ -15,7 +15,7 @@
                  data-show="{ % (!feedItem.my_points && !scope.isProductOneOfProductList(feedItem.to_product_list) ) % }">
               <span class="t-icon_point"></span>Give
             </div>-->
-    <img data-src="{% scope.imgResizedPrefix + feedItem.media_url + scope.imgResizedSuffix%}" alt="" class="img main_image" data-touch="showPostDetails(feedItem)">
+    <img data-src="{% scope.imgResizedPrefix + encodeURIComponent(feedItem.media_url) + scope.imgResizedSuffix%}" alt="" class="img main_image" data-touch="showPostDetails(feedItem)">
     </div>
     <div class="image-link" data-touch="goToLink(feedItem.attachments[0].data.href)"><a href="javascript:;" class="link">{%feedItem.attachments[0].data.link%}</a></div>
   </div>
